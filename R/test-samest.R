@@ -40,7 +40,7 @@ obj_simple <- MakeADFun(SRdata,parameters_simple,DLL="Ricker_simple")
 
 fit1 <- stan(
   file = "src/ricker_linear.stan",  # Stan program
-  data = df,    # named list of data
+  data = datm,    # named list of data
   chains = 4,             # number of Markov chains
   warmup = 1000,          # number of warmup iterations per chain
   iter = 2000,            # total number of iterations per chain
