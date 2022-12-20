@@ -1,9 +1,10 @@
 
 
-install.packages(TMB)
-install.packages(rstan)
+install.packages("TMB")
+install.packages("rstan")
 
-
+library(TMB)
+library(rstan)
 
 
 
@@ -15,21 +16,17 @@ dyn.load(dynlib("src/Ricker_simple"))
 
 
 
-
-
-## Store relevant object names to help run simulation 
-scenNames <- unique(simPar$scenario)
-dirNames <- sapply(scenNames, function(x) paste(x, unique(simPar$species),sep = "_"))
-
-
-
 parameters_simple<- list(
-    alpha=srm$coefficients[1],
-    logbeta = log(ifelse(-srm$coefficients[2]<0,1e-08,-srm$coefficients[2])),
+    alpha=1.5,
+    logbeta = log(1e-08),
     logsigobs=log(.4)
     )
 
-  obj_simple <- MakeADFun(SRdata,parameters_simple,DLL="Ricker_simple")
+SRData<-list(obs_S=df$S,
+    obs_logRS=df$logRS,
+    priors=1)
+
+obj_simple <- MakeADFun(SRdata,parameters_simple,DLL="Ricker_simple")
   newtonOption(obj_simple, smartsearch=FALSE)
 
   opt_simple <- nlminb(obj_simple$par,obj_simple$fn,obj_simple$gr)
