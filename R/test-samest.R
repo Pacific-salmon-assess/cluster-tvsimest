@@ -22,7 +22,7 @@ parameters_simple<- list(
     logsigobs=log(.4)
     )
 
-SRData<-list(obs_S=df$S,
+SRdata<-list(obs_S=df$S,
     obs_logRS=df$logRS,
     priors=1)
 
