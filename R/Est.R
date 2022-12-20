@@ -37,7 +37,7 @@ options(mc.cores = parallel::detectCores())
 ## Load relevant input data
 # Simulation run parameters describing different scenarios
 #simPar <- read.csv("../data/samsimIFcoho/cohoSimPars_test.csv")
-simPar <- read.csv("data/HarCk/harcnkSimPars.csv")
+simPar <- read.csv("data/harcnkSimPars.csv")
 
 ## Store relevant object names to help run simulation 
 scenNames <- unique(simPar$scenario)
@@ -67,7 +67,7 @@ allsimest<-list()
 
 #for(a in seq_len(nrow(simPar))){
 for(a in 5:11){
-  #a<-2
+  #a<-1
   simData[[a]] <- readRDS(paste0("outs/SamSimOutputs/simData/", simPar$nameOM[a],"/",simPar$scenario[a],"/",
                          paste(simPar$nameOM[a],"_", simPar$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
   
@@ -85,7 +85,8 @@ for(a in 5:11){
                     S=dat$obsSpawners,
                     R=dat$obsRecruits,
                     logRS=log(dat$obsRecruits/dat$obsSpawners))
- 
+    write.csv(df,file="data/examplesr.csv", row.names = FALSE,
+            col.names = TRUE)
 
     p <- ricker_TMB(data=df)
     pac <- ricker_TMB(data=df, AC=TRUE)
