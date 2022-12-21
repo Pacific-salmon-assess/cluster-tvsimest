@@ -5,7 +5,7 @@ install.packages("rstan")
 
 library(TMB)
 library(rstan)
-
+library(samEst)
 
 
 df <- read.csv("data/examplesr.csv")
@@ -49,3 +49,12 @@ fit1 <- stan(
   )
 
 
+dat <- data.frame(by=df$by,
+                  S=df$S,
+                  R=df$r,
+                  logRS=df$logRS)
+
+
+p <- ricker_TMB(data=dat)
+
+b <- ricker_stan(data=dat,iter = 800, mod=simple_mod)
