@@ -2,6 +2,8 @@
 
 install.packages("TMB")
 install.packages("rstan")
+remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
+
 
 library(TMB)
 library(rstan)
