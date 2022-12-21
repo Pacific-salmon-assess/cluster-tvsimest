@@ -7,6 +7,8 @@
 #=============================================================
 
 
+#remotes::install_github("stan-dev/rstan", ref = "develop", subdir = "rstan/rstan")
+#
 #
 # run these if first time running script or if updates were implemented. 
 
@@ -20,7 +22,7 @@
 library(samEst)
 library(samSim)
 library(ggplot2)
-library(devtools)
+
 library(gridExtra)
 library(dplyr)
 library(here)
@@ -45,7 +47,7 @@ dirNames <- sapply(scenNames, function(x) paste(x, unique(simPar$species),sep = 
 
 ## First check to ensure that a single scenario can be run (only a small number
 # of trials necessary)
-plotscn <- TRUE
+
 p <- list()
 simData <- list()
 
@@ -85,8 +87,8 @@ for(a in 5:11){
                     S=dat$obsSpawners,
                     R=dat$obsRecruits,
                     logRS=log(dat$obsRecruits/dat$obsSpawners))
-    write.csv(df,file="data/examplesr.csv", row.names = FALSE,
-            col.names = TRUE)
+    #write.csv(df,file="data/examplesr.csv", row.names = FALSE,
+    #        col.names = TRUE)
 
     p <- ricker_TMB(data=df)
     pac <- ricker_TMB(data=df, AC=TRUE)
