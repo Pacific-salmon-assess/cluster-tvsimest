@@ -5,6 +5,8 @@ simPars <- read.csv("data/harcnkSimPars.csv")
 save(simPars, file = "data/harcnkSimPars.RData")
 
 
+
+
 test_func <- function(path=".",a, u) {
   
   simData <- list()  
