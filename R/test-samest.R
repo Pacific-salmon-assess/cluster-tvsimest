@@ -1,9 +1,10 @@
 
 
+
 install.packages("TMB")
 #install.packages("rstan")
-remotes::install_github("stan-dev/rstan", ref = "develop", subdir = "rstan/rstan")
-remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
+remotes::install_github("stan-dev/rstan", ref = "develop", subdir = "rstan/rstan", lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE, lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 
 
 library(TMB)
