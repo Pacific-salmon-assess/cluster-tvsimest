@@ -1,7 +1,9 @@
 
 
 
-install.packages("TMB")
+install.packages("TMB",lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+install.packages("gsl",lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+
 #install.packages("rstan")
 remotes::install_github("stan-dev/rstan", ref = "develop", subdir = "rstan/rstan", lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE, lib="/fs/vnas_Hdfo/comda/caw001/Rlib")

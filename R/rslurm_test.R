@@ -1,4 +1,5 @@
 library(rslurm)
+library(samEst)
 
 
 simPars <- read.csv("data/harcnkSimPars.csv")
