@@ -1,10 +1,10 @@
 library(rslurm)
-library(samEst)
+library(samEst,lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 
 
-simPars <- read.csv("data/harcnkSimPars.csv")
-save(simPars, file = "data/harcnkSimPars.RData")
-
+#simPars <- read.csv("data/harcnkSimPars.csv")
+#save(simPars, file = "data/harcnkSimPars.RData")
+#load("data/harcnkSimPars.RData")
 
 
 
@@ -55,6 +55,16 @@ pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
 
 
 sjob <- slurm_apply(test_func, pars, jobname = 'test_apply',
-                    nodes = 2, cpus_per_node = 2, submit = FALSE,
+                    nodes = 100, cpus_per_node = 2, submit = FALSE,
                     pkgs=c("samEst","samSim","rstan"),
-                    global_objects=c("data/harcnkSimPars.RData"))
+                    rscript_path = "/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
+                    libPaths="/fs/vnas_Hdfo/comda/caw001/Rlib",
+                    global_objects=c("simPars"))
+
+
+
+#modify submit.sh
+#which account should I use
+#which comment should I use
+
+#https://portal.science.gc.ca/confluence/display/SCIDOCS/Quick+Start+to+Using+Linux+Clusters+With+SLURM
