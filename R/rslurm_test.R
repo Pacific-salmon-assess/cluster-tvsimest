@@ -55,11 +55,12 @@ pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
 
 
 sjob <- slurm_apply(test_func, pars, jobname = 'test_apply',
-                    nodes = 100, cpus_per_node = 2, submit = FALSE,
+                    nodes = 1, cpus_per_node = 50, submit = FALSE,
                     pkgs=c("samEst","samSim","rstan"),
                     rscript_path = "/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
                     libPaths="/fs/vnas_Hdfo/comda/caw001/Rlib",
                     global_objects=c("simPars"))
+
 
 
 
