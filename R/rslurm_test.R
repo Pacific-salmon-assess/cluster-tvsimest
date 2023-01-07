@@ -2,7 +2,7 @@ library(rslurm)
 library(samEst,lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 
 
-#simPars <- read.csv("data/harcnkSimPars.csv")
+simPars <- read.csv("data/harcnkSimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
 #load("data/harcnkSimPars.RData")
 
@@ -48,7 +48,11 @@ test_func <- function(path=".",a, u) {
 
 }
 
-    
+
+tst<-test_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
+  a=1,
+  u=1)
+  
 pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   a=rep(1,100),
   u=1:100)
@@ -56,7 +60,7 @@ pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
 
 sjob <- slurm_apply(test_func, pars, jobname = 'test_apply',
                     nodes = 1, cpus_per_node = 50, submit = FALSE,
-                    pkgs=c("samEst","samSim","rstan"),
+                    pkgs=c("samEst","rstan"),
                     rscript_path = "/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
                     libPaths="/fs/vnas_Hdfo/comda/caw001/Rlib",
                     global_objects=c("simPars"))
