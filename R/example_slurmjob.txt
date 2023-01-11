@@ -11,7 +11,7 @@
 #SBATCH --mem-per-cpu=2000M
 #SBATCH --comment="image=registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu18.04"
 #SBATCH --array=0-0
-#SBATCH --cpus-per-task=100
+#SBATCH --cpus-per-task=50
 #SBATCH --output=/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest/slurm_%a.out
 
 . ssmuse-sh -x main/opt/r/r-4.0.5-base 
