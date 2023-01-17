@@ -6,14 +6,6 @@ library(rstan,lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 simPars <- read.csv("data/harcnkSimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
 #load("data/harcnkSimPars.RData")
-simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
-simpleac_mod <- samEst::compile_code(type='static', ac=TRUE, par='n',lambertW = FALSE)
-rwa_mod <- samEst::compile_code(type='rw',ac=FALSE,par="a",lambertW = FALSE)
-rwb_mod <- samEst::compile_code(type='rw',ac=FALSE,par="b",lambertW = FALSE)
-rwab_mod <- samEst::compile_code(type='rw',ac=FALSE,par="both",lambertW = FALSE)
-hmma_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="a",lambertW = FALSE)
-hmmb_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="b",lambertW = FALSE)
-hmmab_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="both",lambertW = FALSE)
 
 
 
@@ -33,6 +25,16 @@ test_func <- function(path=".",a, u) {
                   S=dat$obsSpawners,
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
+
+  simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
+  simpleac_mod <- samEst::compile_code(type='static', ac=TRUE, par='n',lambertW = FALSE)
+  rwa_mod <- samEst::compile_code(type='rw',ac=FALSE,par="a",lambertW = FALSE)
+  rwb_mod <- samEst::compile_code(type='rw',ac=FALSE,par="b",lambertW = FALSE)
+  rwab_mod <- samEst::compile_code(type='rw',ac=FALSE,par="both",lambertW = FALSE)
+  hmma_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="a",lambertW = FALSE)
+  hmmb_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="b",lambertW = FALSE)
+  hmmab_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="both",lambertW = FALSE)
+
 
   p <- ricker_TMB(data=df)
   pac <- ricker_TMB(data=df, AC=TRUE)

@@ -1,12 +1,11 @@
 library(rslurm)
 library(samEst,lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
-library(rstan,lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+library(rstan)
 
 
 simPars <- read.csv("data/harcnkSimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
 #load("data/harcnkSimPars.RData")
-simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
 
 
 
@@ -18,7 +17,9 @@ test_func <- function(path=".",a, u) {
                          paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
 
   #compiled Bayesian models try moving this out of function
-  
+  simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
+
+
   dat <- simData[[a]][simData[[a]]$iteration==u,]
   dat <- dat[dat$year>(max(dat$year)-46),]
   dat <- dat[!is.na(dat$obsRecruits),]
@@ -64,7 +65,7 @@ sjob <- slurm_apply(test_func, pars, jobname = 'test_apply',
                     pkgs=c("samEst","rstan"),
                     rscript_path = "/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
                     libPaths="/fs/vnas_Hdfo/comda/caw001/Rlib",
-                    global_objects=c("simPars","simple_mod"))
+                    global_objects=c("simPars"))
 
 
 
