@@ -26,14 +26,14 @@ test_func <- function(path=".",a, u) {
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
 
-  simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
-  simpleac_mod <- samEst::compile_code(type='static', ac=TRUE, par='n',lambertW = FALSE)
-  rwa_mod <- samEst::compile_code(type='rw',ac=FALSE,par="a",lambertW = FALSE)
-  rwb_mod <- samEst::compile_code(type='rw',ac=FALSE,par="b",lambertW = FALSE)
-  rwab_mod <- samEst::compile_code(type='rw',ac=FALSE,par="both",lambertW = FALSE)
-  hmma_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="a",lambertW = FALSE)
-  hmmb_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="b",lambertW = FALSE)
-  hmmab_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="both",lambertW = FALSE)
+  simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = TRUE)
+  simpleac_mod <- samEst::compile_code(type='static', ac=TRUE, par='n',lambertW = TRUE)
+  rwa_mod <- samEst::compile_code(type='rw',ac=FALSE,par="a",lambertW = TRUE)
+  rwb_mod <- samEst::compile_code(type='rw',ac=FALSE,par="b",lambertW = TRUE)
+  rwab_mod <- samEst::compile_code(type='rw',ac=FALSE,par="both",lambertW = TRUE)
+  hmma_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="a",lambertW = TRUE)
+  hmmb_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="b",lambertW = TRUE)
+  hmmab_mod <- samEst::compile_code(type='hmm',ac=FALSE,par="both",lambertW = TRUE)
 
 
   p <- ricker_TMB(data=df)

@@ -7,17 +7,18 @@ simPars <- read.csv("data/harcnkSimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
 #load("data/harcnkSimPars.RData")
 
+#compiled Bayesian models try moving this out of function
+simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
 
 
-test_func <- function(path=".",a, u) {
+
+
+tmb_func <- function(path=".",a, u) {
   
   simData <- list()  
   allsimest <- list()
   simData[[a]] <- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
                          paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
-
-  #compiled Bayesian models try moving this out of function
-  simple_mod <- samEst::compile_code(type='static', ac=FALSE, par='n',lambertW = FALSE)
 
 
   dat <- simData[[a]][simData[[a]]$iteration==u,]
@@ -51,21 +52,28 @@ test_func <- function(path=".",a, u) {
 }
 
 
-tst<-test_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
+tst<-test_func(path=".",
   a=1,
   u=1)
+
+tst$est
+  
+
+tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
+  a=1,
+  u=16)
   
 pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   a=rep(1,100),
   u=1:100)
 
 
-sjob <- slurm_apply(test_func, pars, jobname = 'test_apply',
+sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'test_apply',
                     nodes = 1, cpus_per_node = 50, submit = FALSE,
                     pkgs=c("samEst","rstan"),
                     rscript_path = "/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
                     libPaths="/fs/vnas_Hdfo/comda/caw001/Rlib",
-                    global_objects=c("simPars"))
+                    global_objects=c("simPars", "simple_mod"))
 
 
 
@@ -77,5 +85,11 @@ sjob <- slurm_apply(test_func, pars, jobname = 'test_apply',
 
 #read in results
 
-res <- get_slurm_out(sjob, outtype = 'table', wait = FALSE)
+res <- get_slurm_out(sjobtmb, outtype = 'table', wait = FALSE)
 head(res, 3)
+
+
+resum <- readRDS("results_0.RDS")
+resum <- readRDS("_rslurm_test_apply/results_0.RDS")
+
+resum[[66]]
