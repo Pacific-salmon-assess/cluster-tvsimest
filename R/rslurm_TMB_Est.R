@@ -11,7 +11,7 @@ simPars <- read.csv("data/harcnkSimPars.csv")
 tmb_func <- function(path=".",a, u) {
   
   simData <- list()  
-  allsimest <- list()
+
   simData[[a]] <- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
                          paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
 
@@ -45,8 +45,8 @@ tmb_func <- function(path=".",a, u) {
                    "autocorr",
                    "rwa","rwb","rwab",
                    "hmma_regime","hmmb_regime","hmmab_regime"),each=nrow(df)),
-              by=rep(dat$year,16),
-              sim=rep(dat$alpha,16),
+              by=rep(dat$year,8),
+              sim=rep(dat$alpha,8),
               est=c(rep(p$alpha,nrow(df)),
                     rep(pac$alpha,nrow(df)),
                     ptva$alpha,
@@ -77,8 +77,8 @@ tst<-tmb_func(path=".",
   u=1)
   
 pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
-  a=rep(1,100),
-  u=1:100)
+  a=rep(1:12,each=1000),
+  u=1:1000)
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
