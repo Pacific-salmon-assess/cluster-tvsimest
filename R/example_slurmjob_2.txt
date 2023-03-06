@@ -1,7 +1,8 @@
 #!/bin/bash -l
 #
 #SBATCH --array=0-0
-#SBATCH --cpus-per-task=1#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=50
 #SBATCH --job-name=TMBrun
 #SBATCH --export=USER,LOGNAME,HOME,MAIL,PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -17,5 +18,5 @@
 export SLURM_EXPORT_ENV=ALL
 set -ex
 
-cd /fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest/_rslurm_TMB
+cd /fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest/_rslurm_TMBrun
 /fs/ssm/main/opt/r/r-4.0.5-base/r_4.0.5-base_ubuntu-18.04-amd64-64/lib/R/bin/Rscript --vanilla slurm_run.R

@@ -39,7 +39,7 @@ options(mc.cores = parallel::detectCores())
 ## Load relevant input data
 # Simulation run parameters describing different scenarios
 #simPar <- read.csv("../data/samsimIFcoho/cohoSimPars_test.csv")
-simPar <- read.csv("data/harcnkSimPars.csv")
+simPar <- read.csv("data/generic/SimPars.csv")
 
 ## Store relevant object names to help run simulation 
 scenNames <- unique(simPar$scenario)
@@ -47,6 +47,17 @@ dirNames <- sapply(scenNames, function(x) paste(x, unique(simPar$species),sep = 
 
 ## First check to ensure that a single scenario can be run (only a small number
 # of trials necessary)
+#tests simulated data
+nit<-list()
+for(a in seq_len(nrow(simPar))){
+simData <- readRDS(paste0("outs/SamSimOutputs/simData/", simPar$nameOM[a],"/",simPar$scenario[a],"/",
+                         paste(simPar$nameOM[a],"_", simPar$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
+ 
+nit[[a]]<-length(unique(simData$iteration))
+
+}
+
+
 
 p <- list()
 simData <- list()

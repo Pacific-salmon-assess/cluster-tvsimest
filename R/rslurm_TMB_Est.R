@@ -243,13 +243,13 @@ tmb_func <- function(path=".",a, u) {
 
 }
 
-tst<-tmb_func(path=".",
+tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   a=1,
   u=1)
   
 pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
-  a=rep(1:4,each=1000),
-  u=1:1000)
+  a=rep(1:4,each=100),
+  u=1:100)
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
@@ -261,7 +261,7 @@ sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
 
 
 
-
+#AFTER JOB IS DONE IMPORT  the results
 res <- get_slurm_out(sjobtmb, outtype = 'table', wait = FALSE)
 head(res, 3)
 
