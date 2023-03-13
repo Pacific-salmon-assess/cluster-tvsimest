@@ -236,18 +236,172 @@ tmb_func <- function(path=".",a, u) {
 
     dfumsy$pbias<- ((dfumsy$est-dfumsy$sim)/dfumsy$sim)*100
 
+    #AIC
+    dfaic<- data.frame(parameter="AIC",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",8),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab",
+                               "hmma_regime", "hmmb_regime","hmmab_regime"),
+                       by=rep(NA,8),
+                       sim=rep(NA,8),
+                       est=c(p$AICc,
+                             pac$AICc,
+                             ptva$AICc,
+                             ptvb$AICc,
+                             ptvab$AICc,
+                             phmma$AICc,
+                             phmmb$AICc,
+                             phmm$AICc),
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem,
+                                     phmma$model$convergence + phmma$conv_problem,
+                                     phmmb$model$convergence + phmmb$conv_problem,
+                                     phmm$model$convergence + phmm$conv_problem),
+                       pbias=rep(NA,8))
+
+    #BIC
+    dfbic<- data.frame(parameter="BIC",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",8),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab",
+                               "hmma_regime", "hmmb_regime","hmmab_regime"),
+                       by=rep(NA,8),
+                       sim=rep(NA,8),
+                       est=c(p$BIC,
+                             pac$BIC,
+                             ptva$BIC,
+                             ptvb$BIC,
+                             ptvab$BIC,
+                             phmma$BIC,
+                             phmmb$BIC,
+                             phmm$BIC),
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem,
+                                     phmma$model$convergence + phmma$conv_problem,
+                                     phmmb$model$convergence + phmmb$conv_problem,
+                                     phmm$model$convergence + phmm$conv_problem),
+                       pbias=rep(NA,8))
+    
+    #new pointwise LL for AIC variants
+    LL_mat=matrix(ncol=nrow(df),nrow=5)
+    
+    LL_mat[1,]=log(dnorm(df$logRS,mean=p$alpha-p$beta*df$S,sd=p$sig))
+    LL_mat[2,1]=log(dnorm(df$logRS[1],mean=pac$alpha-pac$beta*df$S[1],sd=pac$sig))
+    LL_mat[2,2:nrow(df)]=log(dnorm(df$logRS[-1],mean=pac$alpha-pac$beta*df$S[-1]+pac$rho*pac$residuals[-nrow(df)],sd=pac$sigar))
+    LL_mat[3,]=log(dnorm(df$logRS,mean=ptva$alpha-ptva$beta*df$S,sd=ptva$sig))
+    LL_mat[4,]=log(dnorm(df$logRS,mean=ptvb$alpha-ptvb$beta*df$S,sd=ptvb$sig))
+    LL_mat[5,]=log(dnorm(df$logRS,mean=ptvab$alpha-ptvab$beta*df$S,sd=ptvab$sig))
+ 
+    LL_matd90=LL_mat[,apply(LL_mat,2,sum)>=quantile(apply(LL_mat,2,sum),0.1)]
+    LL_matd80=LL_mat[,apply(LL_mat,2,sum)>=quantile(apply(LL_mat,2,sum),0.2)]
+    
+    npar=c(3,4,4,4,5)
    
-    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy)
+    
+    nll=-apply(LL_mat,1,sum)
+    nlld90=-apply(LL_matd90,1,sum)
+    nlld80=-apply(LL_matd80,1,sum)
+    
+    #normal AIC to compare
+    aic_n=2*nll + 2*npar +(2*npar*(npar+1)/(nrow(df)-npar-1))
+    bic_n= 2*nll + npar*log(nrow(df))
+    
+    dfaic2<- data.frame(parameter="AIC_n",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",5),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab"),
+                       by=rep(NA,5),
+                       sim=rep(NA,5),
+                       est=aic_n,
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem),
+                       pbias=rep(NA,5))
+
+     dfbic2<- data.frame(parameter="bic_n",
+                        iteration=u,
+                        scenario= simPars$scenario[a],
+                        method=rep("MLE",5),
+                        model=c("simple",
+                                "autocorr",
+                                "rwa","rwb","rwab"),
+                        by=rep(NA,5),
+                        sim=rep(NA,5),
+                        est=bic_n,
+                        convergence=c(p$model$convergence + p$conv_problem,
+                                      pac$model$convergence + pac$conv_problem,
+                                      ptva$model$convergence+ ptva$conv_problem,
+                                      ptvb$model$convergence+ ptvb$conv_problem,
+                                      ptvab$model$convergence + ptvab$conv_problem),
+                        pbias=rep(NA,5))
+    
+
+    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfaic,dfbic,dfaic2,dfbic2)
 
   return(dff)
 
 }
 
+tmb_lfo_func <- function(a,u) {
+  
+  allsimest <- list()
+  simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
+                         paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
+
+  
+  dat <- simData[simData$iteration==u,]
+  dat <- dat[dat$year>(max(dat$year)-46),]
+  dat <- dat[!is.na(dat$obsRecruits),]
+  df <- data.frame(by=dat$year,
+                  S=dat$obsSpawners,
+                  R=dat$obsRecruits,
+                  logRS=log(dat$obsRecruits/dat$obsSpawners))
+
+  
+  lfostatic<-samEst::tmb_mod_lfo_cv(data=df,model='static', L=10)
+  lfoac <- tryCatch(samEst::tmb_mod_lfo_cv(data=df,model='staticAC', L=10),error = function(e) {lfoac=list(lastparam=rep(-999,length(lfoac$lastparam)))})
+  lfoalpha <- tryCatch(samEst::tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=10),error = function(e) {lfoalpha=list(lastparam=rep(-999,length(lfoac$lastparam)), 
+                                                                                                                   last3param=rep(-999,length(lfoac$lastparam)), 
+                                                                                                                   last5param=rep(-999,length(lfoac$lastparam)))})
+  lfobeta <- tryCatch(samEst::tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=10),error = function(e) {lfobeta=list(lastparam=rep(-999,length(lfoac$lastparam)), 
+                                                                                                                 last3param=rep(-999,length(lfoac$lastparam)), 
+                                                                                                                 last5param=rep(-999,length(lfoac$lastparam)))})
+  lfoalphabeta <- tryCatch(samEst::tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=10),error = function(e) {lfoalphabeta=list(lastparam=rep(-999,length(lfoac$lastparam)), 
+                                                                                                                              last3param=rep(-999,length(lfoac$lastparam)), 
+                                                                                                                              last5param=rep(-999,length(lfoac$lastparam)))})
+  LLdf<-rbind(lfostatic$lastparam,lfoac$lastparam,
+              lfoalpha$lastparam,lfoalpha$last3param,lfoalpha$last5param,
+              lfobeta$lastparam,lfobeta$last3param,lfobeta$last5param,
+              lfoalphabeta$lastparam,lfoalphabeta$last3param,lfoalphabeta$last5param
+  )
+ 
+  return(LLdf)
+  
+}
+
+
 tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   a=1,
   u=1)
   
-pars<-data.frame(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
+pars<-data.frame(path="..",
   a=rep(1:4,each=100),
   u=1:100)
 
@@ -267,3 +421,24 @@ head(res, 3)
 
 
 #https://portal.science.gc.ca/confluence/display/SCIDOCS/Quick+Start+to+Using+Linux+Clusters+With+SLURM
+
+cmdstanpth <- read
+
+#Stan
+cmdstanr::set_cmdstan_path(path="/fs/vnas_Hdfo/comda/dag004/.cmdstan/cmdstan-2.31.0")
+file1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1f.stan")
+mod1=cmdstanr::cmdstan_model(file1)
+file2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2f.stan")
+mod2=cmdstanr::cmdstan_model(file2)
+file3=file.path(cmdstanr::cmdstan_path(),'sr models', "m3f.stan")
+mod3=cmdstanr::cmdstan_model(file3)
+file4=file.path(cmdstanr::cmdstan_path(),'sr models', "m4f.stan")
+mod4=cmdstanr::cmdstan_model(file4)
+file5=file.path(cmdstanr::cmdstan_path(),'sr models', "m5f.stan")
+mod5=cmdstanr::cmdstan_model(file5)
+file6=file.path(cmdstanr::cmdstan_path(),'sr models', "m6f.stan")
+mod6=cmdstanr::cmdstan_model(file6)
+file7=file.path(cmdstanr::cmdstan_path(),'sr models', "m7f.stan")
+mod7=cmdstanr::cmdstan_model(file7)
+file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8f.stan")
+mod8=cmdstanr::cmdstan_model(file8)
