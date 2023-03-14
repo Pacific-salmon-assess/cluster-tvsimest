@@ -1,9 +1,9 @@
 
 #install latest version of packages
 remove.packages(c("StanHeaders", "rstan"))
-install.packages("StanHeaders", repos = c("https://mc-stan.org/r-packages/", getOption("repos")),lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+install.packages("StanHeaders", repos = c("https://mc-stan.org/r-packages/", getOption("repos"))),lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 #install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")),lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
-remotes::install_github("stan-dev/rstan", ref = "develop", subdir = "rstan/rstan", lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+remotes::install_github("stan-dev/rstan", ref = "develop", subdir = "rstan/rstan"), lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 
 
 install.packages("RcppEigen",lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
@@ -11,7 +11,7 @@ install.packages("TMB",lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 install.packages("gsl",lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
 
 remove.packages(c("samEst"),lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
-remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE, lib="/fs/vnas_Hdfo/comda/caw001/Rlib")
+remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
 
 
 library(TMB)
