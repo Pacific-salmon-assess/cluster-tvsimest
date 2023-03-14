@@ -7,7 +7,7 @@ simPars <- read.csv("data/generic/SimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
 #load("data/harcnkSimPars.RData")
 
-source("R/rslurm_TMB_run.R")
+source("R/rslurm_TMB_func.R")
 
 
 
