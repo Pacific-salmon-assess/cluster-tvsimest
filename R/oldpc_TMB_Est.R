@@ -3,7 +3,7 @@ library(rslurm)
 library(samEst)
 
 
-simPars <- read.csv("data/generic/SimPars.csv")
+#simPars <- read.csv("data/generic/SimPars.csv")
 
 simPars <- read.csv("data/sensitivity/SimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
@@ -398,14 +398,18 @@ tmb_lfo_func <- function(a,u) {
   
 }
 
+tst<-tmb_func(path=".",
+  a=1,
+  u=1)
+
 
 tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   a=1,
   u=1)
   
 pars<-data.frame(path="..",
-  a=rep(1:4,each=100),
-  u=1:100)
+  a=rep(1:8,each=1000),
+  u=1:1000)
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
