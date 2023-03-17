@@ -411,6 +411,26 @@ pars<-data.frame(path="..",
   a=rep(1:8,each=1000),
   u=1:1000)
 
+results<-list()
+scn=0
+for(n in seq_len(nrow(pars))){
+   
+  tst<-tmb_func(path=".",
+  a=pars$a[n],
+  u=pars$u[n])
+  if(pars$a[n]!=scn ){
+    results[[pars$a[n]]]<-tst
+    scn<-scn+1
+    print(scn)
+  }else{
+    results[[pars$a[n]]]<-rbind(results[[pars$a[n]]],tst)
+  }
+} 
+
+
+
+
+
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
                     nodes = 1, cpus_per_node = 50, submit = FALSE,
