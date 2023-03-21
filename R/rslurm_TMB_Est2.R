@@ -167,29 +167,29 @@ tmb_func <- function(a,u) {
                                    "rwa","rwb","rwab",
                                    "hmma_regime", "hmmb_regime", "hmmab_regime"),each=nrow(df)),
                        by=rep(dat$year,8),
-                       sim=rep(unlist(mapply(sGenCalc,a=dat$alpha,Smsy=smsysim, b=dat$beta)),8),
-                       est=c(unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="simple"&dfa$method=="MLE"],
+                       sim=rep(unlist(mapply(samEst::sGenCalc,a=dat$alpha,Smsy=smsysim, b=dat$beta)),8),
+                       est=c(unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="simple"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="simple"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="simple"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="autocorr"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="autocorr"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="autocorr"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="autocorr"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="rwa"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwa"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="rwa"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="rwa"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="rwb"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwb"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="rwb"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="rwb"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="rwab"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwab"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="rwab"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="rwab"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmma_regime"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="hmma_regime"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="hmma_regime"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="hmma_regime"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmmb_regime"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="hmmb_regime"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="hmmb_regime"&dfsmsy$method=="MLE"],
                                            b=1/dfsmax$est[dfsmax$model=="hmmb_regime"&dfsmax$method=="MLE"])),
-                             unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmmab_regime"&dfa$method=="MLE"],
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="hmmab_regime"&dfa$method=="MLE"],
                                            Smsy=dfsmsy$est[dfsmsy$model=="hmmab_regime"&dfsmsy$method=="MLE"], 
                                            b=1/dfsmax$est[dfsmax$model=="hmmab_regime"&dfsmax$method=="MLE"]))),
                        convergence=rep(c(p$model$convergence + p$conv_problem,
@@ -582,14 +582,15 @@ pars<-data.frame(a=rep(1:12,each=2000),
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
-                    nodes = 1, cpus_per_node = 50, submit = FALSE,
+                    nodes = 1, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/fs/vnas_Hdfo/comda/dag004/Documents/cluster-tvsimest/",
                     libPaths="/fs/vnas_Hdfo/comda/dag004/Rlib/",
                     global_objects=c("simPars"))
 
 save.image("./slrmjb.RData")
-
+pars<-data.frame(a=rep(1:12,each=5),
+                 u=1:5)
 #load again
 library(rslurm)
 setwd('..')
@@ -999,6 +1000,508 @@ head(res, 3)
 
 #https://portal.science.gc.ca/confluence/display/SCIDOCS/Quick+Start+to+Using+Linux+Clusters+With+SLURM
 
+
+
+#Productivity scenarios####
+library(rslurm)
+
+library(samEst,lib="/fs/vnas_Hdfo/comda/dag004/Rlib")
+
+simPars <- data.frame(scenario=c('trendLinearProd1','trendLinearProd2','trendLinearProd5','trendLinearProd7','regimeProd1','regimeProd2','regimeProd5','regimeProd7'),nameOM=c('trendLinearProd1','trendLinearProd2','trendLinearProd5','trendLinearProd7','regimeProd1','regimeProd2','regimeProd5','regimeProd7'),nameMP='fixedER')
+
+tmb_func_prod <- function(a,u) {
+  
+  allsimest <- list()
+  simData<- readRDS(paste0("/fs/vnas_Hdfo/comda/dag004/Documents/cluster-tvsimest/outs/SamSimOutputs/prod_scns/",simPars$scenario[a],"/",simPars$nameOM[a],"/",
+                           paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
+  
+  dat <- simData[simData$iteration==u,]
+  dat <- dat[dat$year>(max(dat$year)-46),]
+  dat <- dat[!is.na(dat$obsRecruits),]
+  df <- data.frame(by=dat$year,
+                   S=dat$obsSpawners,
+                   R=dat$obsRecruits,
+                   logRS=log(dat$obsRecruits/dat$obsSpawners))
+  
+  p <- samEst::ricker_TMB(data=df)
+  pac <- samEst::ricker_TMB(data=df, AC=TRUE)
+  ptva <- samEst::ricker_rw_TMB(data=df,tv.par='a')
+  ptvb <- samEst::ricker_rw_TMB(data=df, tv.par='b')
+  ptvab <- samEst::ricker_rw_TMB(data=df, tv.par='both')
+  
+  dfa<- data.frame(parameter="alpha",
+                   iteration=u,
+                   scenario= simPars$scenario[a],
+                   method=rep(c(rep("MLE",5)),each=nrow(df)),
+                   model=rep(c("simple",
+                               "autocorr",
+                               "rwa",'rwb','rwab'),each=nrow(df)),
+                   by=rep(dat$year,5),
+                   sim=rep(dat$alpha,5),
+                   est=c(rep(p$alpha,nrow(df)),
+                         rep(pac$alpha,nrow(df)),
+                         ptva$alpha,
+                         rep(ptvb$alpha,nrow(df)),
+                         ptvab$alpha),
+                   convergence=c(rep(c(p$model$convergence + p$conv_problem,
+                                       pac$model$convergence + pac$conv_problem,
+                                       ptva$model$convergence + ptva$conv_problem,
+                                       ptvb$model$convergence + ptvb$conv_problem,
+                                       ptvab$model$convergence + ptvab$conv_problem
+                   ),each=nrow(df))))
+  
+  dfa$pbias<- ((dfa$est-dfa$sim)/dfa$sim)*100
+  
+  #Smax
+  dfsmax<- data.frame(parameter="Smax",
+                      iteration=u,
+                      scenario= simPars$scenario[a],
+                      method=rep(c(rep("MLE",5)),each=nrow(df)),
+                      model=rep(c("simple",
+                                  "autocorr",
+                                  "rwa","rwb","rwab"),each=nrow(df)),
+                      by=rep(dat$year,5),
+                      sim=rep(1/dat$beta,5),
+                      est=c(rep(p$Smax,nrow(df)),
+                            rep(pac$Smax,nrow(df)),
+                            rep(ptva$Smax,nrow(df)),
+                            ptvb$Smax,
+                            ptvab$Smax),
+                      convergence=rep(c(p$model$convergence + p$conv_problem,
+                                        pac$model$convergence + pac$conv_problem,
+                                        ptva$model$convergence + ptva$conv_problem,
+                                        ptvb$model$convergence + ptvb$conv_problem,
+                                        ptvab$model$convergence + ptvab$conv_problem),each=nrow(df)))
+  
+  dfsmax$pbias<- ((dfsmax$est-dfsmax$sim)/dfsmax$sim)*100
+  
+  
+  #sigma
+  dfsig<- data.frame(parameter="sigma",
+                     iteration=u,
+                     scenario= simPars$scenario[a],
+                     method=rep(c(rep("MLE",5)),each=nrow(df)),
+                     model=rep(c("simple",
+                                 "autocorr",
+                                 "rwa","rwb","rwab"),each=nrow(df)),
+                     by=rep(dat$year,5),
+                     sim=rep(dat$sigma,5),
+                     est=c(rep(p$sig,nrow(df)),
+                           rep(pac$sig,nrow(df)),
+                           rep(ptva$sig,nrow(df)),
+                           rep(ptvb$sig,nrow(df)),
+                           rep(ptvab$sig,nrow(df))
+                           ),
+                     convergence=rep(c(p$model$convergence + p$conv_problem,
+                                       pac$model$convergence + pac$conv_problem,
+                                       ptva$model$convergence + ptva$conv_problem,
+                                       ptvb$model$convergence + ptvb$conv_problem,
+                                       ptvab$model$convergence + ptvab$conv_problem),each=nrow(df)))
+  dfsig$pbias<- ((dfsig$est-dfsig$sim)/dfsig$sim)*100
+  
+  
+  #Smsy
+  smsysim<-samEst::smsyCalc(dat$alpha,dat$beta)
+  
+  dfsmsy<- data.frame(parameter="smsy",
+                      iteration=u,
+                      scenario= simPars$scenario[a],
+                      method=rep(c(rep("MLE",5)),each=nrow(df)),
+                      model=rep(c("simple",
+                                  "autocorr",
+                                  "rwa","rwb","rwab"),each=nrow(df)),
+                      by=rep(dat$year,5),
+                      sim=rep(smsysim,5),
+                      est=c(rep(p$Smsy,nrow(df)),
+                            rep(pac$Smsy,nrow(df)),
+                            ptva$Smsy,
+                            ptvb$Smsy,
+                            ptvab$Smsy),    
+                      convergence=rep(c(p$model$convergence + p$conv_problem,
+                                        pac$model$convergence + pac$conv_problem,
+                                        ptva$model$convergence + ptva$conv_problem,
+                                        ptvb$model$convergence + ptvb$conv_problem,
+                                        ptvab$model$convergence + ptvab$conv_problem),each=nrow(df))) 
+  
+  dfsmsy$pbias<- ((dfsmsy$est-dfsmsy$sim)/dfsmsy$sim)*100
+  
+  #Sgen
+  dfsgen <- data.frame(parameter="sgen",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep(c(rep("MLE",5)),each=nrow(df)),
+                       model=rep(c("simple",
+                                   "autocorr",
+                                   "rwa","rwb","rwab"),each=nrow(df)),
+                       by=rep(dat$year,5),
+                       sim=rep(unlist(mapply(samEst::sGenCalc,a=dat$alpha,Smsy=smsysim, b=dat$beta)),5),
+                       est=c(unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="simple"&dfa$method=="MLE"],
+                                           Smsy=dfsmsy$est[dfsmsy$model=="simple"&dfsmsy$method=="MLE"], 
+                                           b=1/dfsmax$est[dfsmax$model=="simple"&dfsmax$method=="MLE"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="autocorr"&dfa$method=="MLE"],
+                                           Smsy=dfsmsy$est[dfsmsy$model=="autocorr"&dfsmsy$method=="MLE"], 
+                                           b=1/dfsmax$est[dfsmax$model=="autocorr"&dfsmax$method=="MLE"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwa"&dfa$method=="MLE"],
+                                           Smsy=dfsmsy$est[dfsmsy$model=="rwa"&dfsmsy$method=="MLE"], 
+                                           b=1/dfsmax$est[dfsmax$model=="rwa"&dfsmax$method=="MLE"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwb"&dfa$method=="MLE"],
+                                           Smsy=dfsmsy$est[dfsmsy$model=="rwb"&dfsmsy$method=="MLE"], 
+                                           b=1/dfsmax$est[dfsmax$model=="rwb"&dfsmax$method=="MLE"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwab"&dfa$method=="MLE"],
+                                           Smsy=dfsmsy$est[dfsmsy$model=="rwab"&dfsmsy$method=="MLE"], 
+                                           b=1/dfsmax$est[dfsmax$model=="rwab"&dfsmax$method=="MLE"]))),
+                       convergence=rep(c(p$model$convergence + p$conv_problem,
+                                         pac$model$convergence + pac$conv_problem,
+                                         ptva$model$convergence + ptvab$conv_problem,
+                                         ptvb$model$convergence + ptvab$conv_problem,
+                                         ptvab$model$convergence + ptvab$conv_problem),
+                                       each=nrow(df)))
+  
+  dfsgen$pbias<- ((dfsgen$est-dfsgen$sim)/dfsgen$sim)*100     
+  #umsy
+  
+  dfumsy<- data.frame(parameter="umsy",
+                      iteration=u,
+                      scenario= simPars$scenario[a],
+                      method=rep(c(rep("MLE",5)),each=nrow(df)),
+                      model=rep(c("simple",
+                                  "autocorr",
+                                  "rwa","rwb","rwab"),each=nrow(df)),
+                      by=rep(dat$year,5),
+                      sim=rep(umsyCalc(dat$alpha),5),
+                      est=c(rep(p$umsy, nrow(df)),
+                            rep(pac$umsy, nrow(df)),
+                            ptva$umsy,
+                            rep(ptvb$umsy, nrow(df)),
+                            ptvab$umsy),
+                      convergence=rep(c(p$model$convergence + p$conv_problem,
+                                        pac$model$convergence + pac$conv_problem,
+                                        ptva$model$convergence+ ptva$conv_problem,
+                                        ptvb$model$convergence+ ptvb$conv_problem,
+                                        ptvab$model$convergence + ptvab$conv_problem),each=nrow(df)))
+  
+  dfumsy$pbias<- ((dfumsy$est-dfumsy$sim)/dfumsy$sim)*100
+  
+  #AIC
+  dfaic<- data.frame(parameter="AIC",
+                     iteration=u,
+                     scenario= simPars$scenario[a],
+                     method=rep("MLE",5),
+                     model=c("simple",
+                             "autocorr",
+                             "rwa","rwb","rwab"),
+                     by=rep(NA,5),
+                     sim=rep(NA,5),
+                     est=c(p$AICc,
+                           pac$AICc,
+                           ptva$AICc,
+                           ptvb$AICc,
+                           ptvab$AICc),
+                     convergence=c(p$model$convergence + p$conv_problem,
+                                   pac$model$convergence + pac$conv_problem,
+                                   ptva$model$convergence+ ptva$conv_problem,
+                                   ptvb$model$convergence+ ptvb$conv_problem,
+                                   ptvab$model$convergence + ptvab$conv_problem),
+                     pbias=rep(NA,5))
+  #BIC
+  dfbic<- data.frame(parameter="BIC",
+                     iteration=u,
+                     scenario= simPars$scenario[a],
+                     method=rep("MLE",5),
+                     model=c("simple",
+                             "autocorr",
+                             "rwa","rwb","rwab"),
+                     by=rep(NA,5),
+                     sim=rep(NA,5),
+                     est=c(p$BIC,
+                           pac$BIC,
+                           ptva$BIC,
+                           ptvb$BIC,
+                           ptvab$BIC),
+                     convergence=c(p$model$convergence + p$conv_problem,
+                                   pac$model$convergence + pac$conv_problem,
+                                   ptva$model$convergence+ ptva$conv_problem,
+                                   ptvb$model$convergence+ ptvb$conv_problem,
+                                   ptvab$model$convergence + ptvab$conv_problem),
+                     pbias=rep(NA,5))
+  
+  #new pointwise LL for AIC variants
+  LL_mat=matrix(ncol=nrow(df),nrow=5)
+  
+  LL_mat[1,]=log(dnorm(df$logRS,mean=p$alpha-p$beta*df$S,sd=p$sig))
+  LL_mat[2,1]=log(dnorm(df$logRS[1],mean=pac$alpha-pac$beta*df$S[1],sd=pac$sig))
+  LL_mat[2,2:nrow(df)]=log(dnorm(df$logRS[-1],mean=pac$alpha-pac$beta*df$S[-1]+pac$rho*pac$residuals[-nrow(df)],sd=pac$sigar))
+  LL_mat[3,]=log(dnorm(df$logRS,mean=ptva$alpha-ptva$beta*df$S,sd=ptva$sig))
+  LL_mat[4,]=log(dnorm(df$logRS,mean=ptvb$alpha-ptvb$beta*df$S,sd=ptvb$sig))
+  LL_mat[5,]=log(dnorm(df$logRS,mean=ptvab$alpha-ptvab$beta*df$S,sd=ptvab$sig))
+  
+  LL_matd90=LL_mat[,apply(LL_mat,2,sum)>=quantile(apply(LL_mat,2,sum),0.1)]
+  LL_matd80=LL_mat[,apply(LL_mat,2,sum)>=quantile(apply(LL_mat,2,sum),0.2)]
+  
+  npar=c(3,4,4,4,5)
+  npar2=c(3,4,3+log(nrow(df)),3+log(nrow(df)),3+2*log(nrow(df)))
+  
+  nll=-apply(LL_mat,1,sum)
+  nlld90=-apply(LL_matd90,1,sum)
+  nlld80=-apply(LL_matd80,1,sum)
+  
+  #normal AIC to compare
+  aic_n=2*nll + 2*npar +(2*npar*(npar+1)/(nrow(df)-npar-1))
+  bic_n= 2*nll + npar*log(nrow(df))
+  #d90
+  aic_d90=2*nlld90 + 2*npar +(2*npar*(npar+1)/(nrow(df)-npar-1))
+  bic_d90= 2*nlld90 + npar*log(nrow(df))
+  #d80
+  aic_d80=2*nlld80 + 2*npar +(2*npar*(npar+1)/(nrow(df)-npar-1))
+  bic_d80= 2*nlld80 + npar*log(nrow(df))
+  
+  #with revised number of parameters
+  aic_n2=2*nll + 2*npar2 +(2*npar2*(npar2+1)/(nrow(df)-npar2-1))
+  bic_n2= 2*nll + npar2*log(nrow(df))
+  #d90
+  aic_d902=2*nlld90 + 2*npar2 +(2*npar2*(npar2+1)/(nrow(df)-npar2-1))
+  bic_d902= 2*nlld90 + npar2*log(nrow(df))
+  #d80
+  aic_d802=2*nlld80 + 2*npar2 +(2*npar2*(npar2+1)/(nrow(df)-npar2-1))
+  bic_d802= 2*nlld80 + npar2*log(nrow(df))
+  
+  
+  dfaic2<- data.frame(parameter="AIC_n",
+                      iteration=u,
+                      scenario= simPars$scenario[a],
+                      method=rep("MLE",5),
+                      model=c("simple",
+                              "autocorr",
+                              "rwa","rwb","rwab"),
+                      by=rep(NA,5),
+                      sim=rep(NA,5),
+                      est=aic_n,
+                      convergence=c(p$model$convergence + p$conv_problem,
+                                    pac$model$convergence + pac$conv_problem,
+                                    ptva$model$convergence+ ptva$conv_problem,
+                                    ptvb$model$convergence+ ptvb$conv_problem,
+                                    ptvab$model$convergence + ptvab$conv_problem),
+                      pbias=rep(NA,5))
+  
+  dfaicd90<- data.frame(parameter="AIC_d90",
+                        iteration=u,
+                        scenario= simPars$scenario[a],
+                        method=rep("MLE",5),
+                        model=c("simple",
+                                "autocorr",
+                                "rwa","rwb","rwab"),
+                        by=rep(NA,5),
+                        sim=rep(NA,5),
+                        est=aic_d90,
+                        convergence=c(p$model$convergence + p$conv_problem,
+                                      pac$model$convergence + pac$conv_problem,
+                                      ptva$model$convergence+ ptva$conv_problem,
+                                      ptvb$model$convergence+ ptvb$conv_problem,
+                                      ptvab$model$convergence + ptvab$conv_problem),
+                        pbias=rep(NA,5))
+  
+  dfaicd80<-data.frame(parameter="AIC_d80",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",5),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab"),
+                       by=rep(NA,5),
+                       sim=rep(NA,5),
+                       est=aic_d80,
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem),
+                       pbias=rep(NA,5))
+  
+  dfbic2<- data.frame(parameter="bic_n",
+                      iteration=u,
+                      scenario= simPars$scenario[a],
+                      method=rep("MLE",5),
+                      model=c("simple",
+                              "autocorr",
+                              "rwa","rwb","rwab"),
+                      by=rep(NA,5),
+                      sim=rep(NA,5),
+                      est=bic_n,
+                      convergence=c(p$model$convergence + p$conv_problem,
+                                    pac$model$convergence + pac$conv_problem,
+                                    ptva$model$convergence+ ptva$conv_problem,
+                                    ptvb$model$convergence+ ptvb$conv_problem,
+                                    ptvab$model$convergence + ptvab$conv_problem),
+                      pbias=rep(NA,5))
+  
+  dfbicd90<- data.frame(parameter="bic_d90",
+                        iteration=u,
+                        scenario= simPars$scenario[a],
+                        method=rep("MLE",5),
+                        model=c("simple",
+                                "autocorr",
+                                "rwa","rwb","rwab"),
+                        by=rep(NA,5),
+                        sim=rep(NA,5),
+                        est=bic_d90,
+                        convergence=c(p$model$convergence + p$conv_problem,
+                                      pac$model$convergence + pac$conv_problem,
+                                      ptva$model$convergence+ ptva$conv_problem,
+                                      ptvb$model$convergence+ ptvb$conv_problem,
+                                      ptvab$model$convergence + ptvab$conv_problem),
+                        pbias=rep(NA,5))
+  
+  dfbicd80<-data.frame(parameter="bic_d80",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",5),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab"),
+                       by=rep(NA,5),
+                       sim=rep(NA,5),
+                       est=bic_d80,
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem),
+                       pbias=rep(NA,5))
+  
+  dfaicnpar2<- data.frame(parameter="AIC_npar2",
+                          iteration=u,
+                          scenario= simPars$scenario[a],
+                          method=rep("MLE",5),
+                          model=c("simple",
+                                  "autocorr",
+                                  "rwa","rwb","rwab"),
+                          by=rep(NA,5),
+                          sim=rep(NA,5),
+                          est=aic_n2,
+                          convergence=c(p$model$convergence + p$conv_problem,
+                                        pac$model$convergence + pac$conv_problem,
+                                        ptva$model$convergence+ ptva$conv_problem,
+                                        ptvb$model$convergence+ ptvb$conv_problem,
+                                        ptvab$model$convergence + ptvab$conv_problem),
+                          pbias=rep(NA,5))
+  dfaicd902<- data.frame(parameter="AIC_d90npar2",
+                         iteration=u,
+                         scenario= simPars$scenario[a],
+                         method=rep("MLE",5),
+                         model=c("simple",
+                                 "autocorr",
+                                 "rwa","rwb","rwab"),
+                         by=rep(NA,5),
+                         sim=rep(NA,5),
+                         est=aic_d902,
+                         convergence=c(p$model$convergence + p$conv_problem,
+                                       pac$model$convergence + pac$conv_problem,
+                                       ptva$model$convergence+ ptva$conv_problem,
+                                       ptvb$model$convergence+ ptvb$conv_problem,
+                                       ptvab$model$convergence + ptvab$conv_problem),
+                         pbias=rep(NA,5))
+  
+  dfaicd802<-data.frame(parameter="AIC_d80npar2",
+                        iteration=u,
+                        scenario= simPars$scenario[a],
+                        method=rep("MLE",5),
+                        model=c("simple",
+                                "autocorr",
+                                "rwa","rwb","rwab"),
+                        by=rep(NA,5),
+                        sim=rep(NA,5),
+                        est=aic_d80,
+                        convergence=c(p$model$convergence + p$conv_problem,
+                                      pac$model$convergence + pac$conv_problem,
+                                      ptva$model$convergence+ ptva$conv_problem,
+                                      ptvb$model$convergence+ ptvb$conv_problem,
+                                      ptvab$model$convergence + ptvab$conv_problem),
+                        pbias=rep(NA,5))
+  
+  dfbic22<- data.frame(parameter="bic_npar2",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",5),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab"),
+                       by=rep(NA,5),
+                       sim=rep(NA,5),
+                       est=bic_n,
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem),
+                       pbias=rep(NA,5))
+  
+  dfbicd902<- data.frame(parameter="bic_d90npar2",
+                         iteration=u,
+                         scenario= simPars$scenario[a],
+                         method=rep("MLE",5),
+                         model=c("simple",
+                                 "autocorr",
+                                 "rwa","rwb","rwab"),
+                         by=rep(NA,5),
+                         sim=rep(NA,5),
+                         est=bic_d90,
+                         convergence=c(p$model$convergence + p$conv_problem,
+                                       pac$model$convergence + pac$conv_problem,
+                                       ptva$model$convergence+ ptva$conv_problem,
+                                       ptvb$model$convergence+ ptvb$conv_problem,
+                                       ptvab$model$convergence + ptvab$conv_problem),
+                         pbias=rep(NA,5))
+  
+  dfbicd802<-data.frame(parameter="bic_d80npar2",
+                        iteration=u,
+                        scenario= simPars$scenario[a],
+                        method=rep("MLE",5),
+                        model=c("simple",
+                                "autocorr",
+                                "rwa","rwb","rwab"),
+                        by=rep(NA,5),
+                        sim=rep(NA,5),
+                        est=bic_d80,
+                        convergence=c(p$model$convergence + p$conv_problem,
+                                      pac$model$convergence + pac$conv_problem,
+                                      ptva$model$convergence+ ptva$conv_problem,
+                                      ptvb$model$convergence+ ptvb$conv_problem,
+                                      ptvab$model$convergence + ptvab$conv_problem),
+                        pbias=rep(NA,5))
+  
+  dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfaic,dfbic,dfaic2,dfaicd90,dfaicd80,dfbic2,dfbicd90,dfbicd80,dfaicnpar2,dfaicd902,dfaicd802,dfbic22,dfbicd902,dfbicd802)
+  
+  return(dff)
+  
+}
+
+pars<-data.frame(a=rep(1:8,each=10),
+                 u=1:10)
+
+
+sjobtmbprod <- slurm_apply(tmb_func, pars, jobname = 'TMBprodscn',
+                       nodes = 1, cpus_per_node = 1, submit = FALSE,
+                       pkgs=c("samEst"),
+                       rscript_path = "/fs/vnas_Hdfo/comda/dag004/Documents/cluster-tvsimest/",
+                       libPaths="/fs/vnas_Hdfo/comda/dag004/Rlib/",
+                       global_objects=c("simPars"))
+
+save.image("./sjobtmbprod.RData")
+
+#load again
+library(rslurm)
+setwd('..')
+load('sjobtmbprod.RData')
+
+res <- get_slurm_out(sjobtmb, outtype = 'table', wait = FALSE)
+head(res, 3)
+
+
+
+
+
+
+
 ###LOCAL pbias & AIC/BIC"####
 #test it out
 tmb_func2 <- function(a, u) {
@@ -1290,10 +1793,15 @@ tmb_func2 <- function(a, u) {
   
 }
 
+
+
+simPars <- data.frame(scenario=c('trendLinearProd1','trendLinearProd2','trendLinearProd5','trendLinearProd7','regimeProd1','regimeProd2','regimeProd5','regimeProd7'),nameOM=c('trendLinearProd1','trendLinearProd2','trendLinearProd5','trendLinearProd7','regimeProd1','regimeProd2','regimeProd5','regimeProd7'),nameMP='fixedER')
+
+
 df=list()
-for(a in 1:12){
+for(a in 1:8){
   df[[a]]=tmb_func2(a=a,u=1)
-  for(u in 2:1000){
+  for(u in 2:10){
     set=tmb_func2(a=a,u=u)
     df[[a]]=rbind(df[[a]],set)
     
