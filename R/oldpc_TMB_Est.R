@@ -410,6 +410,13 @@ tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
 pars<-data.frame(path="..",
   a=rep(1:8,each=1000),
   u=1:1000)
+pars<-data.frame(a=rep(1:8,each=10),
+ u=1:10)
+
+ tst<-tmb_func(path=".",
+  a=pars$a[591],
+  u=pars$u[591])
+
 
 results<-list()
 scn=0

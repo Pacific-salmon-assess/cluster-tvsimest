@@ -93,3 +93,9 @@ resum <- readRDS("results_0.RDS")
 resum <- readRDS("_rslurm_test_apply/results_0.RDS")
 
 resum[[66]]
+
+
+
+res<-readRDS("C:/Users/worc/Documents/timevar/cluster-tvsimest/_rslurm_TMBrun/results_0.RDS", refhook = NULL)
+head(res)
+
