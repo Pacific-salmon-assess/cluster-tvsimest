@@ -61,6 +61,7 @@ tmb_func <- function(path=".",a, u) {
   #Smax
   dfsmax<- data.frame(parameter="Smax",
       iteration=u,
+      scenario= simPars$scenario[a],
       method=rep(c(rep("MLE",8)),each=nrow(df)),
       model=rep(c("simple",
         "autocorr",
@@ -91,6 +92,7 @@ tmb_func <- function(path=".",a, u) {
     #sigma
     dfsig<- data.frame(parameter="sigma",
       iteration=u,
+      scenario= simPars$scenario[a],
       method=rep(c(rep("MLE",8)),each=nrow(df)),
       model=rep(c("simple",
         "autocorr",
@@ -122,6 +124,7 @@ tmb_func <- function(path=".",a, u) {
   
     dfsmsy<- data.frame(parameter="smsy",
       iteration=u,
+      scenario= simPars$scenario[a],
       method=rep(c(rep("MLE",8)),each=nrow(df)),
       model=rep(c("simple",
         "autocorr",
@@ -153,6 +156,7 @@ tmb_func <- function(path=".",a, u) {
 
   dfsgen <- data.frame(parameter="sgen",
     iteration=u,
+    scenario= simPars$scenario[a],
     method=rep(c(rep("MLE",8)),each=nrow(df)),
     model=rep(c("simple",
       "autocorr",
@@ -175,15 +179,15 @@ tmb_func <- function(path=".",a, u) {
         unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="rwab"&dfa$method=="MLE"],
           Smsy=dfsmsy$est[dfsmsy$model=="rwab"&dfsmsy$method=="MLE"], 
           b=1/dfsmax$est[dfsmax$model=="rwab"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmma_regime"&dfa$method=="MLE"],
-          Smsy=dfsmsy$est[dfsmsy$model=="hmma_regime"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$est[dfsmax$model=="hmma_regime"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmmb_regime"&dfa$method=="MLE"],
-          Smsy=dfsmsy$est[dfsmsy$model=="hmmb_regime"&dfsmsy$method=="MLE"],
-           b=1/dfsmax$est[dfsmax$model=="hmmb_regime"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmmab_regime"&dfa$method=="MLE"],
-          Smsy=dfsmsy$est[dfsmsy$model=="hmmab_regime"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$est[dfsmax$model=="hmmab_regime"&dfsmax$method=="MLE"]))),
+        unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmma"&dfa$method=="MLE"],
+          Smsy=dfsmsy$est[dfsmsy$model=="hmma"&dfsmsy$method=="MLE"], 
+          b=1/dfsmax$est[dfsmax$model=="hmma"&dfsmax$method=="MLE"])),
+        unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmmb"&dfa$method=="MLE"],
+          Smsy=dfsmsy$est[dfsmsy$model=="hmmb"&dfsmsy$method=="MLE"],
+           b=1/dfsmax$est[dfsmax$model=="hmmb"&dfsmax$method=="MLE"])),
+        unlist(mapply(sGenCalc,a=dfa$est[dfa$model=="hmmab"&dfa$method=="MLE"],
+          Smsy=dfsmsy$est[dfsmsy$model=="hmmab"&dfsmsy$method=="MLE"], 
+          b=1/dfsmax$est[dfsmax$model=="hmmab"&dfsmax$method=="MLE"]))),
      convergence=rep(c(p$model$convergence + p$conv_problem,
       pac$model$convergence + pac$conv_problem,
       ptva$model$convergence + ptvab$conv_problem,
@@ -202,6 +206,7 @@ tmb_func <- function(path=".",a, u) {
 
     dfumsy<- data.frame(parameter="umsy",
     iteration=u,
+    scenario= simPars$scenario[a],
     method=rep(c(rep("MLE",8)),each=nrow(df)),
     model=rep(c("simple",
       "autocorr",
@@ -228,8 +233,66 @@ tmb_func <- function(path=".",a, u) {
 
     dfumsy$pbias<- ((dfumsy$est-dfumsy$sim)/dfumsy$sim)*100
 
+     #AIC
+    dfaic<- data.frame(parameter="AIC",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",8),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab",
+                               "hmma", "hmmb","hmmab"),
+                       by=rep(NA,8),
+                       sim=rep(NA,8),
+                       est=c(p$AICc,
+                             pac$AICc,
+                             ptva$AICc,
+                             ptvb$AICc,
+                             ptvab$AICc,
+                             phmma$AICc,
+                             phmmb$AICc,
+                             phmm$AICc),
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem,
+                                     phmma$model$convergence + phmma$conv_problem,
+                                     phmmb$model$convergence + phmmb$conv_problem,
+                                     phmm$model$convergence + phmm$conv_problem),
+                       pbias=rep(NA,8))
+    #BIC
+    dfbic<- data.frame(parameter="BIC",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",8),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab",
+                               "hmma", "hmmb","hmmab"),
+                       by=rep(NA,8),
+                       sim=rep(NA,8),
+                       est=c(p$BIC,
+                             pac$BIC,
+                             ptva$BIC,
+                             ptvb$BIC,
+                             ptvab$BIC,
+                             phmma$BIC,
+                             phmmb$BIC,
+                             phmm$BIC),
+                       convergence=c(p$model$convergence + p$conv_problem,
+                                     pac$model$convergence + pac$conv_problem,
+                                     ptva$model$convergence+ ptva$conv_problem,
+                                     ptvb$model$convergence+ ptvb$conv_problem,
+                                     ptvab$model$convergence + ptvab$conv_problem,
+                                     phmma$model$convergence + phmma$conv_problem,
+                                     phmmb$model$convergence + phmmb$conv_problem,
+                                     phmm$model$convergence + phmm$conv_problem),
+                       pbias=rep(NA,8))
+    
+
    
-    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy)
+    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfaic,dfbic)
 
   return(dff)
 

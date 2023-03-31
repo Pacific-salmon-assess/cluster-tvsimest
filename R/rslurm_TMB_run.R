@@ -3,12 +3,12 @@ library(rslurm)
 library(samEst)
 
 
-#simPars <- read.csv("data/generic/SimPars.csv")
-simPars <- read.csv("data/sensitivity/SimPars.csv")
+simPars <- read.csv("data/generic/SimPars.csv")
+#simPars <- read.csv("data/sensitivity/SimPars.csv")
 #save(simPars, file = "data/harcnkSimPars.RData")
 #load("data/harcnkSimPars.RData")
 
-source("R/rslurm_TMB_func.R")
+source("R/tmb_func.R")
 
 
 
@@ -20,7 +20,7 @@ pars<-data.frame(path="..",
   a=rep(1:8,each=1000),
   u=1:1000)
 
-
+getwwd
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
                     nodes = 1, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
