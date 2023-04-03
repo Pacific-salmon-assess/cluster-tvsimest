@@ -5,27 +5,26 @@ library(samEst)
 
 simPars <- read.csv("data/generic/SimPars.csv")
 #simPars <- read.csv("data/sensitivity/SimPars.csv")
-#save(simPars, file = "data/harcnkSimPars.RData")
+
 #load("data/harcnkSimPars.RData")
 
 source("R/tmb_func.R")
 
 
-
 tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   a=1,
   u=1)
-  R
+  
 pars<-data.frame(path="..",
   a=rep(1:8,each=1000),
   u=1:1000)
 
-getwwd
+
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
                     nodes = 1, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
-                    libPaths="/fs/vnas_Hdfo/comda/caw001/Rlib/4.1",
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 
