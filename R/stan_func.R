@@ -1,20 +1,4 @@
 
-file1=file.path(cmdstanr::cmdstan_path(),'srmodels', "m1f.stan")
-mod1=cmdstanr::cmdstan_model(file1)
-file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2f.stan")
-mod2=cmdstanr::cmdstan_model(file2)
-file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f.stan")
-mod3=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f.stan")
-mod4=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f.stan")
-mod5=cmdstanr::cmdstan_model(file5)
-file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6f.stan")
-mod6=cmdstanr::cmdstan_model(file6)
-file7=file.path(cmdstanr::cmdstan_path(),'srmodels', "m7f.stan")
-mod7=cmdstanr::cmdstan_model(file7)
-file8=file.path(cmdstanr::cmdstan_path(),'srmodels', "m8f.stan")
-mod8=cmdstanr::cmdstan_model(file8)
 
 
 stan_func<- function(path=".", a,u){
@@ -132,6 +116,9 @@ stan_func<- function(path=".", a,u){
   phmmab_alpha_conv=abs(f8$summary(variables=c('log_a'))$rhat-1)>.1
   phmmab_alpha_conv_regime=as.numeric(phmmab_alpha_conv[f8$summary(variables=c('zstar'),'median')$median])
   
+  
+
+
   dfa<- data.frame(parameter="alpha",
                    iteration=u,
                    scenario= simPars$scenario[a],
@@ -242,7 +229,9 @@ stan_func<- function(path=".", a,u){
                       by=NA,
                       sim=NA,
                       est=c(f3$summary(variables=c('sigma_a'),'median')$median,
-                            f5$summary(variables=c('sigma_a'),'median')$median))
+                            f5$summary(variables=c('sigma_a'),'median')$median),
+                      convergence=as.numeric(c(abs(f3$summary(variables=c('sigma_a'))$rhat-1)>.1,
+                            abs(f5$summary(variables=c('sigma_a'))$rhat-1)>.1)))
   
   dfsiga$pbias<- NA
   
