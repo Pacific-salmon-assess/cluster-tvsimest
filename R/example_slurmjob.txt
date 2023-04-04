@@ -1,9 +1,9 @@
-#!/bin/bash -l
+#!/bin/bash
 #
-#SBATCH --array=0-0
+#SBATCH --array=0-3
 #SBATCH --cpus-per-task=1
 #SBATCH --job-name=TMBrun
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=50
 #SBATCH --export=USER,LOGNAME,HOME,MAIL,PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 #SBATCH --account=dfo_comda2016
