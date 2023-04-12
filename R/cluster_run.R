@@ -6,19 +6,19 @@ simPars <- read.csv("data/generic/SimPars.csv")
 
 source("R/tmb_func.R")
 
-
+#base case 
 tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
-  a=1,
+  a=5,
   u=1)
   
+ 
 pars<-data.frame(path="..",
-  a=rep(1:11,each=1000),
+  a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
 
-
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
-                    nodes = 4, cpus_per_node = 1, submit = FALSE,
+                    nodes = 50, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -27,17 +27,37 @@ sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
 
 
 #AFTER JOB IS DONE IMPORT  the results
-res <- get_slurm_out(sjobtmb, outtype = 'table', wait = FALSE)
+res <- get_slurm_out(sjobtmb, outtype = 'table', wait = TRUE)
 head(res, 3)
-
 
 
 saveRDS(res, file = "res.rds")
 
+#============================================================================
+#sensitivity a scenarios
 
 
-#try stan version
+simPars <- read.csv("data/sensitivity/SimPars.csv")
 
+pars_a<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+
+
+sjobtmb_a <- slurm_apply(tmb_func, pars_a, jobname = 'TMBrun',
+                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+
+
+
+#---------------------------------------------------------------------------------------------------------
+#stan version
 
 library(cmdstanr)
 
@@ -65,8 +85,16 @@ tst <- stan_func(path=".",
   a=1,
   u=1)
 
+
+#I can run a maximum of 6 scenarios at a time, otherwise R cannot run the results in. 
+
+#base case scn 1-6
+pars<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)/2),each=1000),
+  u=1:1000)
+
 sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
-                    nodes = 8, cpus_per_node = 1, submit = FALSE,
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst", "cmdstanr"),
                     rscript_path = "/home/caw001/Documents/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -79,4 +107,45 @@ sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
 resstan <- get_slurm_out(sjobstan, outtype = 'table', wait = FALSE)
 head(resstan, 3)
 
+
+saveRDS(resstan, file = "/resstan1_6.rds")
+
+cleanup_files(sjobstan)
+
+
+#base case scn 7-12
+ 
+
+pars<-data.frame(path="..",
+  a=rep((nrow(simPars)/2):nrow(simPars),each=1000),
+  u=1:1000)
+ 
+
+sjobstan2 <- slurm_apply(stan_func, pars, jobname = 'stanrun',
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst", "cmdstanr"),
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars", "mod1", "mod2", "mod3",
+                      "mod4","mod5","mod6","mod7","mod8"))
+
+
+
+#AFTER JOB IS DONE IMPORT  the results
+resstan2 <- get_slurm_out(sjobstan2, outtype = 'table', wait = FALSE)
+head(resstan2, 3)
+
+
+saveRDS(resstan, file = "resstan7_12.rds")
+
+cleanup_files(sjobstan)
+
+
+#log_a sensitivity
+
+#log_a sensitivity - half smax
+
+#Smax sensitivity
+
+#Smax sensitivity
 
