@@ -1,5 +1,5 @@
 
-tmb_func <- function(path=".",a, u, simPars) {
+tmb_func <- function(path=".",a, u) {
   
   simData <- list()  
   allsimest <- list()
