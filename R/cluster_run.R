@@ -1,10 +1,15 @@
 library(rslurm)
 library(samEst)
+source("R/tmb_func.R")
 
+
+
+
+#============================================================================
+#sbase case scenarios
 
 simPars <- read.csv("data/generic/SimPars.csv")
 
-source("R/tmb_func.R")
 
 #base case 
 tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
@@ -33,6 +38,9 @@ head(res, 3)
 
 saveRDS(res, file = "res.rds")
 
+
+
+
 #============================================================================
 #sensitivity a scenarios
 
@@ -44,8 +52,83 @@ pars_a<-data.frame(path="..",
   u=1:1000)
 
 
-
 sjobtmb_a <- slurm_apply(tmb_func, pars_a, jobname = 'TMBrun',
+                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+
+#AFTER JOB IS DONE IMPORT  the results
+res_a <- get_slurm_out(sjobtmb_a, outtype = 'table', wait = TRUE)
+
+head(res_a, 3)
+
+
+saveRDS(res_a, file = "res_sensitivity_a.rds")
+
+
+
+#============================================================================
+#sensitivity a scenarios half smax
+
+
+simPars <- read.csv("data/sensitivity_halfSmax/SimPars.csv")
+
+pars_asmax<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+
+sjobtmb_asmax <- slurm_apply(tmb_func, pars_asmax, jobname = 'TMBrun_asmax',
+                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+
+
+
+#============================================================================
+#smax scenarios 
+
+
+simPars <- read.csv("data/Smax_sensitivity/SimPars.csv")
+
+pars_smax<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+
+sjobtmb_smax <- slurm_apply(tmb_func, pars_smax, jobname = 'TMBrun_smax',
+                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+
+
+
+
+
+#============================================================================
+#sensitivity sigma scenarios low
+
+
+simPars <- read.csv("data/sensitivity_halfSmax/SimPars.csv")
+
+pars_asmax<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+
+sjobtmb_asmax <- slurm_apply(tmb_func, pars_asmax, jobname = 'TMBrun_asmax',
                     nodes = 50, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/cluster-tvsimest",

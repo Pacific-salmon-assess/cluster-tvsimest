@@ -1,5 +1,5 @@
 
-tmb_func <- function(path=".",a, u) {
+tmb_func <- function(path=".",a, u, simPars) {
   
   simData <- list()  
   allsimest <- list()
@@ -26,7 +26,7 @@ tmb_func <- function(path=".",a, u) {
   phmmb <- ricker_hmm_TMB(data=df, tv.par='b')
   phmm  <- ricker_hmm_TMB(data=df, tv.par='both')
 
-
+  
 
   dfa<- data.frame(parameter="alpha",
               iteration=u,
@@ -289,10 +289,82 @@ tmb_func <- function(path=".",a, u) {
                                      phmmb$model$convergence + phmmb$conv_problem,
                                      phmm$model$convergence + phmm$conv_problem),
                        pbias=rep(NA,8))
+
+
+    
+   #lfo
+    lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15)
+    lfoac <- tmb_mod_lfo_cv(data=df,model='staticAC', L=15)
+    lfoalpha <- tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=15)
+    lfobeta <- tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=15)
+    lfoalphabeta <- tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=15)
+    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15)
+    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15)
+    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15)
     
 
+    dflfo<- data.frame(parameter="LFO",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE",20),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab",
+                               "rwa_last3","rwb_last3","rwab_last3",
+                               "rwa_last5","rwb_last5","rwab_last5",
+                               "hmma", "hmmb","hmmab",
+                               "hmma_last3", "hmmb_last3","hmmab_last3",
+                               "hmma_last5", "hmmb_last5","hmmab_last5"),
+                       by=rep(NA,20),
+                       sim=rep(NA,20),
+                       est=c(sum(lfostatic$lastparam), 
+                           sum(lfoac$lastparam), 
+                           sum(lfoalpha$lastparam), 
+                           sum(lfoalpha$last3paramavg), 
+                           sum(lfoalpha$last5paramavg), 
+                           sum(lfobeta$lastparam), 
+                           sum(lfobeta$last3paramavg), 
+                           sum(lfobeta$last5paramavg), 
+                           sum(lfoalphabeta$lastparam), 
+                           sum(lfoalphabeta$last3paramavg), 
+                           sum(lfoalphabeta$last5paramavg),    
+                           sum(lfohmma$lastregime_pick),
+                           sum(lfohmma$last3regime_pick),
+                           sum(lfohmma$last5regime_pick),
+                           sum(lfohmmb$lastregime_pick),
+                           sum(lfohmmb$last3regime_pick),
+                           sum(lfohmmb$last5regime_pick),
+                           sum(lfohmm$lastregime_pick),
+                           sum(lfohmm$last3regime_pick),
+                           sum(lfohmm$last5regime_pick)
+                           ),
+                       convergence=c(sum(lfostatic$conv_problem),
+                           sum(lfoac$conv_problem), 
+                           sum(lfoalpha$conv_problem), 
+                           sum(lfoalpha$conv_problem), 
+                           sum(lfoalpha$conv_problem), 
+                           sum(lfobeta$conv_problem), 
+                           sum(lfobeta$conv_problem), 
+                           sum(lfobeta$conv_problem), 
+                           sum(lfoalphabeta$conv_problem), 
+                           sum(lfoalphabeta$conv_problem), 
+                           sum(lfoalphabeta$conv_problem),    
+                           sum(lfohmma$conv_problem),
+                           sum(lfohmma$conv_problem),
+                           sum(lfohmma$conv_problem),
+                           sum(lfohmmb$conv_problem),
+                           sum(lfohmmb$conv_problem),
+                           sum(lfohmmb$conv_problem),
+                           sum(lfohmm$conv_problem),
+                           sum(lfohmm$conv_problem),
+                           sum(lfohmm$conv_problem)
+                                     ),
+                       pbias=rep(NA,20))
+
+
+
    
-    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfaic,dfbic)
+    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfaic,dfbic,dflfo)
 
   return(dff)
 
