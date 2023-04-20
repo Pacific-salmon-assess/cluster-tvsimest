@@ -4,6 +4,30 @@ source("R/tmb_func.R")
 
 
 
+my_get_slurm_out <- function (slr_job_name, nodes.list=0:50, outtype = "raw") 
+{
+       
+    res_files <- paste0("results_", nodes.list, ".RDS")
+    tmpdir <- paste0("_rslurm_", slr_job_name)
+    missing_files <- setdiff(res_files, dir(path = tmpdir))
+    if (length(missing_files) > 0) {
+        missing_list <- paste(missing_files, collapse = ", ")
+        warning(paste("The following files are missing:", missing_list))
+    }
+    res_files <- file.path(tmpdir, setdiff(res_files, missing_files))
+    if (length(res_files) == 0) 
+        return(NA)
+    
+        slurm_out <- lapply(res_files, readRDS)
+    
+    slurm_out <- do.call(c, slurm_out)
+    if (outtype == "table") {
+        slurm_out <- as.data.frame(do.call(rbind, slurm_out))
+    }
+    slurm_out()
+}
+
+
 
 #============================================================================
 #sbase case scenarios
@@ -17,9 +41,12 @@ tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
   u=1)
   
  
+
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
+
+
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
@@ -31,18 +58,43 @@ sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
 
 
 
-#AFTER JOB IS DONE IMPORT  the results
 res <- get_slurm_out(sjobtmb, outtype = 'table', wait = TRUE)
-head(res, 3)
+#res <- my_get_slurm_out(slr_job_name='TMBrun', nodes.list=0:39, outtype = 'table')
 
 
+
+
+
+#AFTER JOB IS DONE IMPORT  the results
+
+saveRDS(res[res$scenario%in%simPars$scenario[1:6],], file = "res1.rds")
+saveRDS(res[res$scenario%in%simPars$scenario[7:12],], file = "res2.rds")
 saveRDS(res, file = "res.rds")
 
 
+tmb_func(path=".",
+  a=5,
+  u=1)
+#run 14 that failed
+.rslurm_id <- 14
+.rslurm_istart <- (.rslurm_id)* 240 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 240, nrow(pars))
+rslurm_result14<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_result14[[i-3360]]<-tmb_func(path=".",
+  a=pars$a[i],
+  u=pars$u[i])
+}
+result14<-do.call(rslurm_result14)
 
-
+rslurm_result14<-mapply(tmb_func,path=".",a=pars$a[.rslurm_istart:.rslurm_iend],
+  u=pars$u[.rslurm_istart:.rslurm_iend]) 
+rslurm_result14[1,]
 #============================================================================
 #sensitivity a scenarios
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
 
 
 simPars <- read.csv("data/sensitivity/SimPars.csv")
@@ -52,8 +104,8 @@ pars_a<-data.frame(path="..",
   u=1:1000)
 
 
-sjobtmb_a <- slurm_apply(tmb_func, pars_a, jobname = 'TMBrun',
-                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+sjobtmb_a <- slurm_apply(tmb_func, pars_a, jobname = 'TMBrun_a',
+                    nodes = 200, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -66,6 +118,13 @@ res_a <- get_slurm_out(sjobtmb_a, outtype = 'table', wait = TRUE)
 
 head(res_a, 3)
 
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_a1.rds")
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_a2.rds")
+saveRDS(res_a, file = "res_a.rds")
+
+
+
+#run 1
 
 saveRDS(res_a, file = "res_sensitivity_a.rds")
 
