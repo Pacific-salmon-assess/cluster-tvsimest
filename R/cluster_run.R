@@ -24,7 +24,7 @@ my_get_slurm_out <- function (slr_job_name, nodes.list=0:50, outtype = "raw")
     if (outtype == "table") {
         slurm_out <- as.data.frame(do.call(rbind, slurm_out))
     }
-    slurm_out()
+    return(slurm_out)
 }
 
 
@@ -85,11 +85,10 @@ for(i in (.rslurm_istart):(.rslurm_iend)){
   a=pars$a[i],
   u=pars$u[i])
 }
-result14<-do.call(rslurm_result14)
+result14<-do.call(rbind, rslurm_result14)
+saveRDS(result14, file = "res14.rds")
 
-rslurm_result14<-mapply(tmb_func,path=".",a=pars$a[.rslurm_istart:.rslurm_iend],
-  u=pars$u[.rslurm_istart:.rslurm_iend]) 
-rslurm_result14[1,]
+
 #============================================================================
 #sensitivity a scenarios
 library(rslurm)
@@ -132,7 +131,9 @@ saveRDS(res_a, file = "res_sensitivity_a.rds")
 
 #============================================================================
 #sensitivity a scenarios half smax
-
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
 
 simPars <- read.csv("data/sensitivity_halfSmax/SimPars.csv")
 
@@ -142,19 +143,27 @@ pars_asmax<-data.frame(path="..",
 
 
 sjobtmb_asmax <- slurm_apply(tmb_func, pars_asmax, jobname = 'TMBrun_asmax',
-                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    nodes = 100, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
+res_asmax <- get_slurm_out(sjobtmb_asmax, outtype = 'table', wait = TRUE)
+
+head(res_asmax, 3)
 
 
+saveRDS(res_asmax[res_asmax$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_asmax1.rds")
+saveRDS(res_asmax[res_asmax$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_asmax2.rds")
+saveRDS(res_asmax, file = "res_asmax.rds")
 
 
 #============================================================================
 #smax scenarios 
-
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
 
 simPars <- read.csv("data/Smax_sensitivity/SimPars.csv")
 
@@ -164,16 +173,35 @@ pars_smax<-data.frame(path="..",
 
 
 sjobtmb_smax <- slurm_apply(tmb_func, pars_smax, jobname = 'TMBrun_smax',
-                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    nodes = 100, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 
+#res_smax <- get_slurm_out(sjobtmb_asmax, outtype = 'table', wait = TRUE)
 
 
+res_smax <- my_get_slurm_out('TMBrun_smax', nodes.list=0:99, outtype = "table") 
+head(res_smax, 3)
 
+saveRDS(res_smax[res_smax$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_smax1.rds")
+saveRDS(res_smax[res_smax$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_smax2.rds")
+saveRDS(res_smax, file = "res_smax.rds")
+
+#run 14 that failed
+.rslurm_id <- 95
+.rslurm_istart <- (.rslurm_id)* 100 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 100, nrow(pars))
+rslurm_res_smax95<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_res_smax95[[i-9500]]<-tmb_func(path=".",
+  a=pars_smax$a[i],
+  u=pars_smax$u[i])
+}
+result_smax_95<-do.call(rbind, rslurm_res_smax95)
+saveRDS(result_smax_95, file = "res_smax_95.rds")
 
 
 #============================================================================
@@ -201,7 +229,11 @@ sjobtmb_asmax <- slurm_apply(tmb_func, pars_asmax, jobname = 'TMBrun_asmax',
 #---------------------------------------------------------------------------------------------------------
 #stan version
 
+
 library(cmdstanr)
+library(rslurm)
+library(samEst)
+
 
 file1=file.path(cmdstanr::cmdstan_path(),'srmodels', "m1f.stan")
 mod1=cmdstanr::cmdstan_model(file1)
@@ -221,6 +253,11 @@ file8=file.path(cmdstanr::cmdstan_path(),'srmodels', "m8f.stan")
 mod8=cmdstanr::cmdstan_model(file8)
 
 source("R/stan_func.R")
+
+
+simPars <- read.csv("data/generic/SimPars.csv")
+
+
 
 
 tst <- stan_func(path=".",
