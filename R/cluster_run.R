@@ -180,7 +180,7 @@ sjobtmb_smax <- slurm_apply(tmb_func, pars_smax, jobname = 'TMBrun_smax',
                     global_objects=c("simPars"))
 
 
-#res_smax <- get_slurm_out(sjobtmb_asmax, outtype = 'table', wait = TRUE)
+res_smax <- get_slurm_out(sjobtmb_smax, outtype = 'table', wait = TRUE)
 
 
 res_smax <- my_get_slurm_out('TMBrun_smax', nodes.list=0:99, outtype = "table") 
@@ -190,11 +190,11 @@ saveRDS(res_smax[res_smax$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)]
 saveRDS(res_smax[res_smax$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_smax2.rds")
 saveRDS(res_smax, file = "res_smax.rds")
 
-#run 14 that failed
+#run 95 that failed
 .rslurm_id <- 95
 .rslurm_istart <- (.rslurm_id)* 100 + 1
 .rslurm_iend <- min((.rslurm_id + 1) * 100, nrow(pars))
-rslurm_res_smax95<-list()
+rslurm_res_smax95<-list()q()
 for(i in (.rslurm_istart):(.rslurm_iend)){
    rslurm_res_smax95[[i-9500]]<-tmb_func(path=".",
   a=pars_smax$a[i],
@@ -202,6 +202,46 @@ for(i in (.rslurm_istart):(.rslurm_iend)){
 }
 result_smax_95<-do.call(rbind, rslurm_res_smax95)
 saveRDS(result_smax_95, file = "res_smax_95.rds")
+
+
+#============================================================================
+#smax scenarios double alpha
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
+
+simPars <- read.csv("data/Smax_sensitivity_doublealpha/SimPars.csv")
+
+pars_smaxda<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+#test
+paste0(".","/outs/SamSimOutputs/simData/", simPars$nameOM[5],"/",simPars$scenario[5],"/",
+                         paste(simPars$nameOM[5],"_", simPars$nameMP[5], "_", "CUsrDat.RData",sep=""))
+tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest",
+  a=5,
+  u=1)
+  
+
+sjobtmb_smaxda <- slurm_apply(tmb_func, pars_smaxda, jobname = 'TMBrun_smaxda',
+                    nodes = 100, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+res_smaxda <- get_slurm_out(sjobtmb_smaxda, outtype = 'table', wait = TRUE)
+
+
+
+head(res_smaxda, 3)
+
+saveRDS(res_smaxda[res_smaxda$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_smaxda1.rds")
+saveRDS(res_smaxda[res_smaxda$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_smaxda2.rds")
+saveRDS(res_smaxda, file = "res_smaxda.rds")
+
 
 
 #============================================================================
@@ -284,10 +324,14 @@ sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
 
 #AFTER JOB IS DONE IMPORT  the results
 resstan <- get_slurm_out(sjobstan, outtype = 'table', wait = FALSE)
+
+saveRDS(resstan, file = "resstan.rds")
+saveRDS(resstan[resstan$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstan1.rds")
+saveRDS(resstan[resstan$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstan2.rds")
+
 head(resstan, 3)
 
 
-saveRDS(resstan, file = "/resstan1_6.rds")
 
 cleanup_files(sjobstan)
 
