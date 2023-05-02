@@ -47,7 +47,7 @@ transformed parameters {
 }
 model{
 
-  log_a ~ gamma(3,1.5);
+  log_a ~ normal(1.5,2.5);
   log_b ~ normal(-12,3);
   
   target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero   
