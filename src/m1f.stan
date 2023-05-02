@@ -18,7 +18,7 @@ transformed parameters{
 }
 model{
   //priors
-  log_a ~ gamma(3,1.5); //intrinsic productivity - wide prior
+  log_a ~ normal(1.5,2.5); //intrinsic productivity - wide prior
   log_b ~ normal(-12,3); //per capita capacity parameter - wide prior
   
   //variance terms
