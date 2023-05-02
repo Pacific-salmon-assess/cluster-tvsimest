@@ -6,7 +6,7 @@ data{
   vector[N] S; //spawners in time T
  }
 parameters{
-  real<lower=0> log_a0;// initial productivity (on log scale) - fixed in this
+  real log_a0;// initial productivity (on log scale) - fixed in this
   real<upper=0> log_b0; // rate capacity - fixed in this
 
  //variance components  
