@@ -31,7 +31,7 @@ transformed parameters{
 }  
 model{
   //priors
-  log_a0 ~ gamma(3,1.5); //initial productivity - wide prior
+  log_a0 ~ normal(1.5,2.5); //initial productivity - wide prior
   log_b ~ normal(-12,3); //per capita capacity parameter - wide prior
   a_dev ~ std_normal(); //standardized (z-scales) deviances
   
