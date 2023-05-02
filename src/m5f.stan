@@ -35,7 +35,7 @@ transformed parameters{
 
 model{
   //priors
-  log_a0 ~ gamma(3,1.5); //initial productivity
+  log_a0 ~ normal(1.5,2.5); //initial productivity
   log_b0 ~ normal(-12,3); //initial capacity
   
   //variance terms
