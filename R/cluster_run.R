@@ -193,7 +193,7 @@ saveRDS(res_smax, file = "res_smax.rds")
 #run 95 that failed
 .rslurm_id <- 95
 .rslurm_istart <- (.rslurm_id)* 100 + 1
-.rslurm_iend <- min((.rslurm_id + 1) * 100, nrow(pars))
+.rslurm_iend <- min((.rslurm_id + 1) * 100, nrow(pars_smax))
 rslurm_res_smax95<-list()q()
 for(i in (.rslurm_istart):(.rslurm_iend)){
    rslurm_res_smax95[[i-9500]]<-tmb_func(path=".",
@@ -242,7 +242,17 @@ saveRDS(res_smaxda[res_smaxda$scenario%in%simPars$scenario[seq_len(nrow(simPars)
 saveRDS(res_smaxda[res_smaxda$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_smaxda2.rds")
 saveRDS(res_smaxda, file = "res_smaxda.rds")
 
-
+.rslurm_id <- 56
+.rslurm_istart <- (.rslurm_id)* 100 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 100, nrow(pars_smaxda))
+rslurm_res_smaxda56<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_res_smaxda56[[i-5600]]<-tmb_func(path=".",
+  a=pars_smaxda$a[i],
+  u=pars_smaxda$u[i])
+}
+result_smaxda_56<-do.call(rbind, rslurm_res_smaxda56)
+saveRDS(result_smaxda_56, file = "res_smaxda_56.rds")
 
 #============================================================================
 #sensitivity sigma scenarios low
