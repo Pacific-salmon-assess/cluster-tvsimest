@@ -399,6 +399,7 @@ data<- read.csv("data/emp/salmon_productivity_compilation_feb2023.csv")
 stocks<- read.csv("data/emp/all_stocks_info_feb2023.csv")
 
 ###Load in data####
+
 #Remove stocks with less than 15 years of recruitment data
 stocks_f=subset(stock_info,n.years>=16) #264 stocks
 stocks_f$stock.name=gsub('/','_',stock_info_filtered$stock.name)
