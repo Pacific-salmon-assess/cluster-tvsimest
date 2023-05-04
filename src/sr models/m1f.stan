@@ -4,7 +4,7 @@ data{
   vector[N] S; //spawners in time T
 }
 parameters {
-  real<lower = 0> log_a;// initial productivity (on log scale)
+  real log_a;// initial productivity (on log scale)
   real<upper = 0> log_b; // rate capacity - fixed in this
     
 //variance components  
@@ -18,7 +18,7 @@ transformed parameters{
 }
 model{
   //priors
-  log_a ~ gamma(3,1.5); //intrinsic productivity - wide prior
+  log_a ~ normal(1.5,2.5); //intrinsic productivity - wide prior
   log_b ~ normal(-12,3); //per capita capacity parameter - wide prior
   
   //variance terms

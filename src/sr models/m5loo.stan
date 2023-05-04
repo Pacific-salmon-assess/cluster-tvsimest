@@ -4,9 +4,11 @@ data{
   int ii[N];//index of years with data
   vector[N] R_S; //log(recruits per spawner)
   vector[N] S; //spawners in time T
+  real y_oos; //log(recruits per spawner)
+  real x_oos; //spawners in time T
  }
-parameters{
-  real<lower=0> log_a0;// initial productivity (on log scale) - fixed in this
+parameters {
+  real log_a0;// initial productivity (on log scale) - fixed in this
   real<upper=0> log_b0; // rate capacity - fixed in this
 
  //variance components  
@@ -21,7 +23,7 @@ parameters{
 
 transformed parameters{
   vector[L] log_a; //a in each year (log scale)
-  vector[L] log_b; //b in each year (log scale)
+  vector<upper = 0>[L] log_b; //b in each year (log scale)
   vector[L] b; //b in each year
   
   log_a[1] = log_a0;
@@ -35,7 +37,7 @@ transformed parameters{
 
 model{
   //priors
-  log_a0 ~ gamma(3,1.5); //initial productivity
+  log_a0 ~ normal(1.5,2.5); //initial productivity
   log_b0 ~ normal(-12,3); //initial capacity
   
   //variance terms
@@ -46,18 +48,24 @@ model{
   a_dev ~ std_normal();
   b_dev ~ std_normal();
   
-  for(n in 1:N) R_S[n] ~ normal(log_a[ii[n]]-b[ii[n]]*S[n], sigma);
+  for(n in 1:N) R_S ~ normal(log_a[ii[n]]-b[ii[n]]*S[n], sigma);
 }
- generated quantities{
-     vector[N] log_lik;
-     vector[L] S_max;
-     vector[L] U_msy;
-     vector[L] S_msy;
-     
-   for(n in 1:N) log_lik[n] = normal_lpdf(R_S[n]|log_a[ii[n]] - S[n]*b[ii[n]], sigma);
-   
-   for(l in 1:L){ S_max[l] = 1/b[l];
-    U_msy[l] = 1-lambert_w0(exp(1-log_a[l]));
-    S_msy[l] = (1-lambert_w0(exp(1-log_a[l])))/b[l];
-   }
-}
+generated quantities{
+  real b_3b;
+  real b_5b;
+  real log_a_3b;
+  real log_a_5b;
+  real log_lik_oos_1b;
+  real log_lik_oos_3b;
+  real log_lik_oos_5b;
+  
+  log_a_3b = (log_a[ii[N]]+log_a[ii[N-1]]+log_a[ii[N-2]])/3;
+  log_a_5b = (log_a[ii[N]]+log_a[ii[N-1]]+log_a[ii[N-2]]+log_a[ii[N-3]]+log_a[ii[N-4]])/5;
+  
+  b_3b = exp((log_b[ii[N]]+log_b[ii[N-1]]+log_b[ii[N-2]])/3);
+  b_5b = exp((log_b[ii[N]]+log_b[ii[N-1]]+log_b[ii[N-2]]+log_b[ii[N-3]]+log_b[ii[N-4]])/5);
+  
+  log_lik_oos_1b = normal_lpdf(y_oos|log_a[ii[N]] - x_oos*b[ii[N]], sigma);
+  log_lik_oos_3b = normal_lpdf(y_oos|log_a_3b - x_oos*b_3b, sigma);
+  log_lik_oos_5b = normal_lpdf(y_oos|log_a_5b - x_oos*b_5b, sigma);
+ }

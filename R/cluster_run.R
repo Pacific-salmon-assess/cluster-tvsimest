@@ -367,26 +367,42 @@ saveRDS(result_sigmed_73, file = "res_siglow_73.rds")
 library(cmdstanr)
 library(rslurm)
 library(samEst)
+source("R/stan_func.R")
 
 
-file1=file.path(cmdstanr::cmdstan_path(),'srmodels', "m1f.stan")
+file1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1f.stan")
 mod1=cmdstanr::cmdstan_model(file1)
-file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2f.stan")
+file2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2f.stan")
 mod2=cmdstanr::cmdstan_model(file2)
-file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f.stan")
+file3=file.path(cmdstanr::cmdstan_path(),'sr models', "m3f.stan")
 mod3=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f.stan")
+file4=file.path(cmdstanr::cmdstan_path(),'sr models', "m4f.stan")
 mod4=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f.stan")
+file5=file.path(cmdstanr::cmdstan_path(),'sr models', "m5f.stan")
 mod5=cmdstanr::cmdstan_model(file5)
-file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6f.stan")
+file6=file.path(cmdstanr::cmdstan_path(),'sr models', "m6f.stan")
 mod6=cmdstanr::cmdstan_model(file6)
-file7=file.path(cmdstanr::cmdstan_path(),'srmodels', "m7f.stan")
+file7=file.path(cmdstanr::cmdstan_path(),'sr models', "m7f.stan")
 mod7=cmdstanr::cmdstan_model(file7)
-file8=file.path(cmdstanr::cmdstan_path(),'srmodels', "m8f.stan")
+file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8f.stan")
 mod8=cmdstanr::cmdstan_model(file8)
 
-source("R/stan_func.R")
+file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
+mod1lfo=cmdstanr::cmdstan_model(file1lfo)
+file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
+mod2lfo=cmdstanr::cmdstan_model(file2lfo)
+file3lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
+mod3lfo=cmdstanr::cmdstan_model(file3lfo)
+file4lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
+mod4lfo=cmdstanr::cmdstan_model(file4lfo)
+file5lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
+mod5lfo=cmdstanr::cmdstan_model(file5lfo)
+file6lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
+mod6lfo=cmdstanr::cmdstan_model(file6lfo)
+file7lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
+mod7lfo=cmdstanr::cmdstan_model(file7lfo)
+file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
+mod8lfo=cmdstanr::cmdstan_model(file8lfo)
 
 
 simPars <- read.csv("data/generic/SimPars.csv")
@@ -457,6 +473,56 @@ saveRDS(resstan, file = "resstan7_12.rds")
 
 cleanup_files(sjobstan)
 
+#empirical - lfo stan runs
+library(cmdstanr)
+library(rslurm)
+library(samEst)
+source("R/emp_lfo.R")
+
+data<- read.csv("data/emp/salmon_productivity_compilation_feb2023.csv")
+stocks<- read.csv("data/emp/all_stocks_info_feb2023.csv")
+
+###Load in data####
+#Remove stocks with less than 15 years of recruitment data
+stocks_f=subset(stock_info,n.years>=16) #264 stocks
+stocks_f$stock.name=gsub('/','_',stock_info_filtered$stock.name)
+stocks_f$stock.name=gsub('&','and',stock_info_filtered$stock.name)
+
+data_f=subset(data,stock.id %in% stocks_f$stock.id)
+length(unique(data_f$stock.id)) #264
+stocks_f$stock.id2=seq(1:nrow(stocks_f))
+data_f$stock.id2=stocks_f$stock.id2[match(data_f$stock.id,stocks_f$stock.id)]
+
+if(any(data_f$spawners==0)){data_f$spawners=data_f$spawners+1;data_f$logR_S=log(data_f$recruits/data_f$spawners)}
+if(any(data_f$recruits==0)){data_f$recruits=data_f$recruits+1;data_f$logR_S=log(data_f$recruits/data_f$spawners)}
+data_f$logR_S=log(data_f$recruits/data_f$spawners)
+
+file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
+mod1lfo=cmdstanr::cmdstan_model(file1lfo)
+file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
+mod2lfo=cmdstanr::cmdstan_model(file2lfo)
+file3lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
+mod3lfo=cmdstanr::cmdstan_model(file3lfo)
+file4lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
+mod4lfo=cmdstanr::cmdstan_model(file4lfo)
+file5lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
+mod5lfo=cmdstanr::cmdstan_model(file5lfo)
+file6lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
+mod6lfo=cmdstanr::cmdstan_model(file6lfo)
+file7lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
+mod7lfo=cmdstanr::cmdstan_model(file7lfo)
+file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
+mod8lfo=cmdstanr::cmdstan_model(file8lfo)
+
+pars=(u=1:nrow(stocks))
+
+sjobstan3 <- slurm_apply(stan_func, pars, jobname = 'emprun',
+                         nodes = 300, cpus_per_node = 1, submit = FALSE,
+                         pkgs=c("samEst", "cmdstanr"),
+                         rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                         libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                         global_objects=c("data","stocks", "mod1lfo", "mod2lfo", "mod3lfo",
+                                          "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
 
 #log_a sensitivity
 
