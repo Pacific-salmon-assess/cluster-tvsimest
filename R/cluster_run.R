@@ -376,8 +376,6 @@ saveRDS(result_sigmed_73, file = "res_siglow_73.rds")
 #===========================================================================================
 #---------------------------------------------------------------------------------------------------------
 #stan version
-
-
 library(cmdstanr)
 library(rslurm)
 library(samEst)
@@ -401,28 +399,8 @@ mod7=cmdstanr::cmdstan_model(file7)
 file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8f.stan")
 mod8=cmdstanr::cmdstan_model(file8)
 
-file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
-mod1lfo=cmdstanr::cmdstan_model(file1lfo)
-file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
-mod2lfo=cmdstanr::cmdstan_model(file2lfo)
-file3lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
-mod3lfo=cmdstanr::cmdstan_model(file3lfo)
-file4lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
-mod4lfo=cmdstanr::cmdstan_model(file4lfo)
-file5lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
-mod5lfo=cmdstanr::cmdstan_model(file5lfo)
-file6lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
-mod6lfo=cmdstanr::cmdstan_model(file6lfo)
-file7lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
-mod7lfo=cmdstanr::cmdstan_model(file7lfo)
-file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
-mod8lfo=cmdstanr::cmdstan_model(file8lfo)
-
 
 simPars <- read.csv("data/generic/SimPars.csv")
-
-
-
 
 tst <- stan_func(path=".",
   a=1,
@@ -433,14 +411,14 @@ tst <- stan_func(path=".",
 
 #base case scn 1-6
 pars<-data.frame(path="..",
-  a=rep(seq_len(nrow(simPars)/2),each=1000),
-  u=1:1000)
+  a=rep(seq_len(nrow(simPars)/2),each=10),
+  u=1:10)
 
 sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
-                    nodes = 300, cpus_per_node = 1, submit = FALSE,
+                    nodes = 50, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst", "cmdstanr"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
-                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    rscript_path = "/fs/vnas_Hdfo/comda/dag004/homey/cluster-tvsimest/",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
                     global_objects=c("simPars", "mod1", "mod2", "mod3",
                       "mod4","mod5","mod6","mod7","mod8"))
 
@@ -497,6 +475,23 @@ data<- read.csv("data/emp/salmon_productivity_compilation_feb2023.csv")
 stocks<- read.csv("data/emp/all_stocks_info_feb2023.csv")
 
 ###Load in data####
+file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
+mod1lfo=cmdstanr::cmdstan_model(file1lfo)
+file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
+mod2lfo=cmdstanr::cmdstan_model(file2lfo)
+file3lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
+mod3lfo=cmdstanr::cmdstan_model(file3lfo)
+file4lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
+mod4lfo=cmdstanr::cmdstan_model(file4lfo)
+file5lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
+mod5lfo=cmdstanr::cmdstan_model(file5lfo)
+file6lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
+mod6lfo=cmdstanr::cmdstan_model(file6lfo)
+file7lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
+mod7lfo=cmdstanr::cmdstan_model(file7lfo)
+file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
+mod8lfo=cmdstanr::cmdstan_model(file8lfo)
+
 
 #Remove stocks with less than 15 years of recruitment data
 stocks_f=subset(stock_info,n.years>=16) #264 stocks
