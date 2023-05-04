@@ -14,6 +14,6 @@
 #SBATCH --output=slurm_%a.out
 
 
-cd /fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest/_rslurm_TMBrun_a
-/usr/bin/Rscript --vanilla slurm_run.R
 
+cd /fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest/TMBrun_sigmed
+/usr/bin/Rscript --vanilla slurm_run.R

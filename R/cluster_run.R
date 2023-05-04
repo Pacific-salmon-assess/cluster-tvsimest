@@ -1,36 +1,12 @@
-library(rslurm)
-library(samEst)
-source("R/tmb_func.R")
-
-
-
-my_get_slurm_out <- function (slr_job_name, nodes.list=0:50, outtype = "raw") 
-{
-       
-    res_files <- paste0("results_", nodes.list, ".RDS")
-    tmpdir <- paste0("_rslurm_", slr_job_name)
-    missing_files <- setdiff(res_files, dir(path = tmpdir))
-    if (length(missing_files) > 0) {
-        missing_list <- paste(missing_files, collapse = ", ")
-        warning(paste("The following files are missing:", missing_list))
-    }
-    res_files <- file.path(tmpdir, setdiff(res_files, missing_files))
-    if (length(res_files) == 0) 
-        return(NA)
-    
-        slurm_out <- lapply(res_files, readRDS)
-    
-    slurm_out <- do.call(c, slurm_out)
-    if (outtype == "table") {
-        slurm_out <- as.data.frame(do.call(rbind, slurm_out))
-    }
-    return(slurm_out)
-}
-
 
 
 #============================================================================
 #sbase case scenarios
+
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
+
 
 simPars <- read.csv("data/generic/SimPars.csv")
 
@@ -159,6 +135,26 @@ saveRDS(res_asmax[res_asmax$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nro
 saveRDS(res_asmax, file = "res_asmax.rds")
 
 
+
+tmb_func(path=".",
+  a=5,
+  u=1)
+#run 58 that failed
+.rslurm_id <- 58
+.rslurm_istart <- (.rslurm_id)* 100 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 100, nrow(pars_asmax))
+rslurm_result58<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_result58[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_asmax$a[i],
+  u=pars_asmax$u[i])
+}
+result58<-do.call(rbind, rslurm_result58)
+saveRDS(result58, file = "res_asmax58.rds")
+
+
+
+
 #============================================================================
 #smax scenarios 
 library(rslurm)
@@ -256,17 +252,20 @@ saveRDS(result_smaxda_56, file = "res_smaxda_56.rds")
 
 #============================================================================
 #sensitivity sigma scenarios low
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
 
 
-simPars <- read.csv("data/sensitivity_halfSmax/SimPars.csv")
+simPars <- read.csv("data/sigmalow_sensitivity/SimPars.csv")
 
-pars_asmax<-data.frame(path="..",
+pars_siglow<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
 
-sjobtmb_asmax <- slurm_apply(tmb_func, pars_asmax, jobname = 'TMBrun_asmax',
-                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+sjobtmb_siglow <- slurm_apply(tmb_func, pars_siglow, jobname = 'TMBrun_siglow',
+                    nodes = 100, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -275,7 +274,92 @@ sjobtmb_asmax <- slurm_apply(tmb_func, pars_asmax, jobname = 'TMBrun_asmax',
 
 
 
+res_siglow <- get_slurm_out(sjobtmb_siglow, outtype = 'table', wait = TRUE)
 
+
+saveRDS(res_siglow[res_siglow$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_siglow1.rds")
+saveRDS(res_siglow[res_siglow$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_siglow2.rds")
+saveRDS(res_siglow, file = "res_siglow.rds")
+
+
+#The following files are missing: results_5.RDS, results_26.RDS
+
+.rslurm_id <- 5
+.rslurm_istart <- (.rslurm_id)* 90 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 90, nrow(pars_siglow))
+rslurm_res_siglow5<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_res_siglow5[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_siglow$a[i],
+  u=pars_siglow$u[i])
+}
+result_siglow_5<-do.call(rbind, rslurm_res_siglow5)
+saveRDS(result_siglow_5, file = "res_siglow_5.rds")
+
+
+
+.rslurm_id <- 26
+.rslurm_istart <- (.rslurm_id)* 90 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 90, nrow(pars_siglow))
+rslurm_res_siglow26<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_res_siglow26[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_siglow$a[i],
+  u=pars_siglow$u[i])
+}
+result_siglow_26<-do.call(rbind, rslurm_res_siglow5)
+saveRDS(result_siglow_26, file = "res_siglow_26.rds")
+
+
+#============================================================================
+#sensitivity sigma scenarios med
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
+
+
+simPars <- read.csv("data/sigmamed_sensitivity/SimPars.csv")
+
+pars_sigmed<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+
+sjobtmb_sigmed <- slurm_apply(tmb_func, pars_sigmed, jobname = 'TMBrun_sigmed',
+                    nodes = 100, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+
+
+res_sigmed <- get_slurm_out(sjobtmb_sigmed, outtype = 'table', wait = TRUE)
+
+
+saveRDS(res_sigmed[res_sigmed$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_sigmed1.rds")
+saveRDS(res_sigmed[res_sigmed$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_sigmed2.rds")
+saveRDS(res_sigmed, file = "res_sigmed.rds")
+
+
+#The following files are missing: results_73.RDS
+
+.rslurm_id <- 73
+.rslurm_istart <- (.rslurm_id)* 90 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 90, nrow(pars_sigmed))
+rslurm_res_sigmed73<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_res_sigmed73[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_sigmed$a[i],
+  u=pars_sigmed$u[i])
+}
+result_sigmed_73<-do.call(rbind, rslurm_res_sigmed73)
+saveRDS(result_sigmed_73, file = "res_siglow_73.rds")
+
+
+
+#===========================================================================================
 #---------------------------------------------------------------------------------------------------------
 #stan version
 
