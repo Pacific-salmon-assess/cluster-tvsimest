@@ -364,21 +364,21 @@ stan_func<- function(path=".", a,u){
   
   #LFO cross-validation
   #model 1 - static Ricker
-  lfostatic<- samEst::stan_lfo_cv(mod=m1,type='static',df=df,L=10)
+  lfostatic<- samEst::stan_lfo_cv(mod=mod1lfo,type='static',df=df,L=10)
   #model 2 - static autocorrelated Ricker
-  lfoac<- samEst::stan_lfo_cv(mod=m2,type='static',df=df,L=10)
+  lfoac<- samEst::stan_lfo_cv(mod=mod2lfo,type='static',df=df,L=10)
   #model 3 - dynamic productivity Ricker
-  lfoalpha<- samEst::stan_lfo_cv(mod=m3,type='tv',df=df,L=10)
+  lfoalpha<- samEst::stan_lfo_cv(mod=mod3lfo,type='tv',df=df,L=10)
   #model 4 - dynamic capacity Ricker
-  lfobeta<- samEst::stan_lfo_cv(mod=m4,type='tv',df=df,L=10)
+  lfobeta<- samEst::stan_lfo_cv(mod=mod4lfo,type='tv',df=df,L=10)
   #model 5 - dynamic productivity & capacity Ricker
-  lfoalphabeta<- samEst::stan_lfo_cv(mod=m5,type='tv',df=df,L=10)
+  lfoalphabeta<- samEst::stan_lfo_cv(mod=mod5lfo,type='tv',df=df,L=10)
   #model 6 - productivity regime shift - 2 regimes
-  lfohmma<- samEst::stan_lfo_cv(mod=m6,type='regime',df=df,L=10,K=2)
+  lfohmma<- samEst::stan_lfo_cv(mod=mod6lfo,type='regime',df=df,L=10,K=2)
   #model 7 - capacity regime shift
-  lfohmmb<- samEst::stan_lfo_cv(mod=m7,type='regime',df=df,L=10,K=2)
+  lfohmmb<- samEst::stan_lfo_cv(mod=mod7lfo,type='regime',df=df,L=10,K=2)
   #model 8 - productivity and capacity regime shift
-  lfohmm<- samEst::stan_lfo_cv(mod=m8,type='regime',df=df,L=10,K=2)
+  lfohmm<- samEst::stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2)
   
   dflfo<- data.frame(parameter="LFO",
                      iteration=u,
