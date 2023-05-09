@@ -1,5 +1,7 @@
 emp_lfo<- function(u){
-  dat <- data[data$stock.id2==stocks_f$stock.id2[u],]
+  #stocks_f
+  #data_f
+  dat <- data_f[data_f$stock.id2==stocks_f$stock.id2[u],]
   dat <- dat[complete.cases(dat$spawners),]
 
   df <- list(by=dat$broodyear,
