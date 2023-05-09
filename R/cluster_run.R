@@ -99,10 +99,24 @@ saveRDS(res_a, file = "res_a.rds")
 
 
 
-#run 1
+tmb_func(path=".",
+  a=5,
+  u=1)
+#run 58 that failed
+.rslurm_id <- 1
+.rslurm_istart <- (.rslurm_id)* 50 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 50, nrow(pars_asmax))
+rslurm_result1<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+  print(i)
+   rslurm_result1[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_a$a[i],
+  u=pars_a$u[i])
+}
+result1<-do.call(rbind, rslurm_result1)
+saveRDS(result1, file = "res_a1.rds")
 
-saveRDS(res_a, file = "res_sensitivity_a.rds")
-
+#The following files are missing: results_1.RDS
 
 
 #============================================================================
