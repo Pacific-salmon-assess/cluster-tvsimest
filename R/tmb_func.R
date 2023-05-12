@@ -15,16 +15,17 @@ tmb_func <- function(path=".",a, u) {
                   S=dat$obsSpawners,
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
-
+  
+  dirpr<-matrix(c(4,1,1,4),2,2)
 
   p <- ricker_TMB(data=df)
   pac <- ricker_TMB(data=df, AC=TRUE)
   ptva <- ricker_rw_TMB(data=df,tv.par='a')
   ptvb <- ricker_rw_TMB(data=df, tv.par='b')
   ptvab <- ricker_rw_TMB(data=df, tv.par='both')
-  phmma <- ricker_hmm_TMB(data=df, tv.par='a')
-  phmmb <- ricker_hmm_TMB(data=df, tv.par='b')
-  phmm  <- ricker_hmm_TMB(data=df, tv.par='both')
+  phmma <- ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr)
+  phmmb <- ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr)
+  phmm  <- ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr)
 
   
 
@@ -289,20 +290,17 @@ tmb_func <- function(path=".",a, u) {
                                      phmmb$model$convergence + phmmb$conv_problem,
                                      phmm$model$convergence + phmm$conv_problem),
                        pbias=rep(NA,8))
-
-
-    
+  
    #lfo
     lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15)
     lfoac <- tmb_mod_lfo_cv(data=df,model='staticAC', L=15)
     lfoalpha <- tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=15)
     lfobeta <- tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=15)
     lfoalphabeta <- tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=15)
-    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15)
-    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15)
-    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15)
+    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15, dirichlet_prior=dirpr)
+    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15, dirichlet_prior=dirpr)
+    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15, dirichlet_prior=dirpr)
     
-
     dflfo<- data.frame(parameter="LFO",
                        iteration=u,
                        scenario= simPars$scenario[a],

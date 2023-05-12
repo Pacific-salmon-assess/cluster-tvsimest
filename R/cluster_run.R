@@ -321,7 +321,7 @@ for(i in (.rslurm_istart):(.rslurm_iend)){
   a=pars_siglow$a[i],
   u=pars_siglow$u[i])
 }
-result_siglow_26<-do.call(rbind, rslurm_res_siglow5)
+result_siglow_26<-do.call(rbind, rslurm_res_siglow26)
 saveRDS(result_siglow_26, file = "res_siglow_26.rds")
 
 
@@ -369,7 +369,7 @@ for(i in (.rslurm_istart):(.rslurm_iend)){
   u=pars_sigmed$u[i])
 }
 result_sigmed_73<-do.call(rbind, rslurm_res_sigmed73)
-saveRDS(result_sigmed_73, file = "res_siglow_73.rds")
+saveRDS(result_sigmed_73, file = "res_sigmed_73.rds")
 
 
 
