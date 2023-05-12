@@ -416,7 +416,7 @@ pars<-data.frame(path="..",
 
 sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
                     nodes = 50, cpus_per_node = 1, submit = FALSE,
-                    pkgs=c("samEst", "cmdstanr"),
+                    pkgs=c("samEst", "cmdstanr","rlang"),
                     rscript_path = "/fs/vnas_Hdfo/comda/dag004/homey/cluster-tvsimest/",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
                     global_objects=c("simPars", "mod1", "mod2", "mod3",
@@ -471,10 +471,11 @@ library(rslurm)
 library(samEst)
 source("R/emp_lfo.R")
 
-data<- read.csv("data/emp/salmon_productivity_compilation_feb2023.csv")
-stocks<- read.csv("data/emp/all_stocks_info_feb2023.csv")
+data<- read.csv("data/emp/salmon_productivity_compilation_may2023.csv")
+stocks<- read.csv("data/emp/all_stocks_info_may2023.csv")
 
 ###Load in data####
+set_cmdstan_path("/gpfs/fs7/dfo/hpcmc/comda/dag004/results/cluster-tvsimest/src")
 file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
 mod1lfo=cmdstanr::cmdstan_model(file1lfo)
 file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
@@ -494,9 +495,9 @@ mod8lfo=cmdstanr::cmdstan_model(file8lfo)
 
 
 #Remove stocks with less than 15 years of recruitment data
-stocks_f=subset(stock_info,n.years>=16) #264 stocks
-stocks_f$stock.name=gsub('/','_',stock_info_filtered$stock.name)
-stocks_f$stock.name=gsub('&','and',stock_info_filtered$stock.name)
+stocks_f=subset(stocks,n.years>=16) #264 stocks
+stocks_f$stock.name=gsub('/','_',stocks_f$stock.name)
+stocks_f$stock.name=gsub('&','and',stocks_f$stock.name)
 
 data_f=subset(data,stock.id %in% stocks_f$stock.id)
 length(unique(data_f$stock.id)) #264
@@ -524,14 +525,14 @@ mod7lfo=cmdstanr::cmdstan_model(file7lfo)
 file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
 mod8lfo=cmdstanr::cmdstan_model(file8lfo)
 
-pars=(u=1:nrow(stocks))
+pars=data.frame(path="..",u=1:nrow(stocks_f))
 
-sjobstan3 <- slurm_apply(stan_func, pars, jobname = 'emprun',
+sjobstan_emp <- slurm_apply(empf_lfo, pars, jobname = 'emprun',
                          nodes = 300, cpus_per_node = 1, submit = FALSE,
                          pkgs=c("samEst", "cmdstanr"),
-                         rscript_path = "/home/caw001/Documents/cluster-tvsimest",
-                         libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
-                         global_objects=c("data","stocks", "mod1lfo", "mod2lfo", "mod3lfo",
+                         rscript_path = "/home/dag004/Documents/cluster-tvsimest",
+                         libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
+                         global_objects=c("data_f","stocks_f", "mod1lfo", "mod2lfo", "mod3lfo",
                                           "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
 
 #log_a sensitivity
