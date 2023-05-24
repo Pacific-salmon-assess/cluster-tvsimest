@@ -465,36 +465,52 @@ saveRDS(resstan, file = "resstan7_12.rds")
 
 cleanup_files(sjobstan)
 
+
+
 #stan lfo runs####
-library(cmdstanr)
 library(rslurm)
-library(samEst)
-source("R/stan_lfo_func.R")
+source("R/stan_lfo_func.R") #stan lfo function
+library(cmdstanr)
 
-
+#load in cmdstanr models for LFO
 file1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
-mod1=cmdstanr::cmdstan_model(file1)
+mod1lfo=cmdstanr::cmdstan_model(file1)
 file2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
-mod2=cmdstanr::cmdstan_model(file2)
+mod2lfo=cmdstanr::cmdstan_model(file2)
 file3=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
-mod3=cmdstanr::cmdstan_model(file3)
+mod3lfo=cmdstanr::cmdstan_model(file3)
 file4=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
-mod4=cmdstanr::cmdstan_model(file4)
+mod4lfo=cmdstanr::cmdstan_model(file4)
 file5=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
-mod5=cmdstanr::cmdstan_model(file5)
+mod5lfo=cmdstanr::cmdstan_model(file5)
 file6=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
-mod6=cmdstanr::cmdstan_model(file6)
+mod6lfo=cmdstanr::cmdstan_model(file6)
 file7=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
-mod7=cmdstanr::cmdstan_model(file7)
+mod7lfo=cmdstanr::cmdstan_model(file7)
 file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
-mod8=cmdstanr::cmdstan_model(file8)
+mod8lfo=cmdstanr::cmdstan_model(file8)
 
-
+#simulation parameters
 simPars <- read.csv("data/generic/SimPars.csv")
 
-tst <- stan_func(path=".",
-                 a=1,
-                 u=1)
+#test function- this takes awhile....
+#tst <- stan_lfo(path=".",
+#                a=1,
+#                u=1)
+
+#test some pars
+pars<-data.frame(path="..",
+                   a=rep(seq_len(nrow(simPars)),each=5),
+                   u=1:5)
+#slurm job
+sjobstan_1 <- slurm_apply(stan_lfo, pars, jobname = 'stanrun1',
+                            nodes = 300, cpus_per_node = 1, submit = FALSE,
+                            pkgs=c("cmdstanr"),
+                            rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/dag004/results/cluster-tvsimest/",
+                            libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
+                            global_objects=c("simPars", "mod1lfo", "mod2lfo", "mod3lfo",
+                                             "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
+
 
 
 #empirical - lfo stan runs####
