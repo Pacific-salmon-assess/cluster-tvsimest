@@ -12,7 +12,7 @@ simPars <- read.csv("data/generic/SimPars.csv")
 
 
 #base case 
-tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/cluster-tvsimest",
+tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest",
   a=5,
   u=1)
   
@@ -26,9 +26,9 @@ pars<-data.frame(path="..",
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
-                    nodes = 50, cpus_per_node = 1, submit = FALSE,
+                    nodes = 100, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
@@ -82,7 +82,7 @@ pars_a<-data.frame(path="..",
 sjobtmb_a <- slurm_apply(tmb_func, pars_a, jobname = 'TMBrun_a',
                     nodes = 200, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
