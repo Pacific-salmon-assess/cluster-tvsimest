@@ -351,11 +351,11 @@ stan_func<- function(path=".", a,u){
                       iteration=u,
                       scenario= simPars$scenario[a],
                       method=rep("MCMC",8),
-                      model=rep(c("simple",
+                      model=c("simple",
                                   "autocorr",
                                   "rwa","rwb","rwab",
-                                  "hmma","hmmb","hmmab"),each=nrow(dat)),
-                      by=rep(dat$year,8),
+                                  "hmma","hmmb","hmmab"),
+  by=c(NA,8),
                       sim=rep(NA,8),
                       est=c(sum(apply(ll[[1]],2,log_mean_exp)),
                      sum(apply(ll[[2]],2,log_mean_exp)),
@@ -372,13 +372,13 @@ sum(apply(ll[[8]],2,log_mean_exp))),
                      iteration=u,
                      scenario= simPars$scenario[a],
                      method=rep("MCMC",8),
-                     model=rep(c("simple",
+                     model=c("simple",
                                  "autocorr",
                                  "rwa","rwb","rwab",
-                                 "hmma","hmmb","hmmab"),each=nrow(dat)),
-                     by=rep(dat$year,8),
+                                 "hmma","hmmb","hmmab"),
+                     by=rep(NA,8),
                      sim=rep(NA,8),
-                     est=c(samEst::stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7)))
+                     est=c(stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7)))
                      ,
                      convergence=rep(NA,8),
                      pbias=rep(NA,8))
@@ -388,20 +388,89 @@ sum(apply(ll[[8]],2,log_mean_exp))),
                      iteration=u,
                      scenario= simPars$scenario[a],
                      method=rep("MCMC",8),
-                     model=rep(c("simple",
+                     model=c("simple",
                                  "autocorr",
                                  "rwa","rwb","rwab",
-                                 "hmma","hmmb","hmmab"),each=nrow(dat)),
-                     by=rep(dat$year,8),
+                                 "hmma","hmmb","hmmab"),
+                     by=rep(NA,8),
                      sim=rep(NA,8),
-                     est=c(samEst::stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7)))
+                     est=c(stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7)))
                      ,
                      convergence=rep(NA,8),
                      pbias=rep(NA,8))
   
   
-  dff<-rbind(dfa,dfsmax,dfsig,dfsiga,dfsigb,dfsmsy,dfsgen,dfumsy,dfelpd,dfaic,df,bic)
+  dff<-rbind(dfa,dfsmax,dfsig,dfsiga,dfsigb,dfsmsy,dfsgen,dfumsy,dfelpd,dfaic,dfbic)
   
   return(dff)
   
+}
+
+stan_aic<- function(x,form=c('aic','bic'),type=c('full','d90','d80'),k){
+  LL=NA;AIC=NA;BIC=NA
+  elpd_1=matrix(nrow=length(x),ncol=ncol(x[[1]]))
+  if(type=='full'){
+    for(i in 1:length(x)){
+      elpd_1[i,]=apply(x[[i]],2,log_mean_exp) #
+    }
+    LL=apply(elpd_1,1,sum)
+    AIC=-2*LL+2*k+(2*k^2+2*k)/(ncol(x[[1]])-k-1)
+    BIC=-2*LL+k*log(ncol(x[[1]]))
+    
+    dAIC=AIC-min(AIC)
+    dBIC=BIC-min(BIC)
+    w_aic=NA
+    w_bic=NA
+    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dBIC))}
+    for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
+  }
+  if(type=='d90'){
+    for(i in 1:length(x)){
+      elpd_1[i,]=apply(x[[i]],2,log_mean_exp) #
+    }
+    elpd_1=elpd_1[,apply(elpd_1,2,sum)>=quantile(apply(elpd_1,2,sum),0.1)]
+    
+    LL=apply(elpd_1,1,sum)
+    AIC=-2*LL+2*k+(2*k^2+2*k)/(ncol(x[[1]])-k-1)
+    BIC=-2*LL+k*log(ncol(x[[1]]))
+    
+    dAIC=AIC-min(AIC)
+    dBIC=BIC-min(BIC)
+    w_aic=NA
+    w_bic=NA
+    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dBIC))}
+    for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
+  }
+  if(type=='d80'){
+    for(i in 1:length(x)){
+      elpd_1[i,]=apply(x[[i]],2,log_mean_exp) #
+    }
+    elpd_1=elpd_1[,apply(elpd_1,2,sum)>=quantile(apply(elpd_1,2,sum),0.2)]
+    
+    LL=apply(elpd_1,1,sum)
+    AIC=-2*LL+2*k+(2*k^2+2*k)/(ncol(x[[1]])-k-1)
+    BIC=-2*LL+k*log(ncol(x[[1]]))
+    
+    dAIC=AIC-min(AIC)
+    dBIC=BIC-min(BIC)
+    w_aic=NA
+    w_bic=NA
+    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dBIC))}
+    for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
+  }
+  if(form=='aic'){
+    return(w_aic)
+  }
+  if(form=='bic'){
+    return(w_bic)
+  }
+}
+
+log_sum_exp <- function(x) {
+  max_x <- max(x)  
+  max_x + log(sum(exp(x - max_x)))
+}
+
+log_mean_exp <- function(x) {
+  log_sum_exp(x) - log(length(x))
 }
