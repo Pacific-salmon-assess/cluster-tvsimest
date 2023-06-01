@@ -37,9 +37,9 @@ model{
   b0 ~ normal(-12,3); //initial capacity
   
   //variance terms
-   target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero   
-  target += normal_lpdf(sigma_b| 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero  
-   
+  sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma_b ~ normal(0,1); //half normal on variance (lower limit of zero)
+  
   b_dev ~ std_normal();
   
   for(n in 1:N) R_S[n] ~ normal(log_a-S[n]*b[ii[n]], sigma);

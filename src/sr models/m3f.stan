@@ -36,8 +36,8 @@ model{
   a_dev ~ std_normal(); //standardized (z-scales) deviances
   
   //variance terms
-   target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero   
-  target += normal_lpdf(sigma_a| 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero  
+  sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)
    
  
   for(n in 1:N) R_S[n] ~ normal(log_a[ii[n]] - S[n]*b, sigma); 

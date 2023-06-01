@@ -102,8 +102,7 @@ saveRDS(res_a, file = "res_a.rds")
 tmb_func(path=".",
   a=5,
   u=1)
-#run 58 that failed
-.rslurm_id <- 1
+#run 58103rm_id <- 1
 .rslurm_istart <- (.rslurm_id)* 50 + 1
 .rslurm_iend <- min((.rslurm_id + 1) * 50, nrow(pars_asmax))
 rslurm_result1<-list()
@@ -449,7 +448,7 @@ pars<-data.frame(path="..",
 sjobstan2 <- slurm_apply(stan_func, pars, jobname = 'stanrun',
                     nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst", "cmdstanr"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
+                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars", "mod1", "mod2", "mod3",
                       "mod4","mod5","mod6","mod7","mod8"))
@@ -469,25 +468,26 @@ cleanup_files(sjobstan)
 
 #stan lfo runs####
 library(rslurm)
+library(samEst)
 source("R/stan_lfo_func.R") #stan lfo function
 library(cmdstanr)
 
 #load in cmdstanr models for LFO
-file1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
+file1=file.path(cmdstanr::cmdstan_path(),'srmodels', "m1loo.stan")
 mod1lfo=cmdstanr::cmdstan_model(file1)
-file2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
+file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2loo.stan")
 mod2lfo=cmdstanr::cmdstan_model(file2)
-file3=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
+file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3loo.stan")
 mod3lfo=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
+file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4loo.stan")
 mod4lfo=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
+file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5loo.stan")
 mod5lfo=cmdstanr::cmdstan_model(file5)
-file6=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
+file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6loo.stan")
 mod6lfo=cmdstanr::cmdstan_model(file6)
-file7=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
+file7=file.path(cmdstanr::cmdstan_path(),'srmodels', "m7loo.stan")
 mod7lfo=cmdstanr::cmdstan_model(file7)
-file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
+file8=file.path(cmdstanr::cmdstan_path(),'srmodels', "m8loo.stan")
 mod8lfo=cmdstanr::cmdstan_model(file8)
 
 #simulation parameters
@@ -503,16 +503,23 @@ pars<-data.frame(path="..",
                    a=rep(seq_len(nrow(simPars)),each=5),
                    u=1:5)
 #slurm job
-sjobstan_1 <- slurm_apply(stan_lfo, pars, jobname = 'stanrun1',
-                            nodes = 300, cpus_per_node = 1, submit = FALSE,
-                            pkgs=c("cmdstanr"),
-                            rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/dag004/results/cluster-tvsimest/",
-                            libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
+sjobstanloobase <- slurm_apply(stan_lfo, pars, jobname = 'stanloobase',
+                            nodes = 25, cpus_per_node = 1, submit = FALSE,
+                            pkgs=c("cmdstanr", "samEst"),
+                            rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
+                            libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1lfo", "mod2lfo", "mod3lfo",
                                              "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
 
 
+resstanloo <- get_slurm_out(sjobstanloobase, outtype = 'table', wait = FALSE)
 
+saveRDS(resstan, file = "resstan.rds")
+saveRDS(resstan[resstan$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstan1.rds")
+saveRDS(resstan[resstan$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstan2.rds")
+
+
+#================================================================================================================
 #empirical - lfo stan runs####
 library(cmdstanr)
 library(rslurm)

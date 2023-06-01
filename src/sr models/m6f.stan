@@ -50,8 +50,9 @@ model{
   log_a ~ normal(1.5,2.5);
   log_b ~ normal(-12,3);
   
-  target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero   
+  sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   
+
   pi1 ~ dirichlet(rep_vector(1, K));
   
   for(k in 1:K){

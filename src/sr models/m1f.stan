@@ -22,8 +22,9 @@ model{
   log_b ~ normal(-12,3); //per capita capacity parameter - wide prior
   
   //variance terms
-  target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero
-  
+  //target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero
+  sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+
    R_S ~ normal(log_a - S*b, sigma);
 }
 generated quantities{
