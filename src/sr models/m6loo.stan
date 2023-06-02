@@ -15,7 +15,6 @@ data {
  }
 parameters {
 // Discrete state model
-simplex[K] pi1; // initial state probabilities
 simplex[K] A[K]; // transition probabilities
 
 // A[i][j] = p(z_t = j | z_{t-1} = i)
@@ -26,8 +25,11 @@ real<lower=0> sigma; // observation standard deviations
 }
 
 transformed parameters {
+simplex[K] pi1; // initial state probabilities
 vector[K] logalpha[N];
 real b; //
+
+for(i in 1:K){pi1[i]=1/K};
 
 b=exp(log_b);
  
@@ -51,9 +53,6 @@ model{
 log_a ~ normal(1.5,2.5);
 log_b ~ normal(-12,3);
 sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
-
-
-pi1 ~ dirichlet(rep_vector(1, K));
 
 for(k in 1:K){
 A[k,] ~ dirichlet(alpha_dirichlet);

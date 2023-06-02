@@ -14,7 +14,6 @@ data {
  }
 parameters {
 // Discrete state model
-simplex[K] pi1; // initial state probabilities
 simplex[K] A[K]; // transition probabilities
 
 // A[i][j] = p(z_t = j | z_{t-1} = i)
@@ -27,8 +26,12 @@ real<lower=0> sigma; // observation standard deviations
 transformed parameters {
 vector[K] logalpha[N];
 vector[K] b; //
+simplex[K] pi1; // initial state probabilities
 
 b=exp(log_b);
+
+for(i in 1:K){pi1[i]=1/K};
+
  
 { // Forward algorithm log p(z_t = j | y_{1:t})
 real accumulator[K];
@@ -51,9 +54,6 @@ model{
 log_a ~ normal(1.5,2.5);
 log_b ~ normal(-12,3);
 sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
-
- 
-pi1 ~ dirichlet(rep_vector(1, K));
 
 for(k in 1:K){
 A[k,] ~ dirichlet(alpha_dirichlet);
