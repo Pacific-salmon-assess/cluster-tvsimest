@@ -12,7 +12,6 @@ functions {
     }
     parameters {
       // Discrete state model
-      simplex[K] pi1; // initial state probabilities
       simplex[K] A[K]; // transition probabilities
       
       // A[i][j] = p(z_t = j | z_{t-1} = i)
@@ -23,9 +22,12 @@ functions {
     }
     
     transformed parameters {
+	 simplex[K] pi1; // initial state probabilities
       vector[K] logalpha[N];
       vector[K] b; //
         
+	 pi1=rep_vector(1%/%K,K);
+
         b=exp(log_b);
         
         { // Forward algorithm log p(z_t = j | y_{1:t})
@@ -50,9 +52,6 @@ functions {
       log_b ~ normal(-12,3);
 
       sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
-  
-      
-      pi1 ~ dirichlet(rep_vector(1, K));
       
       for(k in 1:K){
         A[k,] ~ dirichlet(alpha_dirichlet);
