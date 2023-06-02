@@ -28,7 +28,7 @@ simplex[K] pi1; // initial state probabilities
 vector[K] logalpha[N];
 vector[K] b;
 
- pi1=rep_vector(1%/%K,K);
+  pi1=rep_vector(1.0/K,K);
 
 b=exp(log_b);
  
