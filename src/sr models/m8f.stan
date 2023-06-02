@@ -26,7 +26,7 @@ functions {
       vector[K] logalpha[N];
       vector[K] b; //
         
-		for(i in 1:K){pi1[i]=1/K};
+	 pi1=rep_vector(1%/%K,K);
 
         b=exp(log_b);
         

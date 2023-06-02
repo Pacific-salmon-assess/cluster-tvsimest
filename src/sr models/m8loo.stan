@@ -30,8 +30,7 @@ simplex[K] pi1; // initial state probabilities
 
 b=exp(log_b);
 
-for(i in 1:K){pi1[i]=1/K};
-
+ pi1=rep_vector(1%/%K,K);
  
 { // Forward algorithm log p(z_t = j | y_{1:t})
 real accumulator[K];
