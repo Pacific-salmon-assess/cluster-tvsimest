@@ -35,6 +35,8 @@ mod8=cmdstanr::cmdstan_model(file8)
 simPars <- read.csv("data/generic/SimPars.csv")
 
 
+tst<-stan_func(path=".", a=4,u=19)
+
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
