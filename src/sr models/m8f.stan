@@ -8,7 +8,7 @@ functions {
       vector[N] R_S; //log(recruits per spawner)
       vector[N] S; //spawners in time T
       int<lower=1> K; //number of hidden regime states
-      vector[K] alpha_dirichlet; //prior inputs for dirichlet 
+      matrix[K,K] alpha_dirichlet; //prior inputs for dirichlet 
     }
     parameters {
       // Discrete state model
@@ -25,8 +25,8 @@ functions {
 	 simplex[K] pi1; // initial state probabilities
       vector[K] logalpha[N];
       vector[K] b; //
- 
-	 pi1=rep_vector(1.0/K,K);
+        
+	  pi1=rep_vector(1.0/K,K);
 
         b=exp(log_b);
         
@@ -54,7 +54,7 @@ functions {
       sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
       
       for(k in 1:K){
-        A[k,] ~ dirichlet(alpha_dirichlet);
+        A[k,] ~ dirichlet(alpha_dirichlet[k,]);
       }
       
       target += log_sum_exp(logalpha[N]);

@@ -8,7 +8,7 @@ data {
   vector[N] R_S; //log(recruits per spawner)
   vector[N] S; //spawners in time T
   int<lower=1> K; //number of hidden regime states
-  vector[K] alpha_dirichlet; //prior inputs for dirichlet 
+  matrix[K,K] alpha_dirichlet; //prior inputs for dirichlet 
   
   real y_oos; //log(recruits per spawner)
   real x_oos; //spawners in time T
@@ -55,7 +55,7 @@ log_b ~ normal(-12,3);
 sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
 
 for(k in 1:K){
-A[k,] ~ dirichlet(alpha_dirichlet);
+A[k,] ~ dirichlet(alpha_dirichlet[k,]);
 }
 
 target += log_sum_exp(logalpha[N]);

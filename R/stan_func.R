@@ -16,7 +16,7 @@ stan_func<- function(path=".", a,u){
              ii=as.numeric(as.factor(dat$year)),
              N=nrow(dat),
              K=2,
-             alpha_dirichlet=c(4,1)
+             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2)
   )
   
   #create folder to hold temp files
