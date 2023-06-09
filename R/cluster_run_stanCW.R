@@ -336,6 +336,8 @@ pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
+stan_lfo(path=".", a=4,u=23)
+
 #slurm job
 sjobstanloobase <- slurm_apply(stan_lfo, pars, jobname = 'stanloobase',
                             nodes = 250, cpus_per_node = 1, submit = FALSE,

@@ -25,11 +25,11 @@ stan_lfo<- function(path=".", a,u){
   #model 5 - dynamic productivity & capacity Ricker
   lfoalphabeta<- stan_lfo_cv(mod=mod5lfo,type='tv',df=df,L=10)
   #model 6 - productivity regime shift - 2 regimes
-  lfohmma<- stan_lfo_cv(mod=mod6lfo,type='regime',df=df,L=10,K=2)
+  lfohmma<- stan_lfo_cv(mod=mod6lfo,type='regime',df=df,L=10,K=2,alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2))
   #model 7 - capacity regime shift
-  lfohmmb<- stan_lfo_cv(mod=mod7lfo,type='regime',df=df,L=10,K=2)
+  lfohmmb<- stan_lfo_cv(mod=mod7lfo,type='regime',df=df,L=10,K=2,alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2))
   #model 8 - productivity and capacity regime shift
-  lfohmm<- stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2)
+  lfohmm<- stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2,alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2))
   
   dflfo<- data.frame(parameter="LFO",
                      iteration=u,
