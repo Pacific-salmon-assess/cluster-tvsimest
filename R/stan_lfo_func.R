@@ -29,7 +29,7 @@ stan_lfo<- function(path=".", a,u){
   #model 7 - capacity regime shift
   lfohmmb<- stan_lfo_cv(mod=mod7lfo,type='regime',df=df,L=10,K=2,dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2))
   #model 8 - productivity and capacity regime shift
-  lfohmm<- stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2,dirichlet_priort=matrix(c(2,1,1,2),ncol=2,nrow=2))
+  lfohmm<- stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2,dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2))
   
   dflfo<- data.frame(parameter="LFO",
                      iteration=u,
