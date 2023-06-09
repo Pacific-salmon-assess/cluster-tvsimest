@@ -12,7 +12,7 @@ emp_lfo<- function(u){
              ii=as.numeric(as.factor(dat$broodyear)),
              N=nrow(dat),
              K=2,
-             alpha_dirichlet=c(4,1)
+             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2)
   )
   
   #LFO cross-validation
