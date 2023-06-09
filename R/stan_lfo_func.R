@@ -157,7 +157,7 @@ stan_refit<- function(mod,newdata,oos,K=2){
     y_oos=oosdata$logRS,
     x_oos=oosdata$S,
     K=2,
-    alpha_dirichlet=c(4,1)
+    alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2)
   )
   
   r = mod$sample(data=df,

@@ -16,7 +16,7 @@ tmb_func <- function(path=".",a, u) {
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
   
-  dirpr<-matrix(c(4,1,1,4),2,2)
+  dirpr<-matrix(c(2,1,1,2),2,2)
 
   p <- ricker_TMB(data=df)
   pac <- ricker_TMB(data=df, AC=TRUE)
