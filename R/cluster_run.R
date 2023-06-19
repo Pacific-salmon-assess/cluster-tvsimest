@@ -38,18 +38,8 @@ resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
 #rowsby scenario
 nrow(simParsall)
 
-nr1<-1:nrow(simPars1)
-nr2<-nrow(simPars1)+(1:nrow(simPars2))
-nr3<-nrow(simPars1)+nrow(simPars2)+(1+nrow(simPars3))
-nr4<-nrow(simPars1)+nrow(simPars2)+nrow(simPars3)+(1+nrow(simPars4))
-nr5<-nrow(simPars1)+nrow(simPars2)+nrow(simPars3)+nrow(simPars4)+(1+nrow(simPars5))
-nr6<-nrow(simPars1)+nrow(simPars2)+nrow(simPars3)+nrow(simPars4)+nrow(simPars5)+(1+nrow(simPars6))
-nr7<-nrow(simPars1)+nrow(simPars2)+nrow(simPars3)+nrow(simPars4)+nrow(simPars5)+nrow(simPars6)+(1+nrow(simPars7))
-nr8<-nrow(simPars1)+nrow(simPars2)+nrow(simPars3)+nrow(simPars4)+nrow(simPars5)+nrow(simPars6)+nrow(simPars7)+(1+nrow(simPars8))
-nr9<-nrow(simPars1)+nrow(simPars2)+nrow(simPars3)+nrow(simPars4)+nrow(simPars5)+nrow(simPars6)+nrow(simPars7)+nrow(simPars8)+(1+nrow(simPars9))
-
 #base
-saveRDS(resall[resall$scenario%in%simPar1$scenario,], file = "resbase.rds")
+saveRDS(resall[resall$scenario%in%simPars1$scenario,], file = "resbase.rds")
 saveRDS(resall[resall$scenario%in%simPars1$scenario[seq_len(nrow(simPars1)/2)],],], file = "resbase1.rds")
 saveRDS(resall[resall$scenario%in%simPars1$scenario[(nrow(simPars1)/2+1):nrow(simPars1)],],], file = "resbase2.rds")
 
