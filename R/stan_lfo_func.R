@@ -13,6 +13,9 @@ stan_lfo<- function(path=".", a,u){
              logRS=log(dat$obsRecruits/dat$obsSpawners)
   )
   
+  
+  options(mc.cores = 3)
+
   #LFO cross-validation
   #model 1 - static Ricker
   lfostatic<- stan_lfo_cv(mod=mod1lfo,type='static',df=df,L=10)

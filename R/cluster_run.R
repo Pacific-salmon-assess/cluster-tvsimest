@@ -17,7 +17,7 @@ simPars8 <- read.csv("data/genericER/SimPars_ER.csv")
 simPars9 <- read.csv("data/generic_biascorr/SimPars_biascorr.csv")
 
 
-simParsall<-rbind(simPars1,simPars2,simPars3,simPars4,simPars5,simPars6,simPars7,simPars8,simPars9)
+simPars<-rbind(simPars1,simPars2,simPars3,simPars4,simPars5,simPars6,simPars7,simPars8,simPars9)
 
 
 
@@ -31,9 +31,10 @@ sjobtmball <- slurm_apply(tmb_func, parsall, jobname = 'TMBrunall',
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
-                    global_objects=c("simParsall"))
+                    global_objects=c("simPars"))
 
 resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
+#The following files are missing: results_45.RDS, results_48.RDS, results_116.RDS, results_142.RDS, results_147.RDS, results_225.RDS, results_245.RDS
 
 #rowsby scenario
 nrow(simParsall)
