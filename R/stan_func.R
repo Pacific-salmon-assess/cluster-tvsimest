@@ -474,3 +474,7 @@ log_sum_exp <- function(x) {
 log_mean_exp <- function(x) {
   log_sum_exp(x) - log(length(x))
 }
+
+
+
+

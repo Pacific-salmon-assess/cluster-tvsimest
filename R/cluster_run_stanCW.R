@@ -337,6 +337,12 @@ pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
+
+
+#pars<-data.frame(path="..",
+#  a=rep(2,each=15),
+#  u=1:15)
+#
 #stan_lfo(path=".", a=4,u=23)
 
 #slurm job
@@ -372,7 +378,7 @@ pars_a<-data.frame(path="..",
 
 
 sjobstanloo_a <- slurm_apply(stan_lfo, pars_a, jobname = 'stanloo_a',
-                            nodes = 250, cpus_per_node = 1, submit = FALSE,
+                            nodes = 250, cpus_per_node = 3, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -576,8 +582,10 @@ pars_baseER<-data.frame(path="..",
 
 
 
+
+
 sjobstanloo_baseER <- slurm_apply(stan_lfo, pars_baseER, jobname = 'stanloo_baseER',
-                            nodes = 250, cpus_per_node = 1, submit = FALSE,
+                            nodes = 250, cpus_per_node = 3, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",

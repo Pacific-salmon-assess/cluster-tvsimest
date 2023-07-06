@@ -16,5 +16,5 @@
 
 
 
-cd /fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest/_rslurm_stanloobase
+cd /fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest/_rslurm_stanloo_baseER
 /usr/bin/Rscript --vanilla slurm_run.R
