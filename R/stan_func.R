@@ -28,75 +28,76 @@ stan_func<- function(path=".", a,u){
 #                 '/*',sep=''))
 #}
   
+  options(mc.cores = 5)
   #
   f1 <- mod1$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f2 <- mod2$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f3 <- mod3$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f4 <- mod4$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f5 <- mod5$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f6 <- mod6$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f7 <- mod7$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   
   f8 <- mod8$sample(data=df,
                     seed = 123,
-                    chains = 6, 
-                    iter_warmup = 200,
-                    iter_sampling = 600,
+                    chains = 30, 
+                    iter_warmup = 4000,
+                    iter_sampling = 60000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
