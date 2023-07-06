@@ -40,6 +40,12 @@ pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
+
+
+pars<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=10),
+  u=1:10)
+
 tst<-stan_func(path=".", a=2,u=19)
 
 sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
