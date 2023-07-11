@@ -28,7 +28,7 @@ stan_func<- function(path=".", a,u){
 #                 '/*',sep=''))
 #}
   
-  #options(mc.cores = 5)
+  options(mc.cores = 5)
   #
   f1 <- mod1$sample(data=df,
                     seed = 123,
@@ -456,7 +456,7 @@ stan_aic<- function(x,form=c('aic','bic'),type=c('full','d90','d80'),k){
     dBIC=BIC-min(BIC)
     w_aic=NA
     w_bic=NA
-    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dBIC))}
+    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dAIC))}
     for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
   }
   if(form=='aic'){
