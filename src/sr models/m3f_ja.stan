@@ -14,20 +14,20 @@ parameters{
   real<lower = 0> sigma_a;
 
   //time-varying parameters
-  //vector[L-1] a_dev; //year-to-year deviations in a
-  vector[L] log_a; //year-to-year estimates of a
+  vector[L-1] a_dev; //year-to-year deviations in a
+ 
 }
 transformed parameters{
   real b;
-  //vector[L] log_a; //a in each year (on log scale)
+  vector[L] log_a; //a in each year (on log scale)
   
   b=exp(log_b);
   
   
-  //log_a[1] = log_a0; //initial value
-  //for(t in 2:L){
-  //  log_a[t] = log_a[t-1] + a_dev[t-1]*sigma_a; //random walk of log_a
-  //}
+  log_a[1] = log_a0; //initial value
+  for(t in 2:L){
+    log_a[t] = log_a[t-1] + a_dev[t-1]*sigma_a; //random walk of log_a
+  }
   
 }  
 model{
@@ -35,15 +35,13 @@ model{
   log_a0 ~ normal(1.5,2.5); //initial productivity - wide prior
   log_b ~ normal(-12,3); //per capita capacity parameter - wide prior
    
-  //a_dev ~ std_normal(); //standardized (z-scales) deviances
+  a_dev ~ std_normal(); //standardized (z-scales) deviances
   
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)
    
-  log_a[1] ~ normal(log_a0, sigma_a); 
-  for(n in 2:N) log_a[n] ~ normal(log_a[n-1],  sigma_a); 
-  
+
   for(n in 1:N) R_S[n] ~ normal(log_a[ii[n]] - S[n]*b, sigma); 
 
   //jacobian
@@ -62,4 +60,4 @@ model{
     S_max = 1/b;
     U_msy = 1-lambert_w0(exp(1-log_a));
     S_msy = (1-lambert_w0(exp(1-log_a)))/b;
-    }
+}

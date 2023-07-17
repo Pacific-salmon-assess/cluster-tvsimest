@@ -40,7 +40,7 @@ model{
   
    
   b_dev ~ std_normal();
- for(n in 1:N) R_S[n] ~ normal(log_a-b[ii[n]]*S[n], sigma);
+  for(n in 1:N) R_S[n] ~ normal(log_a-b[ii[n]]*S[n], sigma);
 
  //jacobian
   target +=  b0;
