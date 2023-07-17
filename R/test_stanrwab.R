@@ -504,3 +504,7 @@ ggplot(dfsmax)+
 geom_line(aes(x=by,y=value,color=model, group=interaction(model, iteration)),linewidth=1.2)+
 scale_color_viridis_d(begin=.1, end=.8) +
 mytheme
+
+
+
+resf4Smax[grep("S_max",resf4Smax$variable),]
