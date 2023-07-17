@@ -38,7 +38,7 @@ transformed parameters{
 model{
   //priors
   log_a ~ normal(1.5,2.5); //productivity
-  b0 ~ normal(logSmax_pr,logSmax_pr_sig); //capacity
+  b0 ~ normal(logSmax_pr,logSmax_pr_sig); //initial capacity
   
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
@@ -47,6 +47,8 @@ model{
    
   b_dev ~ std_normal();
  for(n in 1:N) R_S[n] ~ normal(log_a-b[ii[n]]*S[n], sigma);
+
+ target += b0; 
 }
 generated quantities{
      vector[N] log_lik;

@@ -8,7 +8,7 @@ data{
   real pSmax_sig;
 }
 parameters {
-  real log_a;// initial productivity (on log scale) - fixed in this
+  real<lower = 0> log_a;// initial productivity (on log scale) - fixed in this
   real<lower = 0> Smax0; // rate capacity - fixed in this
 
  //variance components  
@@ -16,27 +16,27 @@ parameters {
   real<lower = 0> sigma_b;
   
   //time-varying parameters
-  vector[L] S_max; //year-to-year deviations in a
-
+  vector[L-1] smax_dev; //year-to-year deviations in a
+  
 }
 
 transformed parameters{
-  
+vector<lower=0>[L] Smax; //year-to-year deviations in a
+   
+Smax[1]=Smax0;
+
+for(t in 2:L){Smax[t]=Smax[t-1] + smax_dev[t-1]*sigma_b;}
+
 }  
 
 model{
   //priors
   log_a ~ normal(1.5,2.5); //productivity
-  Smax0 ~ normal(pSmax_mean,pSmax_sig); //per capita capacity parameter - wide prior
+  Smax0 ~ lognormal(log(pSmax_mean),log(1+(pSmax_sig/pSmax_mean))); //per capita capacity parameter - wide prior
   
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_b ~ normal(0,1); //half normal on variance (lower limit of zero)
-  
-  S_max[1] ~ normal(Smax0, sigma_b); 
-  for(n in 2:N) S_max[n] ~ normal(S_max[n-1],  sigma_b); 
-  
-  
  
   for(n in 1:N) R_S[n] ~ normal(log_a-S[n]/S_max[ii[n]], sigma);
 }
