@@ -7,7 +7,7 @@
 library(cmdstanr)
 library(rslurm)
 library(samEst)
-source("R/stan_func.R")
+source("R/stan_rwtest_func.R")
 
 
 file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f.stan")
@@ -37,24 +37,20 @@ simPars <- read.csv("data/generic/SimPars.csv")
 
 
 pars<-data.frame(path="..",
-  a=rep(seq_len(nrow(simPars)),each=1000),
+  a=rep(c(4,5,6,11),each=1000),
   u=1:1000)
 
 
 
-pars<-data.frame(path="..",
-  a=rep(seq_len(nrow(simPars)),each=10),
-  u=1:10)
 
-tst<-stan_func(path=".", a=2,u=19)
 
-sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrun',
+sjobstan <- slurm_apply(stan_rwtest_func, pars, jobname = 'stanrwtest',
                     nodes = 120, cpus_per_node = 5, submit = FALSE,
                     pkgs=c("samEst", "cmdstanr"),
                     rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
-                    global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                    global_objects=c("simPars", "mod3","mod3_ja"
+                      "mod4","mod4_ja","mod4_jan"))
 
 
 
