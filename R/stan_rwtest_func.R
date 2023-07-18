@@ -35,7 +35,7 @@ stan_rwtest_func<- function(path=".", a,u){
 #                 '/*',sep=''))
 #}
   
-  options(mc.cores = 5)
+  #options(mc.cores = 5)
   #
   
   

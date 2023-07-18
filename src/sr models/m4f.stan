@@ -4,12 +4,6 @@ data{
   int ii[N];//index of years with data
   vector[N] R_S; //log(recruits per spawner)
   vector[N] S; //spawners in time T
-  real pSmax_mean;
-  real pSmax_sig;
-}
-transformed data{
-logSmax_pr=log(pSmax_mean); //convert smax prior to log scale
-logSmax_pr_sig=log(1+pSmax_sig/pSmax_mean); //conversion of sd to log scale
 }
 parameters {
   real log_a;// initial productivity (on log scale) - fixed in this
@@ -38,7 +32,7 @@ transformed parameters{
 model{
   //priors
   log_a ~ normal(1.5,2.5); //productivity
-  b0 ~ normal(logSmax_pr,logSmax_pr_sig); //capacity
+  b0 ~ normal(-12,3); //capacity
   
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
