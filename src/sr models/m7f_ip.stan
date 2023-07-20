@@ -13,6 +13,8 @@ data {
   real pSmax_sig;
 }
 transformed data{
+  real logSmax_pr;
+  real logSmax_pr_sig;
 logSmax_pr=log(1/pSmax_mean); //convert smax prior to log scale
 logSmax_pr_sig=sqrt(log(1+(pSmax_sig*pSmax_sig)/(pSmax_mean*pSmax_mean))); //this converts sigma on the untransformed scale to a log scale
 }
