@@ -18,7 +18,7 @@
 #install samest
 #remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
 
-
+packageVersion("Matrix")
 library(samEst)
 library(samSim)
 library(ggplot2)

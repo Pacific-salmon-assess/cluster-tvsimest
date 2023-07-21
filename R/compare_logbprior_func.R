@@ -60,9 +60,7 @@ compare_logbprior_func<- function(path=".", a,u){
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   resf4<-f4$summary()
- ip_logb_mean<-log(1/(max(df_tmb$S)*.5))
-  ip_logb_sd<-sqrt(log(1+ (ip_logb_mean)^2/ ip_logb_mean^2))
-
+ 
 
   f4_ip <- mod4_ip$sample(data=df,
                     seed = 123,
@@ -108,14 +106,14 @@ compare_logbprior_func<- function(path=".", a,u){
                          rep(ptvb_ip$alpha,nrow(dat))
                          ),
                    convergence= as.numeric( c(
-                        abs(resf3noadj[grep("log_a\\[",resf3noadj$variable),"rhat"][[1]]-1)>.1,
-                        abs(resf3ja[grep("log_a\\[",resf3ja$variable),"rhat"][[1]]-1)>.1,
-                        rep(abs(resf4noadj[grep("log_a",resf4noadj$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
-                        rep(abs(resf4ja[grep("log_a",resf4ja$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
-                        rep(abs(resf4jan[grep("log_a",resf4jan$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
-
+                        abs(resf3[grep("log_a\\[",resf3$variable),"rhat"][[1]]-1)>.1,
+                        abs(resf3_ip[grep("log_a\\[",resf3_ip$variable),"rhat"][[1]]-1)>.1,
+                        rep(abs(resf4[grep("log_a",resf4$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
+                        rep(abs(resf4_ip[grep("log_a",resf4_ip$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
                         rep(ptva$model$convergence + ptva$conv_problem,nrow(dat)),
-                        rep(ptvb$model$convergence + ptvb$conv_problem,nrow(dat)))))
+                        rep(ptva_ip$model$convergence + ptva_ip$conv_problem,nrow(dat)),
+                        rep(ptvb$model$convergence + ptvb$conv_problem,nrow(dat)),
+                        rep(ptvb_ip$model$convergence + ptvb_ip$conv_problem,nrow(dat)))))
 
 
   dfa$pbias<- ((dfa$est-dfa$sim)/dfa$sim)*100
@@ -126,24 +124,26 @@ compare_logbprior_func<- function(path=".", a,u){
   dfsmax<- data.frame(parameter="smax",
                       iteration=u,
                       scenario= simPars$scenario[a],
-                      method=rep(c(rep("MCMC",5),rep("MCMC",2)),each=nrow(dat)),
-                      model=rep(c("rwa","rwa_ja","rwb","rwb_ja","rwb_jan","rwa_tmb","rwb_tmb"),each=nrow(dat)),
-                      by=rep(dat$year,7),
-                      sim=rep(1/dat$beta,7),
+                      method=rep(c(rep("MCMC",4),rep("MCMC",4)),each=nrow(dat)),
+                      model=rep(c("rwa_stan","rwa_stan_ip","rwb_stan","rwb_stan_ip","rwa_tmb","rwa_tmb_ip","rwb_tmb","rwb_tmb_ip"),each=nrow(dat)),
+                      by=rep(dat$year,8),
+                      sim=rep(1/dat$beta,8),
                       est=c(rep(resf3noadj[grep('S_max',resf3noadj$variable),"median"][[1]],nrow(dat)),
                             rep(resf3ja[grep('S_max',resf3ja$variable),"median"][[1]],nrow(dat)),
-                            resf4noadj[grep('S_max',resf4noadj$variable),"median"][[1]],
-                            resf4ja[grep('S_max',resf4ja$variable),"median"][[1]],
-                            resf4jan[grep('S_max',resf4jan$variable),"median"][[1]],
+                            resf4[grep('S_max',resf4$variable),"median"][[1]],
+                            resf4_ip[grep('S_max',resf4_ip$variable),"median"][[1]],
                             rep(ptva$Smax,nrow(dat)),
-                            ptvb$Smax),
-                      convergence=c(rep(abs(resf3noadj[grep('S_max',resf3noadj$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
-                            rep(abs(resf3ja[grep('S_max',resf3ja$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
-                            abs(resf4noadj[grep('S_max',resf4noadj$variable),"rhat"][[1]]-1)>.1,
-                            abs(resf4ja[grep('S_max',resf4ja$variable),"rhat"][[1]]-1)>.1,
-                            abs(resf4jan[grep('S_max',resf4jan$variable),"rhat"][[1]]-1)>.1,
+                            rep(ptva_ip$Smax,nrow(dat)),
+                            ptvb$Smax,
+                            ptvb_ip$Smax),
+                      convergence=c(rep(abs(resf3[grep('S_max',resf3$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
+                            rep(abs(resf3_ip[grep('S_max',resf3_ip$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
+                            abs(resf4[grep('S_max',resf4$variable),"rhat"][[1]]-1)>.1,
+                            abs(resf4_ip[grep('S_max',resf4_ip$variable),"rhat"][[1]]-1)>.1,                   
                             rep(ptva$model$convergence + ptva$conv_problem,nrow(dat)),
-                            rep(ptvb$model$convergence + ptvb$conv_problem,nrow(dat))
+                            rep(ptva_ip$model$convergence + ptva_ip$conv_problem,nrow(dat)),
+                            rep(ptvb$model$convergence + ptvb$conv_problem,nrow(dat)),
+                            rep(ptvb_ip$model$convergence + ptvb_ip$conv_problem,nrow(dat))
                             ))
             
   dfsmax$pbias<- ((dfsmax$est-dfsmax$sim)/dfsmax$sim)*100
