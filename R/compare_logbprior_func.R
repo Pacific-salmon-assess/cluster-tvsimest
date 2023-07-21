@@ -1,7 +1,6 @@
 compare_logbprior_func<- function(path=".", a,u){
   
   
-  allsimest <- list()
   simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
                            paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
   
@@ -61,6 +60,8 @@ compare_logbprior_func<- function(path=".", a,u){
                     adapt_delta = 0.95,
                     max_treedepth = 15)
   resf4<-f4$summary()
+ ip_logb_mean<-log(1/(max(df_tmb$S)*.5))
+  ip_logb_sd<-sqrt(log(1+ (ip_logb_mean)^2/ ip_logb_mean^2))
 
 
   f4_ip <- mod4_ip$sample(data=df,

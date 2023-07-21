@@ -94,11 +94,11 @@ pars<-data.frame(path="..",
 
 
 sjob_ip <- slurm_apply(compare_logbprior_func, pars, jobname = 'priorcompare',
-                    nodes = 120, cpus_per_node = 5, submit = FALSE,
+                    nodes = 250, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst", "cmdstanr"),
                     rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
-                    global_objects=c("simPars", "mod3","mod3_ip"
+                    global_objects=c("simPars", "mod3","mod3_ip",
                       "mod4","mod4_ip"))
 
 
@@ -106,6 +106,6 @@ sjob_ip <- slurm_apply(compare_logbprior_func, pars, jobname = 'priorcompare',
 #AFTER JOB IS DONE IMPORT  the results
 res_ip <- get_slurm_out(sjob_ip, outtype = 'table', wait = FALSE)
 
-saveRDS(res_ip, file = "resstanrw.rds")
+saveRDS(res_ip, file = "res_ip_compare.rds")
 
 
