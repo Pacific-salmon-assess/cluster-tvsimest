@@ -57,7 +57,7 @@ transformed data{
     model{
      
       log_a ~ normal(1.5,2.5);
-      log_b ~ log_b ~ normal(logSmax_pr,logSmax_pr_sig); //capacity
+      log_b ~ normal(logSmax_pr,logSmax_pr_sig); //capacity
 
       sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
       
