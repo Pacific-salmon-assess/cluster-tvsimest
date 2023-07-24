@@ -29,7 +29,7 @@ compare_logbprior_func<- function(path=".", a,u){
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
 
 
-  log(1/df$pSmax_mean-0.5*(df$pSmax_sig*df$pSmax_sig))
+  
   
   f3 <- mod3$sample(data=df,
                     seed = 123,
@@ -96,39 +96,50 @@ compare_logbprior_func<- function(path=".", a,u){
   resf4_sip<-f4_sip$summary()
   
 
-  #prior values for TMB
-  Smax_mean<-1/(max(df_tmb$S)*.5)
-  Smax_sd<-Smax_mean
-  Smax_sd_sip<-(1/(max(df_tmb$S)*.5))*.5
+  
 
-  ip_logb_mean<-log(Smax_mean)
-  ip_logb_sd<-sqrt(log(1+ (Smax_sd)^2/ (Smax_mean)^2))
-  sip_logb_sd<-sqrt(log(1+ (Smax_sd_sip)^2/ (Smax_mean)^2))
+  #prior values for TMB
+  Smax_mean<-(max(df_tmb$S)*.5)
+  Smax_sd<-Smax_mean
+  Smax_sd_sip<-((max(df_tmb$S)*.5))*2
+
+  logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
+  logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
+ 
+  logbeta_sippr_sig=sqrt(log(1+((1/ Smax_sd_sip)*(1/ Smax_sd_sip))/((1/Smax_mean)*(1/Smax_mean))))
+  logbeta_sippr=log(1/(Smax_mean))-0.5*logbeta_sippr_sig^2
+ 
+  
+
+
 
   
 
 
 
   ptva <- ricker_rw_TMB(data=df_tmb,tv.par='a')
-  ptva_ip <- ricker_rw_TMB(data=df_tmb,tv.par='a',logb_p_mean=ip_logb_mean,logb_p_sd=ip_logb_sd)
-  ptva_sip <- ricker_rw_TMB(data=df_tmb,tv.par='a',logb_p_mean=ip_logb_mean,logb_p_sd=sip_logb_sd)
+  ptva_ip <- ricker_rw_TMB(data=df_tmb,tv.par='a',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  ptva_sip <- ricker_rw_TMB(data=df_tmb,tv.par='a',logb_p_mean=logbeta_sippr,logb_p_sd=logbeta_sippr_sig)
 
   ptvb <- ricker_rw_TMB(data=df_tmb, tv.par='b')
-  ptvb_ip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=ip_logb_mean,logb_p_sd=ip_logb_sd)
-  ptvb_sip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=ip_logb_mean,logb_p_sd=sip_logb_sd)
+  ptvb_ip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  ptvb_sip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=logbeta_sippr,logb_p_sd=logbeta_sippr_sig)
   
   #Max. prod
-  
+    ptvb_sip$alpha 
   #regime state sequence:
   
   
   dfa<- data.frame(parameter="alpha",
                    iteration=u,
                    scenario= simPars$scenario[a],
-                   method=rep(c(rep("MCMC",4),rep("MLE",4)),each=nrow(dat)),
-                   model=rep(c("rwa_stan","rwa_stan_ip","rwb_stan","rwb_stan_ip","rwa_tmb","rwa_tmb_ip","rwb_tmb","rwb_tmb_ip"),each=nrow(dat)),
-                   by=rep(dat$year,8),
-                   sim=rep(dat$alpha,8),
+                   method=rep(c(rep("MCMC",6),rep("MLE",6)),each=nrow(dat)),
+                   model=rep(c("rwa_stan","rwa_stan_ip","rwa_stan_sip",
+                               "rwb_stan","rwb_stan_ip","rwb_stan_sip",
+                              "rwa_tmb","rwa_tmb_ip","rwa_tmb_sip",
+                              "rwb_tmb","rwb_tmb_ip","rwb_tmb_sip"),each=nrow(dat)),
+                   by=rep(dat$year,12),
+                   sim=rep(dat$alpha,12),
                    est=c(resf3[grep("log_a\\[",resf3$variable),"median"][[1]],
                          resf3_ip[grep("log_a\\[",resf3_ip$variable),"median"][[1]],
                          resf3_sip[grep("log_a\\[",resf3_sip$variable),"median"][[1]],
@@ -166,10 +177,13 @@ compare_logbprior_func<- function(path=".", a,u){
   dfsmax<- data.frame(parameter="smax",
                       iteration=u,
                       scenario= simPars$scenario[a],
-                      method=rep(c(rep("MCMC",4),rep("MCMC",4)),each=nrow(dat)),
-                      model=rep(c("rwa_stan","rwa_stan_ip","rwb_stan","rwb_stan_ip","rwa_tmb","rwa_tmb_ip","rwb_tmb","rwb_tmb_ip"),each=nrow(dat)),
-                      by=rep(dat$year,8),
-                      sim=rep(1/dat$beta,8),
+                      method=rep(c(rep("MCMC",6),rep("MCMC",6)),each=nrow(dat)),
+                      model=rep(c("rwa_stan","rwa_stan_ip","rwa_stan_sip",
+                               "rwb_stan","rwb_stan_ip","rwb_stan_sip",
+                              "rwa_tmb","rwa_tmb_ip","rwa_tmb_sip",
+                              "rwb_tmb","rwb_tmb_ip","rwb_tmb_sip"),each=nrow(dat)),
+                      by=rep(dat$year,12),
+                      sim=rep(1/dat$beta,12),
                       est=c(rep(resf3[grep('S_max',resf3$variable),"median"][[1]],nrow(dat)),
                             rep(resf3_ip[grep('S_max',resf3_ip$variable),"median"][[1]],nrow(dat)),
                             rep(resf3_sip[grep('S_max',resf3_sip$variable),"median"][[1]],nrow(dat)),
