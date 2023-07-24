@@ -6,10 +6,12 @@ data{
   real pSmax_sig;
 }
 transformed data{
-  real logSmax_pr;
-  real logSmax_pr_sig;
-  logSmax_pr=log(1/pSmax_mean-0.5*(pSmax_sig*pSmax_sig)); //convert smax prior to per capita slope - transform to log scale
-  logSmax_pr_sig=sqrt(log(1+(pSmax_sig*pSmax_sig)/(pSmax_mean*pSmax_mean))); //this converts sigma on the untransformed scale to a log scale
+real logbeta_pr;
+real logbeta_pr_sig;
+
+logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax_mean)))); //this converts sigma on the untransformed scale to a log scale
+logbeta_pr=log(1/(pSmax_mean+0.5*logSmax_pr_sig*logSmax_pr_sig)); //convert smax prior to per capita slope - transform to log scale with bias correction
+
 }
 parameters {
   real log_a;// initial productivity (on log scale)
@@ -27,8 +29,8 @@ transformed parameters{
 model{
   //priors
   log_a ~ normal(1.5,2.5); //intrinsic productivity - wide prior
-  log_b ~ normal(logSmax_pr,logSmax_pr_sig); //per capita capacity parameter - wide prior
-  
+ log_b ~ normal(logbeta_pr,logbeta_pr_sig); //per capita capacity parameter - wide prior
+   
   //variance terms
   //target += normal_lpdf(sigma | 0, 1) - normal_lcdf(0 | 0, 1); //remove density below zero
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)

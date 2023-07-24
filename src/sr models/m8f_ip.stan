@@ -13,10 +13,12 @@ functions {
   real pSmax_sig;
 }
 transformed data{
-  real logSmax_pr;
-  real logSmax_pr_sig;
- logSmax_pr=log(1/pSmax_mean-0.5*(pSmax_sig*pSmax_sig)); //convert smax prior to per capita slope - transform to log scale
- logSmax_pr_sig=sqrt(log(1+(pSmax_sig*pSmax_sig)/(pSmax_mean*pSmax_mean))); //this converts sigma on the untransformed scale to a log scale
+real logbeta_pr;
+real logbeta_pr_sig;
+
+logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax_mean)))); //this converts sigma on the untransformed scale to a log scale
+logbeta_pr=log(1/(pSmax_mean+0.5*logSmax_pr_sig*logSmax_pr_sig)); //convert smax prior to per capita slope - transform to log scale with bias correction
+
 }
     parameters {
       // Discrete state model
@@ -57,7 +59,7 @@ transformed data{
     model{
      
       log_a ~ normal(1.5,2.5);
-      log_b ~ log_b ~ normal(logSmax_pr,logSmax_pr_sig); //capacity
+      log_b ~ normal(logbeta_pr,logbeta_pr_sig); //capacity
 
       sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
       
