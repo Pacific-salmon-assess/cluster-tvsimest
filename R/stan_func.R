@@ -28,7 +28,7 @@ stan_func<- function(path=".", a,u){
 #                 '/*',sep=''))
 #}
   
-  options(mc.cores = 5)
+  #options(mc.cores = 5)
   #
   f1 <- mod1$sample(data=df,
                     seed = 123,
