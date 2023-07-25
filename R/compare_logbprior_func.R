@@ -111,8 +111,8 @@ compare_logbprior_func<- function(path=".", a,u){
  
   
 
-
-
+   plot(1/exp(seq(-15,-9,.25)),dnorm( seq(-15,-9,.25),logbeta_sippr,logbeta_sippr_sig))
+   abline(v=unique(dat$capacity))
   
 
 
