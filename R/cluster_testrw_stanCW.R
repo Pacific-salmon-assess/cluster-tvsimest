@@ -129,6 +129,6 @@ sjob_ip <- slurm_apply(compare_logbprior_func, pars, jobname = 'priorcompare',
 #AFTER JOB IS DONE IMPORT  the results
 res_ip <- get_slurm_out(sjob_ip, outtype = 'table', wait = FALSE)
 
-saveRDS(res_ip, file = "res_ip_compare.rds")
+saveRDS(res_ip, file = "res_ip_sip_compare.rds")
 
 
