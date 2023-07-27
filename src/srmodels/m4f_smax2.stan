@@ -28,7 +28,7 @@ transformed parameters{
   for(t in 2:L){
     Smax[t] = Smax[t-1] + smax_dev[t-1]*sigma_sm;
   } 
-  b=1./Smax;
+  b=1 ./ Smax;
 }  
 
 model{
