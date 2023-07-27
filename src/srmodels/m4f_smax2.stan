@@ -8,7 +8,7 @@ data{
   real pSmax_sig;
 }
 parameters {
-  real<upper = 0> log_a;// initial productivity (on log scale) - fixed in this
+  real<lower = 0> log_a;// initial productivity (on log scale) - fixed in this
   real<lower = 0> Smax0; // rate capacity - fixed in this
 
  //variance components  
