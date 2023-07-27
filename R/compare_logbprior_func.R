@@ -28,18 +28,8 @@ compare_logbprior_func<- function(path=".", a,u){
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
 
-
+  options(mc.cores = 5)
   
-  
-  f3 <- mod3$sample(data=df,
-                    seed = 123,
-                    chains = 6, 
-                    iter_warmup = 500,
-                    iter_sampling = 5000,
-                    refresh = 0,
-                    adapt_delta = 0.95,
-                    max_treedepth = 15)
-  resf3<-f3$summary()
 
   
   f3_ip <- mod3_ip$sample(data=df,
@@ -48,7 +38,7 @@ compare_logbprior_func<- function(path=".", a,u){
                     iter_warmup = 500,
                     iter_sampling = 5000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   resf3_ip<-f3_ip$summary()
 
@@ -59,20 +49,10 @@ compare_logbprior_func<- function(path=".", a,u){
                     iter_warmup = 500,
                     iter_sampling = 5000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   resf3_sip<-f3_sip$summary()
-
-
-  f4 <- mod4$sample(data=df,
-                    seed = 123,
-                    chains = 6, 
-                    iter_warmup = 500,
-                    iter_sampling = 5000,
-                    refresh = 0,
-                    adapt_delta = 0.95,
-                    max_treedepth = 15)
-  resf4<-f4$summary()
+  
  
 
   f4_ip <- mod4_ip$sample(data=df,
@@ -81,7 +61,7 @@ compare_logbprior_func<- function(path=".", a,u){
                     iter_warmup = 500,
                     iter_sampling = 5000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   resf4_ip<-f4_ip$summary()
 
@@ -91,7 +71,7 @@ compare_logbprior_func<- function(path=".", a,u){
                     iter_warmup = 500,
                     iter_sampling = 5000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   resf4_sip<-f4_sip$summary()
   
@@ -111,9 +91,6 @@ compare_logbprior_func<- function(path=".", a,u){
  
   
 
-   plot(1/exp(seq(-15,-9,.25)),dnorm( seq(-15,-9,.25),logbeta_sippr,logbeta_sippr_sig))
-   abline(v=unique(dat$capacity))
-  
 
 
 
@@ -125,8 +102,14 @@ compare_logbprior_func<- function(path=".", a,u){
   ptvb_ip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   ptvb_sip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=logbeta_sippr,logb_p_sd=logbeta_sippr_sig)
   
-  #Max. prod
-    ptvb_sip$alpha 
+  stvb_ip<-ricker_rw_TMBstan(data=df_tmb, tv.par='b', ,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig,
+    chains=6,
+    iter=5000 ,
+    warmup =500,
+     control = list(adapt_delta = 0.99))
+
+
+  
   #regime state sequence:
   
   
@@ -195,7 +178,7 @@ compare_logbprior_func<- function(path=".", a,u){
                             rep(ptva_sip$Smax,nrow(dat)),
                             ptvb$Smax,
                             ptvb_ip$Smax,
-                            ptvb_sip$Smax),
+                            ptvb_sip$Smax,),
                       convergence=c(rep(abs(resf3[grep('S_max',resf3$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
                             rep(abs(resf3_ip[grep('S_max',resf3_ip$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
                             rep(abs(resf3_sip[grep('S_max',resf3_sip$variable),"rhat"][[1]]-1)>.1,nrow(dat)),
@@ -222,7 +205,7 @@ compare_logbprior_func<- function(path=".", a,u){
 
 
 
-
+plot(1:40)
 
 
 

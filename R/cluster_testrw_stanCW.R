@@ -108,6 +108,8 @@ mod8_ip=cmdstanr::cmdstan_model(file8_ip)
 
 simPars <- read.csv("data/generic/SimPars.csv")
 
+a=5
+u=2
 
 
 pars<-data.frame(path="..",
