@@ -617,12 +617,19 @@ pars<-data.frame(path="..",
                  u=1:5)
 #slurm job
 sjobstan_1 <- slurm_apply(stan_lfo, pars, jobname = 'stanrun1',
-                          nodes = 300, cpus_per_node = 1, submit = FALSE,
+                          nodes = 60, cpus_per_node = 1, submit = FALSE,
                           pkgs=c("cmdstanr"),
                           rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/dag004/results/cluster-tvsimest/",
-                          libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
+                          libPaths="/fs/vnas_Hdfo/comda/dag004/Rlib/",
                           global_objects=c("simPars", "mod1lfo", "mod2lfo", "mod3lfo",
                                            "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
+
+save.image(file = "sj_st.RData")
+q()
+
+library(rslurm)
+load("sj_st.RData")
+res_s <- get_slurm_out(sjobstan_1, outtype = 'table', wait = TRUE)
 
 
 
