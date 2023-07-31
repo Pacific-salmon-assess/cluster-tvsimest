@@ -8,22 +8,25 @@ library(cmdstanr)
 library(rslurm)
 library(samEst)
 source("R/stan_func.R")
+source("R/utils.R")
+source("R/check_stan_conv.R")
 
-file1=file.path(cmdstanr::cmdstan_path(),'srmodels', "m1f.stan")
+
+file1=file.path(cmdstanr::cmdstan_path(),'srmodels', "m1f_ip.stan")
 mod1=cmdstanr::cmdstan_model(file1)
-file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2f.stan")
+file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2f_ip.stan")
 mod2=cmdstanr::cmdstan_model(file2)
-file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f.stan")
+file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f_ip.stan")
 mod3=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f.stan")
+file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_ip.stan")
 mod4=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f.stan")
+file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f_ip.stan")
 mod5=cmdstanr::cmdstan_model(file5)
-file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6f.stan")
+file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6f_ip.stan")
 mod6=cmdstanr::cmdstan_model(file6)
-file7=file.path(cmdstanr::cmdstan_path(),'srmodels', "m7f.stan")
+file7=file.path(cmdstanr::cmdstan_path(),'srmodels', "m7f_ip.stan")
 mod7=cmdstanr::cmdstan_model(file7)
-file8=file.path(cmdstanr::cmdstan_path(),'srmodels', "m8f.stan")
+file8=file.path(cmdstanr::cmdstan_path(),'srmodels', "m8f_ip.stan")
 mod8=cmdstanr::cmdstan_model(file8)
 
 
@@ -53,7 +56,7 @@ sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrunhi',
                     rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                      "mod4","mod5","mod6","mod7","mod8","mode", "check_stan_conv" ))
 
 
 

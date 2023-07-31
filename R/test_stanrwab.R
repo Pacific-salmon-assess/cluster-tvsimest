@@ -594,21 +594,41 @@ mytheme
 
 #======================================================================
 #rwb examples
-  options(mc.cores = 5)
-file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f.stan")
-mod4=cmdstanr::cmdstan_model(file4)
 
+  options(mc.cores = 5)
+
+
+file4smaxip=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_ipsmax_ja.stan")
+mod4_smaxip=cmdstanr::cmdstan_model(file4smaxip)
 
 file4_ip=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_ip.stan")
 mod4_ip=cmdstanr::cmdstan_model(file4_ip)
 
 
+mytheme = list(
+    theme_classic(16)+
+        theme(panel.background = element_blank(),strip.background = element_rect(colour=NA, fill=NA),panel.border = element_rect(fill = NA, color = "black"),
+              legend.title = element_blank(),legend.position="bottom", strip.text = element_text(face="bold", size=12),
+              axis.text=element_text(face="bold"),axis.title = element_text(face="bold"),plot.title = element_text(face = "bold", hjust = 0.5,size=15))
+)
+
 library(TMB)
-#compile tmb models
+library(samEst)
+library(ggplot2)
+source("R/check_stan_conv.R")
+
+
+
+#compile tm bmodels
+
+
+compile("src/srmodels/Ricker_tvSmax.cpp")
+dyn.load("src/srmodels/Ricker_tvSmax.dll")
+
 
 path="."
 a=6
-u=10
+u=15
 
  
 simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
@@ -645,6 +665,15 @@ simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],
   Smax_sd<-Smax_mean
   Smax_sd_sip<-((max(df_tmb$S)*.5))*2
 
+
+mode<-function(x,minS=20000,maxS=4000000){
+
+  d=density(x, n=10000, from=minS,to=maxS )
+
+  return(d$x[which.max(d$y)])
+
+}
+
   logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
   logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
  
@@ -664,44 +693,94 @@ simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],
   resf4_ip<-f4_ip$summary()
   resf4_ip_conv<-check_stan_conv(resf4_ip)
 
- head(f4_ip)
- draws <- f4_ip$draws(format = "matrix")
- colnames(draws)[grep("S_max\\[",colnames(draws))]
  
- "S_max[40]"
+
+  Smaxmode_f4_ip<-apply(f4_ip$draws(variable='S_max',format = "matrix"),2,mode)
+
+
+ mode(f4_ip$draws("S_max[40]",format = "df"))
+sm40<-f4_ip$draws("S_max[40]",format = "list")
+summary(lapply(sm40,c)[[1]])
 
 bayesplot::mcmc_areas(
-  f4_ip$draws(colnames(draws)[grep("S_max\\[",colnames(draws))]), 
-  prob = 0.8, # 80% intervals
-  prob_outer = 0.99, # 99%
-  point_est = "median"
+  f4_ip$draws(colnames(draws)[grep("S_max\\[",colnames(draws))[1:10]]), 
+  prob = 2/3,
+   prob_outer = 0.9,
+   point_est = "mean"
 )+
+coord_cartesian(xlim = c(70000,500000))+ 
 theme_bw(12)
 
+
+ f4_smaxip <- mod4_smaxip$sample(data=dfsip,
+                    seed = 123,
+                    chains = 6, 
+                    iter_warmup = 1000,
+                    iter_sampling = 10000,
+                    refresh = 0,
+                    adapt_delta = 0.99,
+                    max_treedepth = 15)
+
+
+resf4_smaxip<-f4_smaxip$summary()
+  resf4_smaxip_conv<-check_stan_conv(resf4_smaxip)
+
+
+resf4_smaxip[grep("S_max",resf4_smaxip$variable),"median"][[1]]
+
+
+
+bayesplot::mcmc_areas(
+  f4_smaxip$draws("S_max",format = "matrix"), 
+  prob = 2/3,
+   prob_outer = 0.9,
+   point_est = "mean"
+)+
+coord_cartesian(xlim = c(70000,500000))+ 
+theme_bw(12)
+
+
+
+
+bayesplot::mcmc_areas(
+  f4_smaxip$draws("sigma_b",format = "matrix"), 
+  prob = 2/3,
+   prob_outer = 0.99,
+   point_est = "mean"
+)+
+coord_cartesian(xlim = c(0,1))
+theme_bw(12)
+
+
+sigma_b
 
   ptvb_ip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   
   stvb_ip<-ricker_rw_TMBstan(data=df_tmb, tv.par='b',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig,
     chains=10,
-    iter=5000 ,
-    warmup =500,
+    iter=10000 ,
+    warmup =1000,
      control = list(adapt_delta = 0.99))
   
   stvb_ip_conv<- check_tmbstan_conv(stansum=stvb_ip$fit_summary$summary)
 
 
   dfsmax<-data.frame(param="smax",
-  model=rep(c("rwb_tmb","rwb_tmbstan","rwb_stan","sim"),each=40),
+  model=rep(c("rwb_tmb","rwb_tmbstan","rwb_stan","rwb_stan_mode","rwb_stan_smaxip","sim"),each=40),
   by=1:40,
   iteration=u,
   scenario=simPars$scenario[a],
   value=c(ptvb_ip$Smax,
     apply(stvb_ip$Smax,1,median),
-    resf4_ip[grep("S_max",resf4_ip$variable),"median"][[1]],   
+    resf4_ip[grep("S_max",resf4_ip$variable),"median"][[1]], 
+    Smaxmode_f4_ip,  
+    resf4_smaxip[grep("S_max",resf4_smaxip$variable),"median"][[1]],
     dat$capacity),
-  convergence=c(rep(ptvb_ip$model$convergence ptvb_ip$conv_problem,nrow(dat)),
+  convergence=c(rep(ptvb_ip$model$convergence +ptvb_ip$conv_problem,nrow(dat)),
     stvb_ip_conv$conv_mat$sumconv[grep("logbeta\\[",stvb_ip_conv$conv_mat$variable)],
     resf4_ip_conv$conv_mat$sumconv[grep("S_max\\[",resf4_ip_conv$conv_mat$variable)],
+    resf4_ip_conv$conv_mat$sumconv[grep("S_max\\[",resf4_ip_conv$conv_mat$variable)],
+    resf4_smaxip_conv$conv_mat$sumconv[grep("S_max\\[",resf4_smaxip_conv$conv_mat$variable)],
     rep(0,nrow(dat))
     ))
 
@@ -714,3 +793,111 @@ geom_line(aes(x=by,y=value,color=model, group=interaction(model, iteration)),lin
 scale_color_viridis_d(begin=.1, end=.8) +
 mytheme
 
+#==============================================================
+
+
+library(TMB)
+library(samEst)
+#compile tmb models
+
+simPars <- read.csv("data/generic/SimPars.csv")
+
+compile("src/srmodels/Ricker_tvSmax.cpp")
+dyn.load("src/srmodels/Ricker_tvSmax.dll")
+
+file4_ip=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_ip.stan")
+mod4_ip=cmdstanr::cmdstan_model(file4_ip)
+
+
+
+path="."
+a=6
+u=15
+
+ 
+simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
+                           paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
+  
+  dat <- simData[simData$iteration==u,]
+  dat <- dat[dat$year>(max(dat$year)-46),]
+  dat <- dat[!is.na(dat$obsRecruits),]
+  df <- list(by=dat$year,
+             S=dat$obsSpawners,
+             R=dat$obsRecruits,
+             R_S=log(dat$obsRecruits/dat$obsSpawners),
+             L=max(dat$year)-min(dat$year)+1,
+             ii=as.numeric(as.factor(dat$year)),
+             N=nrow(dat),
+             K=2,
+             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
+             pSmax_mean=max(dat$obsSpawners)*.5,
+             pSmax_sig=max(dat$obsSpawners)*.5
+  )
+  dfsip<-df
+  dfsip$pSmax_sig<-max(dat$obsSpawners)*.25
+
+  df_tmb <- data.frame(by=dat$year,
+                  S=dat$obsSpawners,
+                  R=dat$obsRecruits,
+                  logRS=log(dat$obsRecruits/dat$obsSpawners))
+
+
+
+
+#prior values for TMB
+Smax_mean<-(max(df_tmb$S)*.5)
+Smax_sd<-Smax_mean
+logSmax_pr_sig=sqrt(log(1+((Smax_sd^2)/(Smax_mean^2))))
+
+logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
+logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
+ 
+  
+ptvb_ip <- ricker_rw_TMB(data=df_tmb, tv.par='b',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+
+Smax_mean<-(max(df_tmb$S)*.5)/10000
+Smax_sd<-Smax_mean
+logSmax_pr_sig=sqrt(log(1+((Smax_sd^2)/(Smax_mean^2))))
+
+
+tmb_data_smax <- list(
+  obs_S = df_tmb$S/10000,
+  obs_logRS = df_tmb$logRS,
+  priors_flag=1,
+  stan_flag=0,
+  sig_p_sd=1,
+  sigSmax_p_sd=.3,
+  plogSmax_mean=log(Smax_mean),
+  plogSmax_sig=1
+  )
+
+  
+tmb_params_smax <- list(
+                   alpha   = 2,                 
+                   logSmaxo = log(Smax_mean),
+                   logsigobs = log(.6),
+                   logsigsmax = 1,
+                   logSmax=rep(log(Smax_mean), length(df_tmb$S)))
+
+obj_smax<-MakeADFun(tmb_data_smax,tmb_params_smax,DLL="Ricker_tvSmax")
+    newtonOption(obj_smax, smartsearch=FALSE)
+
+opt_smax<-nlminb(obj_smax$par,obj_smax$fn,obj_smax$gr)
+
+convsmax<-get_convergence_diagnostics(TMB::sdreport(obj_smax))
+
+#rep_smax<-obj_smax$report()
+
+#rep_smax$Smax
+#ptvb_ip$Smax
+#rep_smax$sigsmax
+
+plot(1:40, rep_smax$Smax*10000,col="darkgreen", type="l",lwd=2,ylim=c(150000,300000))
+lines(1:40,ptvb_ip$Smax, col="blue",lwd=2)
+lines(1:40,dat$capacity, lwd=2)
+legend("topright",   # Coordinates (x also accepts keywords)
+       c("log_smax","log_b", "sim"), # Vector with the name of each group
+       col = c("darkgreen","blue","black"), # Color of lines or symbols
+       border = "black", # Fill box border color
+       lty=1, lwd=2)
+ 

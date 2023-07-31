@@ -1,7 +1,6 @@
 stan_func<- function(path=".", a,u){
   
   
-  allsimest <- list()
   simData<- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
                            paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
   
@@ -16,7 +15,9 @@ stan_func<- function(path=".", a,u){
              ii=as.numeric(as.factor(dat$year)),
              N=nrow(dat),
              K=2,
-             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2)
+             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
+             pSmax_mean=max(dat$obsSpawners)*.5,
+             pSmax_sig=max(dat$obsSpawners)*.5
   )
   
   #create folder to hold temp files
@@ -38,83 +39,134 @@ stan_func<- function(path=".", a,u){
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f1_ip<-f1$summary()
+  conv_f1_ip <- check_stan_conv(stansum=f1_ip)
   
   f2 <- mod2$sample(data=df,
                     seed = 123,
                    chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f2_ip<-f2$summary()
+  conv_f2_ip <- check_stan_conv(stansum=f2_ip)
   
   f3 <- mod3$sample(data=df,
                     seed = 123,
                     chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f3_ip<-f3$summary()
+  conv_f3_ip <- check_stan_conv(stansum=f3_ip)
   
   f4 <- mod4$sample(data=df,
                     seed = 123,
                     chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f4_ip<-f4$summary()
+  conv_f4_ip <- check_stan_conv(stansum=f4_ip)
   
   f5 <- mod5$sample(data=df,
                     seed = 123,
                     chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f5_ip<-f5$summary()
+  conv_f5_ip <- check_stan_conv(stansum=f5_ip)
   
   f6 <- mod6$sample(data=df,
                     seed = 123,
                     chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f6_ip<-f6$summary()
+  conv_f6_ip <- check_stan_conv(stansum=f6_ip)
   
   f7 <- mod7$sample(data=df,
                     seed = 123,
                     chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f7_ip<-f7$summary()
+  conv_f7_ip <- check_stan_conv(stansum=f7_ip)
   
   f8 <- mod8$sample(data=df,
                     seed = 123,
                    chains = 30, 
                     iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_sampling = 3000,
                     refresh = 0,
                     adapt_delta = 0.95,
                     max_treedepth = 15)
+  f8_ip<-f8$summary()
+  conv_f8_ip <- check_stan_conv(stansum=f8_ip)
+  
+  
+  
   #Max. prod
   
-  #regime state sequence:
-  phmma_alpha=f6$summary(variables=c('log_a'),'median')$median
-  phmma_alpha_regime=phmma_alpha[f6$summary(variables=c('zstar'),'median')$median]
-  phmma_alpha_conv= abs(f6$summary(variables=c('log_a'))$rhat-1)>.1
-  phmma_alpha_conv_regime=as.numeric(phmma_alpha_conv[f6$summary(variables=c('zstar'),'median')$median])
+  
 
-  phmmab_alpha=f8$summary(variables=c('log_a'),'median')$median
-  phmmab_alpha_regime=phmmab_alpha[f8$summary(variables=c('zstar'),'median')$median]
-  phmmab_alpha_conv=abs(f8$summary(variables=c('log_a'))$rhat-1)>.1
-  phmmab_alpha_conv_regime=as.numeric(phmmab_alpha_conv[f8$summary(variables=c('zstar'),'median')$median])
+  drf1<-as.data.frame(f1$draws( format="matrix"))
+  drf2<-as.data.frame(f2$draws( format="matrix"))
+  drf3<-as.data.frame(f3$draws( format="matrix"))
+  drf4<-as.data.frame(f4$draws( format="matrix"))
+  drf5<-as.data.frame(f5$draws( format="matrix"))
+  drf6<-as.data.frame(f6$draws( format="matrix"))
+  drf7<-as.data.frame(f7$draws( format="matrix"))
+  drf8<-as.data.frame(f8$draws( format="matrix"))
+
   
+  loga_f1 <-  mode(x=drf1$log_a)
+  loga_f2 <- mode(x=drf2$log_a)
+  loga_f3 <- apply(drf3[,grep("log_a\\[",colnames(drf3))],2,mode)
+  loga_f4 <- mode(x=drf4$log_a)
+  loga_f5 <- apply(drf5[,grep("log_a\\[",colnames(drf5))],2,mode)
   
+  loga_f6_regime <- apply(drf6[,grep("log_a\\[",colnames(drf6))],2,mode)
+  zstar_f6 <- apply(drf6[,grep("zstar\\[",colnames(drf6))],2,function(x)which.max(tabulate(as.integer(x))))
+  loga_f6 <- loga_f6_regime[zstar_f6]
+  loga_f6_conv <- 
+    conv_f6_ip[[2]]$sumconv[grep('log_a\\[',conv_f6_ip[[2]]$variable)][f6_ip$median[grep('zstar\\[',f6_ip$variable)]] +
+    conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
+
+
+  loga_f7 <- mode(x=drf7$log_a)
+
+  loga_f8_regime <- apply(drf8[,grep("log_a\\[",colnames(drf8))],2,mode)
+  zstar_f8 <- apply(drf8[,grep("zstar\\[",colnames(drf8))],2,function(x)which.max(tabulate(as.integer(x))))
+  loga_f8 <- loga_f8_regime[zstar_f8] 
+  loga_f8_conv <- 
+    conv_f8_ip[[2]]$sumconv[grep('log_a\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
+    conv_f8_ip[[2]]$sumconv[grep('zstar\\[',conv_f8_ip[[2]]$variable)]
+
+  phmma_alpha_regime_median<-f6_ip$median[grep('log_a\\[',f6_ip$variable)]
+  phmma_zstar_regime_median<-f6_ip$median[grep('zstar\\[',f6_ip$variable)]
+  phmma_alpha_median <-phmma_alpha_regime_median[phmma_zstar_regime_median]
+
+  phmmab_alpha_regime_median<- f8_ip$median[grep('log_a\\[',f8_ip$variable)]
+  phmmab_zstar_regime_median<- f8_ip$median[grep('zstar\\[',f8_ip$variable)]
+  phmmab_alpha_median <- phmmab_alpha_regime_median[phmmab_zstar_regime_median]
+
+
   dfa<- data.frame(parameter="alpha",
                    iteration=u,
                    scenario= simPars$scenario[a],
@@ -125,38 +177,72 @@ stan_func<- function(path=".", a,u){
                                "hmma","hmmb","hmmab"),each=nrow(dat)),
                    by=rep(dat$year,8),
                    sim=rep(dat$alpha,8),
-                   est=c(rep(f1$summary(variables=c('log_a'),'median')$median,nrow(dat)),
-                         rep(f2$summary(variables=c('log_a'),'median')$median,nrow(dat)),
-                         f3$summary(variables=c('log_a'),'median')$median,
-                         rep(f4$summary(variables=c('log_a'),'median')$median,nrow(dat)),
-                         f5$summary(variables=c('log_a'),'median')$median,
-                         phmma_alpha_regime,
-                         rep(f7$summary(variables=c('log_a'),'median')$median,nrow(dat)),
-                         phmmab_alpha_regime),
-                   convergence= as.numeric(c(rep(abs(f1$summary(variables=c('log_a'))$rhat-1)>.1,nrow(dat)),
-                           rep(abs(f2$summary(variables=c('log_a'))$rhat-1)>.1,nrow(dat)),
-                           abs(f3$summary(variables=c('log_a'))$rhat-1)>.1,
-                           rep(abs(f4$summary(variables=c('log_a'))$rhat-1)>.1,nrow(dat)),
-                           abs(f5$summary(variables=c('log_a'))$rhat-1)>.1,
-                           phmma_alpha_conv_regime,
-                           rep(abs(f7$summary(variables=c('log_a'))$rhat-1)>.1,nrow(dat)),
-                           phmmab_alpha_conv_regime)))
+                   median=c(rep(f1_ip$median[f1_ip$variable=='log_a'],nrow(dat)),
+                         rep(f2_ip$median[f2_ip$variable=='log_a'],nrow(dat)),
+                         f3_ip$median[grep('log_a\\[',f3_ip$variable)],
+                         rep(f4_ip$median[f4_ip$variable=='log_a'],nrow(dat)),
+                         f5_ip$median[grep('log_a\\[',f5_ip$variable)],
+                         phmma_alpha_median,
+                         rep(f7_ip$median[f7_ip$variable=='log_a'],nrow(dat)),
+                         phmmab_alpha_median),
+                   mode=c(rep(loga_f1,nrow(dat)),
+                         rep(loga_f2,nrow(dat)),
+                         loga_f3,
+                         rep(loga_f4,nrow(dat)),
+                         loga_f5,
+                         loga_f6,
+                         rep(loga_f7,nrow(dat)),
+                         loga_f8),
+                   #need to get in the harsher convergence criteria
+                   convergence= c(rep(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=="log_a"],nrow(dat)),
+                        rep(conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=="log_a"],nrow(dat)),
+                        conv_f3_ip[[2]]$sumconv[grep('log_a\\[',conv_f3_ip[[2]]$variable)],
+                        rep(conv_f4_ip[[2]]$sumconv[conv_f4_ip[[2]]$variable=="log_a"],nrow(dat)),
+                        conv_f5_ip[[2]]$sumconv[grep('log_a\\[',conv_f5_ip[[2]]$variable)],
+                        loga_f6_conv,
+                        rep(conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=="log_a"],nrow(dat)),
+                        loga_f8_conv))
 
-  
-  dfa$pbias<- ((dfa$est-dfa$sim)/dfa$sim)*100
+
+  dfa$pbias<- ((dfa$mode-dfa$sim)/dfa$sim)*100
+  dfa$bias<- (dfa$mode-dfa$sim)
  
+
   #Smax
-  phmmb_smax=f7$summary(variables=c('S_max'),'median')$median
-  phmmb_smax_regime=phmmb_smax[f7$summary(variables=c('zstar'),'median')$median]
-  phmmb_smax_conv=abs(f7$summary(variables=c('S_max'))$rhat-1)>.1
-  phmmb_smax_conv_regime=as.numeric(phmmb_smax_conv[f7$summary(variables=c('zstar'),'median')$median])
+  smax_f1 <-  mode(x=drf1$S_max)
+  smax_f2 <- mode(x=drf2$S_max)
+  smax_f3 <- mode(x=drf3$S_max)
+
+  smax_f4 <- apply(drf4[,grep("S_max\\[",colnames(drf4))],2,mode)
+  smax_f5 <- apply(drf5[,grep("S_max\\[",colnames(drf5))],2,mode)
+
+  smax_f6 <- mode(x=drf6$S_max)
+
+  smax_f7_regime <- apply(drf7[,grep("S_max\\[",colnames(drf7))],2,mode)
+  zstar_f7 <- apply(drf7[,grep("zstar\\[",colnames(drf7))],2,function(x)which.max(tabulate(as.integer(x))))
+  smax_f7 <- smax_f7_regime[zstar_f7]
+
+  smax_f7_conv <- 
+    conv_f7_ip[[2]]$sumconv[grep('S_max\\[',conv_f7_ip[[2]]$variable)][f7_ip$median[grep('zstar\\[',f7_ip$variable)]] +
+    conv_f7_ip[[2]]$sumconv[grep('zstar\\[',conv_f7_ip[[2]]$variable)]
 
 
-  phmmab_smax=f8$summary(variables=c('S_max'),'median')$median
-  phmmab_smax_regime=phmmb_smax[f8$summary(variables=c('zstar'),'median')$median]
-  phmmab_smax_conv=abs(f8$summary(variables=c('S_max'))$rhat-1)>.1
-  phmmab_smax_conv_regime=as.numeric(phmmab_smax_conv[f8$summary(variables=c('zstar'),'median')$median])
+  smax_f8_regime <- apply(drf8[,grep("S_max\\[",colnames(drf8))],2,mode)
+  smax_f8 <- smax_f8_regime[zstar_f8]
+ 
+  smax_f8_conv <- 
+    conv_f8_ip[[2]]$sumconv[grep('S_max\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
+    conv_f8_ip[[2]]$sumconv[grep('zstar\\[',conv_f8_ip[[2]]$variable)]
+
   
+  phmmb_smax_regime_median<-f7_ip$median[grep('S_max\\[',f7_ip$variable)]
+  phmmb_zstar_regime_median<-f7_ip$median[grep('zstar\\[',f7_ip$variable)]
+  phmmb_smax_median <-phmmb_smax_regime_median[phmmb_zstar_regime_median]
+
+  phmmab_smax_regime_median<- f8_ip$median[grep('S_max\\[',f8_ip$variable)]
+  phmmab_smax_median <- phmmab_smax_regime_median[phmmab_zstar_regime_median]
+
+
   dfsmax<- data.frame(parameter="smax",
                       iteration=u,
                       scenario= simPars$scenario[a],
@@ -167,26 +253,50 @@ stan_func<- function(path=".", a,u){
                                   "hmma","hmmb","hmmab"),each=nrow(dat)),
                       by=rep(dat$year,8),
                       sim=rep(1/dat$beta,8),
-                      est=c(rep(f1$summary(variables=c('S_max'),'median')$median,nrow(dat)),
-                            rep(f2$summary(variables=c('S_max'),'median')$median,nrow(dat)),
-                            rep(f3$summary(variables=c('S_max'),'median')$median,nrow(dat)),
-                            f4$summary(variables=c('S_max'),'median')$median,
-                            f5$summary(variables=c('S_max'),'median')$median,
-                            rep(f6$summary(variables=c('S_max'),'median')$median,nrow(dat)),
-                            phmmb_smax_regime,
-                            phmmab_smax_regime),
-                      convergence=as.numeric(c(rep(abs(f1$summary(variables=c('S_max'))$rhat-1)>.1,nrow(dat)),
-                           rep(abs(f2$summary(variables=c('S_max'))$rhat-1)>.1,nrow(dat)),
-                           rep(abs(f3$summary(variables=c('S_max'))$rhat-1)>.1,nrow(dat)),
-                           rep(abs(f4$summary(variables=c('log_a'))$rhat-1)>.1,nrow(dat)),
-                           abs(f5$summary(variables=c('log_a'))$rhat-1)>.1,
-                           phmma_alpha_conv_regime,
-                           rep(abs(f7$summary(variables=c('log_a'))$rhat-1)>.1,nrow(dat)),
-                           phmmab_alpha_conv_regime)))
+                      median=c(rep(f1_ip$median[f1_ip$variable=='S_max'],nrow(dat)),
+                        rep(f2_ip$median[f2_ip$variable=='S_max'],nrow(dat)),
+                        rep(f3_ip$median[f3_ip$variable=='S_max'],nrow(dat)),
+                        f4_ip$median[grep('S_max\\[',f4_ip$variable)],
+                        f5_ip$median[grep('S_max\\[',f5_ip$variable)],
+                        rep(f6_ip$median[f6_ip$variable=='S_max'],nrow(dat)),
+                        phmmb_smax_median,
+                        phmmab_smax_median),
+                      mode=c(rep(smax_f1,nrow(dat)),
+                         rep(smax_f2,nrow(dat)),
+                         rep(smax_f3,nrow(dat)),
+                         smax_f4,
+                         smax_f5,
+                         rep(smax_f6,nrow(dat)),
+                         smax_f7,
+                         smax_f8),
+                      convergence=
+                      c(rep(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=="S_max"],nrow(dat)),
+                        rep(conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=="S_max"],nrow(dat)),
+                        rep(conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=="S_max"],nrow(dat)),
+                        conv_f4_ip[[2]]$sumconv[grep('S_max\\[',conv_f4_ip[[2]]$variable)],
+                        conv_f5_ip[[2]]$sumconv[grep('S_max\\[',conv_f5_ip[[2]]$variable)],
+                        rep(conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=="S_max"],nrow(dat)),
+                        smax_f7_conv,
+                        smax_f8_conv))
                       
-  dfsmax$pbias<- ((dfsmax$est-dfsmax$sim)/dfsmax$sim)*100
-  
-  #obs error
+  dfsmax$pbias <- ((dfsmax$mode-dfsmax$sim)/dfsmax$sim)*100
+  dfsmax$bias <- (dfsmax$mode-dfsmax$sim)
+
+
+  #sigma -obs error
+  sig_f1 <- mode(x=drf1$sigma)
+  sig_f2 <- mode(x=drf2$sigma)
+  sig_f3 <- mode(x=drf3$sigma)
+  sig_f4 <- mode(x=drf4$sigma)
+  sig_f5 <- mode(x=drf5$sigma)
+  sig_f6 <- mode(x=drf6$sigma)
+  sig_f7 <- mode(x=drf7$sigma)
+  sig_f8 <- mode(x=drf8$sigma)
+
+ 
+ 
+
+
   dfsig<- data.frame(parameter="sigma",
                      iteration=u,
                      scenario= simPars$scenario[a],
@@ -197,26 +307,39 @@ stan_func<- function(path=".", a,u){
                              "hmma","hmmb","hmmab"),
                      by=NA,
                      sim=rep(dat$sigma,8),
-                     est=c(f1$summary(variables=c('sigma'),'median')$median,
-                           f2$summary(variables=c('sigma'),'median')$median,
-                           f3$summary(variables=c('sigma'),'median')$median,
-                           f4$summary(variables=c('sigma'),'median')$median,
-                           f5$summary(variables=c('sigma'),'median')$median,
-                           f6$summary(variables=c('sigma'),'median')$median,
-                           f7$summary(variables=c('sigma'),'median')$median,
-                           f8$summary(variables=c('sigma'),'median')$median),
-                    convergence= as.numeric(c(abs(f1$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f2$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f3$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f4$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f5$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f6$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f7$summary(variables=c('sigma'))$rhat-1)>.1,
-                      abs(f8$summary(variables=c('sigma'))$rhat-1)>.1)))
+                     median=c(f1_ip$median[f1_ip$variable=='sigma'],
+                      f2_ip$median[f2_ip$variable=='sigma'],
+                      f3_ip$median[f3_ip$variable=='sigma'],
+                      f4_ip$median[f4_ip$variable=='sigma'],
+                      f5_ip$median[f5_ip$variable=='sigma'],
+                      f6_ip$median[f6_ip$variable=='sigma'],
+                      f7_ip$median[f7_ip$variable=='sigma'],
+                      f8_ip$median[f8_ip$variable=='sigma']),
+                     mode=c(sig_f1,
+                      sig_f2,
+                      sig_f3,
+                      sig_f4,
+                      sig_f5,
+                      sig_f6,
+                      sig_f7,
+                      sig_f8),
+                    convergence= c(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=='sigma'],
+                      conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=='sigma'],
+                      conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=='sigma'],
+                      conv_f4_ip[[2]]$sumconv[conv_f4_ip[[2]]$variable=='sigma'],
+                      conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma'],
+                      conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=='sigma'],
+                      conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=='sigma'],
+                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']))
   
-  dfsig$pbias<- ((dfsig$est-dfsig$sim)/dfsig$sim)*100
+  dfsig$pbias<- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
+  dfsig$bias<- (dfsig$mode-dfsig$sim)
   
   #sigma a
+
+  siga_f3 <- mode(x=drf3$"sigma_a")
+  siga_f5 <- mode(x=drf5$"sigma_a")
+ 
   dfsiga<- data.frame(parameter="sigma_a",
                       iteration=u,
                       scenario= simPars$scenario[a],
@@ -224,14 +347,23 @@ stan_func<- function(path=".", a,u){
                       model=c("rwa","rwab"),
                       by=NA,
                       sim=NA,
-                      est=c(f3$summary(variables=c('sigma_a'),'median')$median,
-                            f5$summary(variables=c('sigma_a'),'median')$median),
-                      convergence=as.numeric(c(abs(f3$summary(variables=c('sigma_a'))$rhat-1)>.1,
-                            abs(f5$summary(variables=c('sigma_a'))$rhat-1)>.1)))
-  
+                      median=c(f3_ip$median[f3_ip$variable=='sigma_a'],
+                            f5_ip$median[f5_ip$variable=='sigma_a']),
+                      mode=c(siga_f3,
+                        siga_f5),
+                      convergence=c(conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=='sigma_a'],
+                        conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma_a'])
+                        )
+
   dfsiga$pbias<- NA
+  dfsiga$bias<- NA
   
   #sigma b
+
+
+  sigb_f4 <- mode(x=drf4$"sigma_b")
+  sigb_f5 <- mode(x=drf5$"sigma_b")
+ 
   dfsigb<- data.frame(parameter="sigma_b",
                       iteration=u,
                       scenario= simPars$scenario[a],
@@ -239,16 +371,57 @@ stan_func<- function(path=".", a,u){
                       model=c("rwb","rwab"),
                       by=NA,
                       sim=NA,
-                      est=c(f4$summary(variables=c('sigma_b'),'median')$median,
-                            f5$summary(variables=c('sigma_b'),'median')$median),
-                      convergence=as.numeric(c(abs(f4$summary(variables=c('sigma_b'))$rhat-1)>.1,
-                            abs(f5$summary(variables=c('sigma_b'))$rhat-1)>.1)))
-  
+                      median=c(f4_ip$median[f4_ip$variable=='sigma_b'],
+                        f5_ip$median[f5_ip$variable=='sigma_b']),
+                      mode=c(sigb_f4,
+                          sigb_f5),
+                      convergence=c(conv_f4_ip[[2]]$sumconv[conv_f4_ip[[2]]$variable=='sigma_b'],
+                        conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma_b']))
+
+                     
   dfsigb$pbias<- NA
+  dfsigb$bias<- NA
+  
+
   #S msy
-  #Smsy - estimate from posterior 
-  #static
-  smsysim<-samEst::smsyCalc(dat$alpha,dat$beta)
+  Smsy_f1 <- mode(x=drf1$"S_msy")
+  Smsy_f2 <- mode(x=drf2$"S_msy")
+
+  Smsy_f3 <- apply(drf3[,grep("S_msy\\[",colnames(drf3))],2,mode)
+  Smsy_f4 <- apply(drf4[,grep("S_msy\\[",colnames(drf4))],2,mode)
+  Smsy_f5 <- apply(drf5[,grep("S_msy\\[",colnames(drf5))],2,mode)
+  
+
+  Smsy_f6_regime <- apply(drf6[,grep("S_msy\\[",colnames(drf6))],2,mode)
+  Smsy_f6 <- Smsy_f6_regime[zstar_f6]
+  Smsy_f6_conv <- 
+    conv_f6_ip[[2]]$sumconv[grep('S_msy\\[',conv_f6_ip[[2]]$variable)][f6_ip$median[grep('zstar\\[',f6_ip$variable)]] +
+    conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
+
+  Smsy_f7_regime <- apply(drf7[,grep("S_msy\\[",colnames(drf7))],2,mode)
+  Smsy_f7 <- Smsy_f7_regime[zstar_f7]
+  Smsy_f7_conv <- 
+    conv_f7_ip[[2]]$sumconv[grep('S_msy\\[',conv_f7_ip[[2]]$variable)][f7_ip$median[grep('zstar\\[',f7_ip$variable)]] +
+    conv_f7_ip[[2]]$sumconv[grep('zstar\\[',conv_f7_ip[[2]]$variable)]
+
+  Smsy_f8_regime <- apply(drf8[,grep("S_msy\\[",colnames(drf8))],2,mode)
+  Smsy_f8 <- Smsy_f7_regime[zstar_f8]
+  Smsy_f8_conv <- 
+    conv_f8_ip[[2]]$sumconv[grep('S_msy\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
+    conv_f8_ip[[2]]$sumconv[grep('zstar\\[',conv_f8_ip[[2]]$variable)]
+
+ 
+
+  phmma_Smsy_regime_median <- f6_ip$median[grep('S_msy\\[',f6_ip$variable)]
+  phmma_Smsy_median <- phmma_Smsy_regime_median[phmma_zstar_regime_median]
+  
+  phmmb_Smsy_regime_median<-f7_ip$median[grep('S_msy\\[',f7_ip$variable)]
+  phmmb_Smsy_median <-phmmb_Smsy_regime_median[phmmb_zstar_regime_median]
+
+  phmmab_Smsy_regime_median<-f8_ip$median[grep('S_msy\\[',f8_ip$variable)]
+  phmmab_Smsy_median <-phmmab_Smsy_regime_median[phmmab_zstar_regime_median]
+
+
   
   dfsmsy<- data.frame(parameter="smsy",
                       iteration=u,
@@ -259,21 +432,42 @@ stan_func<- function(path=".", a,u){
                                   "rwa","rwb","rwab",
                                   "hmma","hmmb","hmmab"),each=nrow(dat)),
                       by=rep(dat$year,8),
-                      sim=rep(smsysim,8),
-                      est=c(samEst::smsyCalc(a=dfa$est[dfa$model=="simple"],b=1/dfsmax$est[dfsmax$model=="simple"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="autocorr"],b=1/dfsmax$est[dfsmax$model=="autocorr"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="rwa"],b=1/dfsmax$est[dfsmax$model=="rwa"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="rwb"],b=1/dfsmax$est[dfsmax$model=="rwb"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="rwab"],b=1/dfsmax$est[dfsmax$model=="rwab"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="hmma"],b=1/dfsmax$est[dfsmax$model=="hmma"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="hmmb"],b=1/dfsmax$est[dfsmax$model=="hmmb"]),
-                            samEst::smsyCalc(a=dfa$est[dfa$model=="hmmab"],b=1/dfsmax$est[dfsmax$model=="hmmab"])),
-                      convergence=dfa$convergence+dfsmax$convergence
-                      )
+                      sim=rep(dat$sMSY,8),
+                      median=c(rep(f1_ip$median[f1_ip$variable=='S_msy'],nrow(dat)),
+                             rep(f2_ip$median[f2_ip$variable=='S_msy'],nrow(dat)),
+                             f3_ip$median[grep('S_msy\\[',f3_ip$variable)],
+                             f4_ip$median[grep('S_msy\\[',f4_ip$variable)],
+                             f5_ip$median[grep('S_msy\\[',f5_ip$variable)],
+                             phmma_Smsy_median,
+                             phmmb_Smsy_median,
+                            phmmab_Smsy_median),
+                      mode=c(rep(Smsy_f1,nrow(dat)) ,
+                        rep(Smsy_f2,nrow(dat)),
+                        Smsy_f3,
+                        Smsy_f4,
+                        Smsy_f5,
+                        Smsy_f6,
+                        Smsy_f7,
+                        Smsy_f8),
+                      convergence=c(rep(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=="S_msy"],nrow(dat)),
+                        rep(conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=="S_msy"],nrow(dat)),
+                         conv_f3_ip[[2]]$sumconv[grep('S_msy\\[',conv_f3_ip[[2]]$variable)],
+                         conv_f4_ip[[2]]$sumconv[grep('S_msy\\[',conv_f4_ip[[2]]$variable)],
+                         conv_f5_ip[[2]]$sumconv[grep('S_msy\\[',conv_f5_ip[[2]]$variable)],
+                         Smsy_f6_conv,
+                         Smsy_f7_conv,
+                         Smsy_f8_conv
+                        ) )
   
-  dfsmsy$pbias<- ((dfsmsy$est-dfsmsy$sim)/dfsmsy$sim)*100
+  dfsmsy$pbias<- ((dfsmsy$mode-dfsmsy$sim)/dfsmsy$sim)*100
+  dfsmsy$bias<- (dfsmsy$mode-dfsmsy$sim)
   
   
+  #sgen
+  head(dat)
+   #S msy
+  
+
   dfsgen <- data.frame(parameter="sgen",
                        iteration=u,
                        scenario= simPars$scenario[a],
@@ -283,37 +477,92 @@ stan_func<- function(path=".", a,u){
                                    "rwa","rwb","rwab",
                                    "hmma","hmmb","hmmab"),each=nrow(dat)),
                        by=rep(dat$year,8),
-                       sim=rep(unlist(mapply(samEst::sGenCalc,a=dat$alpha,Smsy=smsysim, b=dat$beta)),8),
-                       est=c(unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="simple"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="simple"], 
-                                           b=1/dfsmax$est[dfsmax$model=="simple"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="autocorr"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="autocorr"], 
-                                           b=1/dfsmax$est[dfsmax$model=="autocorr"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwa"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="rwa"], 
-                                           b=1/dfsmax$est[dfsmax$model=="rwa"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwb"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="rwb"], 
-                                           b=1/dfsmax$est[dfsmax$model=="rwb"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="rwab"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="rwab"], 
-                                           b=1/dfsmax$est[dfsmax$model=="rwab"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="hmma"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="hmma"], 
-                                           b=1/dfsmax$est[dfsmax$model=="hmma"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="hmmb"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="hmmb"], 
-                                           b=1/dfsmax$est[dfsmax$model=="hmmb"])),
-                             unlist(mapply(samEst::sGenCalc,a=dfa$est[dfa$model=="hmmab"],
-                                           Smsy=dfsmsy$est[dfsmsy$model=="hmmab"], 
-                                           b=1/dfsmax$est[dfsmax$model=="hmmab"]))),
-                      convergence=dfa$convergence+dfsmax$convergence
+                       sim=dat$sGen,
+                       median=c(unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="simple"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="simple"], 
+                                           b=1/dfsmax$median[dfsmax$model=="simple"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="autocorr"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="autocorr"], 
+                                           b=1/dfsmax$median[dfsmax$model=="autocorr"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="rwa"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="rwa"], 
+                                           b=1/dfsmax$median[dfsmax$model=="rwa"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="rwb"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="rwb"], 
+                                           b=1/dfsmax$median[dfsmax$model=="rwb"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="rwab"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="rwab"], 
+                                           b=1/dfsmax$median[dfsmax$model=="rwab"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="hmma"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="hmma"], 
+                                           b=1/dfsmax$median[dfsmax$model=="hmma"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="hmmb"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="hmmb"], 
+                                           b=1/dfsmax$median[dfsmax$model=="hmmb"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$median[dfa$model=="hmmab"],
+                                           Smsy=dfsmsy$median[dfsmsy$model=="hmmab"], 
+                                           b=1/dfsmax$median[dfsmax$model=="hmmab"]))),
+                       mode=c(unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="simple"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="simple"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="simple"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="autocorr"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="autocorr"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="autocorr"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="rwa"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="rwa"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="rwa"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="rwb"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="rwb"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="rwb"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="rwab"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="rwab"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="rwab"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="hmma"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="hmma"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="hmma"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="hmmb"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="hmmb"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="hmmb"])),
+                             unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="hmmab"],
+                                           Smsy=dfsmsy$mode[dfsmsy$model=="hmmab"], 
+                                           b=1/dfsmax$mode[dfsmax$model=="hmmab"]))),
+                      convergence=dfsmsy$convergence
                        )
   
-  dfsgen$pbias<- ((dfsgen$est-dfsgen$sim)/dfsgen$sim)*100     
+  dfsgen$pbias<- ((dfsgen$mode-dfsgen$sim)/dfsgen$sim)*100   
+  dfsgen$bias<- (dfsgen$mode-dfsgen$sim) 
   
   #umsy
+  #S msy
+  umsy_f1 <- mode(x=drf1$"U_msy")
+  umsy_f2 <- mode(x=drf2$"U_msy")
+
+  umsy_f3 <- apply(drf3[,grep("U_msy\\[",colnames(drf3))],2,mode)
+  umsy_f4 <- mode(x=drf4$"U_msy")
+  umsy_f5 <- apply(drf5[,grep("U_msy\\[",colnames(drf5))],2,mode)
+  
+
+  umsy_f6_regime <- apply(drf6[,grep("U_msy\\[",colnames(drf6))],2,mode)
+  umsy_f6 <- Smsy_f6_regime[zstar_f6]
+  umsy_f6_conv <- 
+    conv_f6_ip[[2]]$sumconv[grep('U_msy\\[',conv_f6_ip[[2]]$variable)][f6_ip$median[grep('zstar\\[',f6_ip$variable)]] +
+    conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
+
+  umsy_f7 <- mode(x=drf7$"U_msy")
+
+  umsy_f8_regime <- apply(drf8[,grep("U_msy\\[",colnames(drf8))],2,mode)
+  umsy_f8 <- Smsy_f7_regime[zstar_f8]
+  umsy_f8_conv <- 
+    conv_f8_ip[[2]]$sumconv[grep('U_msy\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
+    conv_f8_ip[[2]]$sumconv[grep('zstar\\[',conv_f8_ip[[2]]$variable)]
+
+  phmma_umsy_regime_median <- f6_ip$median[grep('U_msy\\[',f6_ip$variable)]
+  phmma_umsy_median <- phmma_umsy_regime_median[phmma_zstar_regime_median]
+  
+  phmmab_umsy_regime_median<-f8_ip$median[grep('U_msy\\[',f8_ip$variable)]
+  phmmab_umsy_median <-phmmab_umsy_regime_median[phmmab_zstar_regime_median]
+
+
   dfumsy<- data.frame(parameter="umsy",
                       iteration=u,
                       scenario= simPars$scenario[a],
@@ -324,18 +573,33 @@ stan_func<- function(path=".", a,u){
                                   "hmma","hmmb","hmmab"),each=nrow(dat)),
                       by=rep(dat$year,8),
                       sim=rep(samEst::umsyCalc(dat$alpha),8),
-                      est=c(samEst::umsyCalc(dfa$est[dfa$model=="simple"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="autocorr"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="rwa"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="rwb"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="rwab"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="hmma"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="hmmb"]),
-                            samEst::umsyCalc(dfa$est[dfa$model=="hmmab"])),
-                      convergence=dfa$convergence
-  )
+                      median=c(rep(f1_ip$median[f1_ip$variable=='U_msy'],nrow(dat)),
+                             rep(f2_ip$median[f2_ip$variable=='U_msy'],nrow(dat)),
+                             f3_ip$median[grep('U_msy\\[',f3_ip$variable)],
+                             rep(f4_ip$median[f4_ip$variable=='U_msy'],nrow(dat)),
+                             f5_ip$median[grep('U_msy\\[',f5_ip$variable)],
+                             phmma_umsy_median,
+                             rep(f7_ip$median[f7_ip$variable=='U_msy'],nrow(dat)),
+                            phmmab_umsy_median),
+                      mode=c(rep(umsy_f1,nrow(dat)),
+                        rep(umsy_f2,nrow(dat)),
+                        umsy_f3,
+                        rep(umsy_f4,nrow(dat)),
+                        umsy_f5,
+                        umsy_f6,
+                        rep(umsy_f7,nrow(dat)),
+                        umsy_f8),
+                      convergence=c(rep(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=="U_msy"],nrow(dat)),
+                        rep(conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=="U_msy"],nrow(dat)),
+                         conv_f3_ip[[2]]$sumconv[grep('U_msy\\[',conv_f3_ip[[2]]$variable)],
+                         rep(conv_f4_ip[[2]]$sumconv[conv_f4_ip[[2]]$variable=="U_msy"],nrow(dat)),
+                         conv_f5_ip[[2]]$sumconv[grep('U_msy\\[',conv_f5_ip[[2]]$variable)],
+                         umsy_f6_conv,
+                         rep(conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=="U_msy"],nrow(dat)),
+                         umsy_f8_conv))
   
-  dfumsy$pbias<- ((dfumsy$est-dfumsy$sim)/dfumsy$sim)*100
+  dfumsy$pbias<- ((dfumsy$mode-dfumsy$sim)/dfumsy$sim)*100
+  dfumsy$bias<- (dfumsy$mode-dfumsy$sim)
   
   ##logliks
   ll=list(f1$draws(variables=c('log_lik'),format='draws_matrix'),
@@ -356,18 +620,20 @@ stan_func<- function(path=".", a,u){
                                   "autocorr",
                                   "rwa","rwb","rwab",
                                   "hmma","hmmb","hmmab"),
-  by=c(NA,8),
+                      by=c(NA,8),
                       sim=rep(NA,8),
-                      est=c(sum(apply(ll[[1]],2,log_mean_exp)),
+                      median=c(sum(apply(ll[[1]],2,log_mean_exp)),
                      sum(apply(ll[[2]],2,log_mean_exp)),
-  sum(apply(ll[[3]],2,log_mean_exp)),
-sum(apply(ll[[4]],2,log_mean_exp)),
-sum(apply(ll[[5]],2,log_mean_exp)),
-sum(apply(ll[[6]],2,log_mean_exp)), 
-sum(apply(ll[[7]],2,log_mean_exp)),
-sum(apply(ll[[8]],2,log_mean_exp))),
+                    sum(apply(ll[[3]],2,log_mean_exp)),
+                    sum(apply(ll[[4]],2,log_mean_exp)),
+                    sum(apply(ll[[5]],2,log_mean_exp)),
+                    sum(apply(ll[[6]],2,log_mean_exp)), 
+                    sum(apply(ll[[7]],2,log_mean_exp)),
+                    sum(apply(ll[[8]],2,log_mean_exp))),
+                      mode=NA,
                       convergence=rep(NA,8),
-                      pbias=rep(NA,8))
+                      pbias=rep(NA,8),
+                      bias=NA)
   #Stan AIC estimates
   dfaic<- data.frame(parameter="AIC",
                      iteration=u,
@@ -379,10 +645,11 @@ sum(apply(ll[[8]],2,log_mean_exp))),
                                  "hmma","hmmb","hmmab"),
                      by=rep(NA,8),
                      sim=rep(NA,8),
-                     est=c(stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7)))
-                     ,
+                     median=c(stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7))),
+                     mode=NA,
                      convergence=rep(NA,8),
-                     pbias=rep(NA,8))
+                     pbias=rep(NA,8),
+                     bias=NA)
   
   #Stan BIC estimates
   dfbic<- data.frame(parameter="BIC",
@@ -395,12 +662,12 @@ sum(apply(ll[[8]],2,log_mean_exp))),
                                  "hmma","hmmb","hmmab"),
                      by=rep(NA,8),
                      sim=rep(NA,8),
-                     est=c(stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7)))
-                     ,
+                     median=c(stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7))),
+                     mode=NA,
                      convergence=rep(NA,8),
-                     pbias=rep(NA,8))
-  
-  
+                     pbias=rep(NA,8),
+                     bias=NA)
+
   dff<-rbind(dfa,dfsmax,dfsig,dfsiga,dfsigb,dfsmsy,dfsgen,dfumsy,dfelpd,dfaic,dfbic)
   
   return(dff)
