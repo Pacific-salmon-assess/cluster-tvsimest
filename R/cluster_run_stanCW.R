@@ -51,7 +51,7 @@ pars<-data.frame(path="..",
 tst<-stan_func(path=".", a=2,u=19)
 
 sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrunhi',
-                    nodes = 120, cpus_per_node = 1, submit = FALSE,
+                    nodes = 250, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst", "cmdstanr"),
                     rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
