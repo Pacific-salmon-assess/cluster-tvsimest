@@ -43,10 +43,14 @@ simPars <- read.csv("data/generic/SimPars.csv")
 #  a=rep(seq_len(nrow(simPars)),each=1000),
 #  u=1:1000)
 
-
+#run on Aug 1
 pars<-data.frame(path="..",
-  a=rep(seq_len(nrow(simPars)),each=10),
-  u=1:10)
+  a=rep(c(1,2),each=1000),
+  u=1:1000)
+
+#pars<-data.frame(path="..",
+#  a=rep(seq_len(nrow(simPars)),each=10),
+#  u=1:10)
 
 tst<-stan_func(path=".", a=2,u=19)
 

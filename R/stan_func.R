@@ -31,90 +31,100 @@ stan_func<- function(path=".", a,u){
   
   options(mc.cores = 5)
   #
+  print("simple")
   f1 <- mod1$sample(data=df,
                     seed = 123,
                     chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f1_ip<-f1$summary()
   conv_f1_ip <- check_stan_conv(stansum=f1_ip)
+
+
   
+  
+   print("autocorr")
   f2 <- mod2$sample(data=df,
                     seed = 123,
                    chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f2_ip<-f2$summary()
   conv_f2_ip <- check_stan_conv(stansum=f2_ip)
   
+  print("rwa")
   f3 <- mod3$sample(data=df,
                     seed = 123,
                     chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f3_ip<-f3$summary()
   conv_f3_ip <- check_stan_conv(stansum=f3_ip)
   
+  print("rwb")
   f4 <- mod4$sample(data=df,
                     seed = 123,
                     chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f4_ip<-f4$summary()
   conv_f4_ip <- check_stan_conv(stansum=f4_ip)
   
+  print("rwab")
   f5 <- mod5$sample(data=df,
                     seed = 123,
                     chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 1000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f5_ip<-f5$summary()
   conv_f5_ip <- check_stan_conv(stansum=f5_ip)
-  
+  print("hmma")
   f6 <- mod6$sample(data=df,
                     seed = 123,
                     chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 1000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f6_ip<-f6$summary()
   conv_f6_ip <- check_stan_conv(stansum=f6_ip)
   
+  print("hmmb")
   f7 <- mod7$sample(data=df,
                     seed = 123,
                     chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 1000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f7_ip<-f7$summary()
   conv_f7_ip <- check_stan_conv(stansum=f7_ip)
-  
+
+  print("hmmab")
   f8 <- mod8$sample(data=df,
                     seed = 123,
                    chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    iter_warmup = 1000,
+                    iter_sampling = 10000,
                     refresh = 0,
-                    adapt_delta = 0.95,
+                    adapt_delta = 0.99,
                     max_treedepth = 15)
   f8_ip<-f8$summary()
   conv_f8_ip <- check_stan_conv(stansum=f8_ip)

@@ -901,3 +901,55 @@ legend("topright",   # Coordinates (x also accepts keywords)
        border = "black", # Fill box border color
        lty=1, lwd=2)
  
+
+
+ #random test
+
+  f4 <- mod4$sample(data=df,
+                    seed = 123,
+                    chains = 30, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
+                    refresh = 0,
+                    adapt_delta = 0.99,
+                    max_treedepth = 15)
+  f4_ip<-f4$summary()
+  conv_f4_ip <- check_stan_conv(stansum=f4_ip)
+  
+pryr::object_size(f4)
+
+
+bayesplot::mcmc_areas(
+  f4$draws(f4_ip$variable[grep("S_max\\[",f4_ip$variable)][1:10],format = "matrix"), 
+  prob = 2/3,
+   prob_outer = 0.9,
+   point_est = "mean"
+)+
+#coord_cartesian(xlim = c(70000,500000))+ 
+theme_bw(12)
+  
+
+
+  f1.2 <- mod1$sample(data=df,
+                    seed = 123,
+                    chains = 30, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
+                    refresh = 0,
+                    adapt_delta = 0.99,
+                    max_treedepth = 10)
+  f1.2_ip<-f1.2$summary()
+  conv_f1.2_ip <- check_stan_conv(stansum=f1.2_ip)
+
+
+
+
+bayesplot::mcmc_areas(
+  f4_ip$draws(colnames(draws)[grep("S_max\\[",colnames(draws))[1:10]]), 
+  prob = 2/3,
+   prob_outer = 0.9,
+   point_est = "mean"
+)+
+coord_cartesian(xlim = c(70000,500000))+ 
+theme_bw(12)
+  
