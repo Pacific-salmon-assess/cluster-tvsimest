@@ -6,6 +6,7 @@ data{
   vector[N] S; //spawners in time T
   real pSmax_mean;
   real pSmax_sig;
+  real psig_b;
 }
 transformed data{
 real logbeta_pr;
@@ -26,12 +27,12 @@ generated quantities{
   //time-varying parameters
   vector[L-1] b_dev; //year-to-year deviations in a
 
-  log_a = fabs(normal_rng(1.5,2.5)); //productivity
+  log_a = abs(normal_rng(1.5,2.5)); //productivity
   log_b0 = normal_rng(logbeta_pr,logbeta_pr_sig); //capacity
   
   //variance terms
-  sigma = fabs(normal_rng(0,1)); //half normal on variance (lower limit of zero)
-  sigma_b = fabs(normal_rng(0,1)); //half normal on variance (lower limit of zero)
+  sigma = abs(normal_rng(0,1)); //half normal on variance (lower limit of zero)
+  sigma_b = abs(normal_rng(0,sdsigb)); //half normal on variance (lower limit of zero)
   
 
 

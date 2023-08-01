@@ -6,6 +6,7 @@ data{
   vector[N] S; //spawners in time T
   real pSmax_mean;
   real pSmax_sig;
+  real psig_b;
 }
 transformed data{
 real logbeta_pr;
@@ -17,7 +18,7 @@ logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax p
 }
 parameters {
   real<lower = 0> log_a;// initial productivity (on log scale) - fixed in this
-  real b0; // rate capacity - fixed in this
+  real<upper=0> log_b0; // rate capacity - fixed in this
 
  //variance components  
   real<lower = 0> sigma;
@@ -32,21 +33,22 @@ transformed parameters{
   vector[L] log_b; //b in each year
   vector[L] b; //b in each year
   
-  log_b[1] = b0;
+  log_b[1] = log_b0;
   for(t in 2:L){
     log_b[t] = log_b[t-1] + b_dev[t-1]*sigma_b;
-  } 
+  }
+  
   b=exp(log_b);
 }  
 
 model{
   //priors
   log_a ~ normal(1.5,2.5); //productivity
-  b0 ~ normal(logbeta_pr,logbeta_pr_sig); //capacity
+  log_b0 ~ normal(logbeta_pr,logbeta_pr_sig); //capacity
   
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
-  sigma_b ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma_b ~ normal(0,psig_b); //half normal on variance (lower limit of zero)
   
    
   b_dev ~ std_normal();
