@@ -17,7 +17,8 @@ stan_func<- function(path=".", a,u){
              K=2,
              alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
              pSmax_mean=max(dat$obsSpawners)*.5,
-             pSmax_sig=max(dat$obsSpawners)*.5
+             pSmax_sig=max(dat$obsSpawners)*.5,
+             psig_b=.4
   )
   
   #create folder to hold temp files
@@ -44,7 +45,7 @@ stan_func<- function(path=".", a,u){
   conv_f1_ip <- check_stan_conv(stansum=f1_ip)
 
 
-  
+
   
    print("autocorr")
   f2 <- mod2$sample(data=df,

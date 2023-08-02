@@ -22,7 +22,7 @@ path="."
              alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
              pSmax_mean=max(dat$obsSpawners)*.5,
              pSmax_sig=max(dat$obsSpawners)*2,
-             sdsigb=.4
+             psig_b=.4
   )
 
 logbeta_pr_sig=sqrt(log(1+((1/df$pSmax_sig)*(1/df$pSmax_sig))/((1/df$pSmax_mean)*(1/df$pSmax_mean)))); #this converts sigma on the untransformed scale to a log scale
@@ -94,15 +94,4 @@ bayesplot::mcmc_areas(
 #coord_cartesian(xlim = c(70000,500000))+ 
 theme_bw(12)
   
-
-bayesplot::mcmc_areas(
-  f4_ppc$draws("log_a"), 
-  prob = 2/3,
-   prob_outer = 0.9,
-   point_est = "mean"
-)+
-coord_cartesian(xlim = c(70000,500000))+ 
-theme_bw(12)
-  
-
 
