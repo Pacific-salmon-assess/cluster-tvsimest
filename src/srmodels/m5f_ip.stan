@@ -6,6 +6,7 @@ data{
   vector[N] S; //spawners in time T
   real pSmax_mean;
   real pSmax_sig;
+  real psig_b;
 }
 transformed data{
 real logbeta_pr;
@@ -51,7 +52,7 @@ model{
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)
-  sigma_b ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma_b ~ normal(0,psig_b); //half normal on variance (lower limit of zero)
   
   
   a_dev ~ std_normal();

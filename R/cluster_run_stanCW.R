@@ -38,15 +38,18 @@ mod8=cmdstanr::cmdstan_model(file8)
 simPars <- read.csv("data/generic/SimPars.csv")
 
 
-
 #pars<-data.frame(path="..",
-#  a=rep(seq_len(nrow(simPars)),each=1000),
+#  a=rep(seq_len(nrow(simPars)),each=2000),
 #  u=1:1000)
 
-#run on Aug 1
 pars<-data.frame(path="..",
-  a=rep(c(1,2),each=1000),
-  u=1:1000)
+  a=rep(seq_len(nrow(simPars)),each=200),
+  u=1:200)
+
+#run on Aug 1
+#pars<-data.frame(path="..",
+#  a=rep(c(1,2),each=1000),
+#  u=1:1000)
 
 #pars<-data.frame(path="..",
 #  a=rep(seq_len(nrow(simPars)),each=10),
