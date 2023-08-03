@@ -311,37 +311,37 @@ stan_func<- function(path=".", a,u){
   dfsig<- data.frame(parameter="sigma",
                      iteration=u,
                      scenario= simPars$scenario[a],
-                     method=rep("MCMC",8),
-                     model=c("simple",
+                     method="MCMC",
+                     model=rep(c("simple",
                              "autocorr",
                              "rwa","rwb","rwab",
-                             "hmma","hmmb","hmmab"),
-                     by=NA,
+                             "hmma","hmmb","hmmab"),each=nrow(df)),
+                     by=rep(dat$year,8),
                      sim=rep(dat$sigma,8),
-                     median=c(f1_ip$median[f1_ip$variable=='sigma'],
+                     median=rep(c(f1_ip$median[f1_ip$variable=='sigma'],
                       f2_ip$median[f2_ip$variable=='sigma'],
                       f3_ip$median[f3_ip$variable=='sigma'],
                       f4_ip$median[f4_ip$variable=='sigma'],
                       f5_ip$median[f5_ip$variable=='sigma'],
                       f6_ip$median[f6_ip$variable=='sigma'],
                       f7_ip$median[f7_ip$variable=='sigma'],
-                      f8_ip$median[f8_ip$variable=='sigma']),
-                     mode=c(sig_f1,
+                      f8_ip$median[f8_ip$variable=='sigma']),each=nrow(df)),
+                     mode=rep(c(sig_f1,
                       sig_f2,
                       sig_f3,
                       sig_f4,
                       sig_f5,
                       sig_f6,
                       sig_f7,
-                      sig_f8),
-                    convergence= c(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=='sigma'],
+                      sig_f8),each=nrow(df)),
+                    convergence= rep(c(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=='sigma'],
                       conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=='sigma'],
                       conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=='sigma'],
                       conv_f4_ip[[2]]$sumconv[conv_f4_ip[[2]]$variable=='sigma'],
                       conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma'],
                       conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=='sigma'],
                       conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=='sigma'],
-                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']))
+                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']),each=nrow(df)))
   
   dfsig$pbias<- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
   dfsig$bias<- (dfsig$mode-dfsig$sim)
@@ -634,13 +634,13 @@ stan_func<- function(path=".", a,u){
                       by=c(NA,8),
                       sim=rep(NA,8),
                       median=c(sum(apply(ll[[1]],2,log_mean_exp)),
-                     sum(apply(ll[[2]],2,log_mean_exp)),
-                    sum(apply(ll[[3]],2,log_mean_exp)),
-                    sum(apply(ll[[4]],2,log_mean_exp)),
-                    sum(apply(ll[[5]],2,log_mean_exp)),
-                    sum(apply(ll[[6]],2,log_mean_exp)), 
-                    sum(apply(ll[[7]],2,log_mean_exp)),
-                    sum(apply(ll[[8]],2,log_mean_exp))),
+                     sum(apply(ll[[2]],2,samEst::log_mean_exp)),
+                    sum(apply(ll[[3]],2,samEst::log_mean_exp)),
+                    sum(apply(ll[[4]],2,samEst::log_mean_exp)),
+                    sum(apply(ll[[5]],2,samEst::log_mean_exp)),
+                    sum(apply(ll[[6]],2,samEst::log_mean_exp)), 
+                    sum(apply(ll[[7]],2,samEst::log_mean_exp)),
+                    sum(apply(ll[[8]],2,samEst::log_mean_exp))),
                       mode=NA,
                       convergence=rep(NA,8),
                       pbias=rep(NA,8),
@@ -656,7 +656,7 @@ stan_func<- function(path=".", a,u){
                                  "hmma","hmmb","hmmab"),
                      by=rep(NA,8),
                      sim=rep(NA,8),
-                     median=c(stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7))),
+                     median=c(samEst::stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7))),
                      mode=NA,
                      convergence=rep(NA,8),
                      pbias=rep(NA,8),
@@ -673,7 +673,7 @@ stan_func<- function(path=".", a,u){
                                  "hmma","hmmb","hmmab"),
                      by=rep(NA,8),
                      sim=rep(NA,8),
-                     median=c(stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7))),
+                     median=c(samEst::stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7))),
                      mode=NA,
                      convergence=rep(NA,8),
                      pbias=rep(NA,8),
@@ -683,75 +683,6 @@ stan_func<- function(path=".", a,u){
   
   return(dff)
   
-}
-
-stan_aic<- function(x,form=c('aic','bic'),type=c('full','d90','d80'),k){
-  LL=NA;AIC=NA;BIC=NA
-  elpd_1=matrix(nrow=length(x),ncol=ncol(x[[1]]))
-  if(type=='full'){
-    for(i in 1:length(x)){
-      elpd_1[i,]=apply(x[[i]],2,log_mean_exp) #
-    }
-    LL=apply(elpd_1,1,sum)
-    AIC=-2*LL+2*k+(2*k^2+2*k)/(ncol(x[[1]])-k-1)
-    BIC=-2*LL+k*log(ncol(x[[1]]))
-    
-    dAIC=AIC-min(AIC)
-    dBIC=BIC-min(BIC)
-    w_aic=NA
-    w_bic=NA
-    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dAIC))}
-    for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
-  }
-  if(type=='d90'){
-    for(i in 1:length(x)){
-      elpd_1[i,]=apply(x[[i]],2,log_mean_exp) #
-    }
-    elpd_1=elpd_1[,apply(elpd_1,2,sum)>=quantile(apply(elpd_1,2,sum),0.1)]
-    
-    LL=apply(elpd_1,1,sum)
-    AIC=-2*LL+2*k+(2*k^2+2*k)/(ncol(x[[1]])-k-1)
-    BIC=-2*LL+k*log(ncol(x[[1]]))
-    
-    dAIC=AIC-min(AIC)
-    dBIC=BIC-min(BIC)
-    w_aic=NA
-    w_bic=NA
-    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dAIC))}
-    for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
-  }
-  if(type=='d80'){
-    for(i in 1:length(x)){
-      elpd_1[i,]=apply(x[[i]],2,log_mean_exp) #
-    }
-    elpd_1=elpd_1[,apply(elpd_1,2,sum)>=quantile(apply(elpd_1,2,sum),0.2)]
-    
-    LL=apply(elpd_1,1,sum)
-    AIC=-2*LL+2*k+(2*k^2+2*k)/(ncol(x[[1]])-k-1)
-    BIC=-2*LL+k*log(ncol(x[[1]]))
-    
-    dAIC=AIC-min(AIC)
-    dBIC=BIC-min(BIC)
-    w_aic=NA
-    w_bic=NA
-    for(i in 1:length(x)){w_aic[i]=exp(-0.5*dAIC[i])/sum(exp(-0.5*dAIC))}
-    for(i in 1:length(x)){w_bic[i]=exp(-0.5*dBIC[i])/sum(exp(-0.5*dBIC))}
-  }
-  if(form=='aic'){
-    return(w_aic)
-  }
-  if(form=='bic'){
-    return(w_bic)
-  }
-}
-
-log_sum_exp <- function(x) {
-  max_x <- max(x)  
-  max_x + log(sum(exp(x - max_x)))
-}
-
-log_mean_exp <- function(x) {
-  log_sum_exp(x) - log(length(x))
 }
 
 
