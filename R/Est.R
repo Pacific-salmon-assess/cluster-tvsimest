@@ -30,6 +30,7 @@ source("R/check_stan_conv.R")
 library(ggplot2)
 library(gridExtra)
 library(dplyr)
+library(rstan)
 
 #source("sgen_functions.R")
 
@@ -74,3 +75,4 @@ head(tst_stan)
 head(tst_tmb)
 
 tst<-rbind()
+
