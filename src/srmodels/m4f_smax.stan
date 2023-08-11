@@ -6,6 +6,7 @@ data{
   vector[N] S; //spawners in time T
   real pSmax_mean;
   real pSmax_sig;
+  real psig_b;
 }
 parameters {
   real<lower = 0> log_a;// initial productivity (on log scale) - fixed in this
@@ -32,13 +33,13 @@ for(t in 2:L){Smax[t]=Smax[t-1] + smax_dev[t-1]*sigma_b;}
 model{
   //priors
   log_a ~ normal(1.5,2.5); //productivity
-  Smax0 ~ lognormal(log(pSmax_mean),log(1+(pSmax_sig/pSmax_mean))); //per capita capacity parameter - wide prior
+  Smax0 ~ normal(pSmax_mean,pSmax_sig); //per capita capacity parameter - wide prior
   
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
-  sigma_b ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma_b ~ normal(0,psig_b); //half normal on variance (lower limit of zero)
  
-  for(n in 1:N) R_S[n] ~ normal(log_a-S[n]/S_max[ii[n]], sigma);
+  for(n in 1:N) R_S[n] ~ normal(log_a-S[n]/Smax[ii[n]], sigma);
 }
 generated quantities{
      vector[N] log_lik;
@@ -48,11 +49,11 @@ generated quantities{
      
      
     for(l in 1:L){ 
-      b[l] = 1/S_max[l];
+      b[l] = 1/Smax[l];
       S_msy[l] = (1-lambert_w0(exp(1-log_a)))/b[l];
     }
     U_msy = 1-lambert_w0(exp(1-log_a));
     
-    for(n in 1:N) log_lik[n] = normal_lpdf(R_S[n]|log_a - S[n]/S_max[ii[n]], sigma);
+    for(n in 1:N) log_lik[n] = normal_lpdf(R_S[n]|log_a - S[n]/Smax[ii[n]], sigma);
 }
  

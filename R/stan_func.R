@@ -18,8 +18,11 @@ stan_func<- function(path=".", a,u){
              alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
              pSmax_mean=max(dat$obsSpawners)*.5,
              pSmax_sig=max(dat$obsSpawners)*.5,
-             psig_b=.4
+             psig_b=max(dat$obsSpawners)*.5
   )
+
+ 
+
   
   #create folder to hold temp files
 #  dir.create(paste("/fs/vnas_Hdfo/comda/dag004/Rlib/tmp/tmp_cmdst/",u,sep=''))
@@ -31,13 +34,16 @@ stan_func<- function(path=".", a,u){
 #}
   
   options(mc.cores = 5)
+  print(paste("a is", a))
+  print(paste("u is", u))
+  
   #
   print("simple")
   f1 <- mod1$sample(data=df,
                     seed = 123,
-                    chains = 30, 
+                    chains = 6, 
                     iter_warmup = 2000,
-                    iter_sampling = 15000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
@@ -50,9 +56,9 @@ stan_func<- function(path=".", a,u){
    print("autocorr")
   f2 <- mod2$sample(data=df,
                     seed = 123,
-                   chains = 30, 
+                   chains = 6, 
                     iter_warmup = 2000,
-                    iter_sampling = 15000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
@@ -62,9 +68,9 @@ stan_func<- function(path=".", a,u){
   print("rwa")
   f3 <- mod3$sample(data=df,
                     seed = 123,
-                    chains = 30, 
+                    chains = 6, 
                     iter_warmup = 2000,
-                    iter_sampling = 15000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
@@ -74,9 +80,9 @@ stan_func<- function(path=".", a,u){
   print("rwb")
   f4 <- mod4$sample(data=df,
                     seed = 123,
-                    chains = 30, 
+                    chains = 6, 
                     iter_warmup = 2000,
-                    iter_sampling = 15000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
@@ -86,9 +92,9 @@ stan_func<- function(path=".", a,u){
   print("rwab")
   f5 <- mod5$sample(data=df,
                     seed = 123,
-                    chains = 30, 
-                    iter_warmup = 1000,
-                    iter_sampling = 15000,
+                    chains = 6, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
@@ -97,37 +103,37 @@ stan_func<- function(path=".", a,u){
   print("hmma")
   f6 <- mod6$sample(data=df,
                     seed = 123,
-                    chains = 30, 
-                    iter_warmup = 1000,
-                    iter_sampling = 15000,
+                    chains = 6, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
-  f6_ip<-f6$summary()
+  f6_ip <- f6$summary()
   conv_f6_ip <- check_stan_conv(stansum=f6_ip)
   
   print("hmmb")
   f7 <- mod7$sample(data=df,
                     seed = 123,
-                    chains = 30, 
-                    iter_warmup = 1000,
-                    iter_sampling = 15000,
+                    chains = 6, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
-  f7_ip<-f7$summary()
+  f7_ip <- f7$summary()
   conv_f7_ip <- check_stan_conv(stansum=f7_ip)
 
   print("hmmab")
   f8 <- mod8$sample(data=df,
                     seed = 123,
-                   chains = 30, 
-                    iter_warmup = 1000,
-                    iter_sampling = 15000,
+                   chains = 6, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.99,
                     max_treedepth = 15)
-  f8_ip<-f8$summary()
+  f8_ip <- f8$summary()
   conv_f8_ip <- check_stan_conv(stansum=f8_ip)
   
   
@@ -224,8 +230,8 @@ stan_func<- function(path=".", a,u){
   smax_f2 <- mode(x=drf2$S_max)
   smax_f3 <- mode(x=drf3$S_max)
 
-  smax_f4 <- apply(drf4[,grep("S_max\\[",colnames(drf4))],2,mode)
-  smax_f5 <- apply(drf5[,grep("S_max\\[",colnames(drf5))],2,mode)
+  smax_f4 <- apply(drf4[,grep("Smax\\[",colnames(drf4))],2,mode)
+  smax_f5 <- apply(drf5[,grep("Smax\\[",colnames(drf5))],2,mode)
 
   smax_f6 <- mode(x=drf6$S_max)
 
@@ -267,8 +273,8 @@ stan_func<- function(path=".", a,u){
                       median=c(rep(f1_ip$median[f1_ip$variable=='S_max'],nrow(dat)),
                         rep(f2_ip$median[f2_ip$variable=='S_max'],nrow(dat)),
                         rep(f3_ip$median[f3_ip$variable=='S_max'],nrow(dat)),
-                        f4_ip$median[grep('S_max\\[',f4_ip$variable)],
-                        f5_ip$median[grep('S_max\\[',f5_ip$variable)],
+                        f4_ip$median[grep('Smax\\[',f4_ip$variable)],
+                        f5_ip$median[grep('Smax\\[',f5_ip$variable)],
                         rep(f6_ip$median[f6_ip$variable=='S_max'],nrow(dat)),
                         phmmb_smax_median,
                         phmmab_smax_median),
@@ -284,8 +290,8 @@ stan_func<- function(path=".", a,u){
                       c(rep(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=="S_max"],nrow(dat)),
                         rep(conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=="S_max"],nrow(dat)),
                         rep(conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=="S_max"],nrow(dat)),
-                        conv_f4_ip[[2]]$sumconv[grep('S_max\\[',conv_f4_ip[[2]]$variable)],
-                        conv_f5_ip[[2]]$sumconv[grep('S_max\\[',conv_f5_ip[[2]]$variable)],
+                        conv_f4_ip[[2]]$sumconv[grep('Smax\\[',conv_f4_ip[[2]]$variable)],
+                        conv_f5_ip[[2]]$sumconv[grep('Smax\\[',conv_f5_ip[[2]]$variable)],
                         rep(conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=="S_max"],nrow(dat)),
                         smax_f7_conv,
                         smax_f8_conv))
@@ -315,7 +321,7 @@ stan_func<- function(path=".", a,u){
                      model=rep(c("simple",
                              "autocorr",
                              "rwa","rwb","rwab",
-                             "hmma","hmmb","hmmab"),each=nrow(df)),
+                             "hmma","hmmb","hmmab"),each=nrow(dat)),
                      by=rep(dat$year,8),
                      sim=rep(dat$sigma,8),
                      median=rep(c(f1_ip$median[f1_ip$variable=='sigma'],
@@ -325,7 +331,7 @@ stan_func<- function(path=".", a,u){
                       f5_ip$median[f5_ip$variable=='sigma'],
                       f6_ip$median[f6_ip$variable=='sigma'],
                       f7_ip$median[f7_ip$variable=='sigma'],
-                      f8_ip$median[f8_ip$variable=='sigma']),each=nrow(df)),
+                      f8_ip$median[f8_ip$variable=='sigma']),each=nrow(dat)),
                      mode=rep(c(sig_f1,
                       sig_f2,
                       sig_f3,
@@ -333,7 +339,7 @@ stan_func<- function(path=".", a,u){
                       sig_f5,
                       sig_f6,
                       sig_f7,
-                      sig_f8),each=nrow(df)),
+                      sig_f8),each=nrow(dat)),
                     convergence= rep(c(conv_f1_ip[[2]]$sumconv[conv_f1_ip[[2]]$variable=='sigma'],
                       conv_f2_ip[[2]]$sumconv[conv_f2_ip[[2]]$variable=='sigma'],
                       conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=='sigma'],
@@ -341,7 +347,7 @@ stan_func<- function(path=".", a,u){
                       conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma'],
                       conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=='sigma'],
                       conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=='sigma'],
-                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']),each=nrow(df)))
+                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']),each=nrow(dat)))
   
   dfsig$pbias<- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
   dfsig$bias<- (dfsig$mode-dfsig$sim)
@@ -370,8 +376,6 @@ stan_func<- function(path=".", a,u){
   dfsiga$bias<- NA
   
   #sigma b
-
-
   sigb_f4 <- mode(x=drf4$"sigma_b")
   sigb_f5 <- mode(x=drf5$"sigma_b")
  

@@ -18,10 +18,16 @@ file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2f_ip.stan")
 mod2=cmdstanr::cmdstan_model(file2)
 file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f_ip.stan")
 mod3=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_ip.stan")
+
+file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_smax.stan")
 mod4=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f_ip.stan")
+#file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_ip.stan")
+
+file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f_smax.stan")
 mod5=cmdstanr::cmdstan_model(file5)
+#file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f_ip.stan")
+
+
 file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6f_ip.stan")
 mod6=cmdstanr::cmdstan_model(file6)
 file7=file.path(cmdstanr::cmdstan_path(),'srmodels', "m7f_ip.stan")
@@ -38,9 +44,9 @@ mod8=cmdstanr::cmdstan_model(file8)
 simPars <- read.csv("data/generic/SimPars.csv")
 
 
-#pars<-data.frame(path="..",
-#  a=rep(seq_len(nrow(simPars)),each=2000),
-#  u=1:1000)
+pars<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=2000),
+  u=1:1000)
 
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=200),
@@ -55,7 +61,7 @@ pars<-data.frame(path="..",
 #  a=rep(seq_len(nrow(simPars)),each=10),
 #  u=1:10)
 
-tst<-stan_func(path=".", a=2,u=19)
+tst<-stan_func(path=".", a=6,u=19)
 
 sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrunhi',
                     nodes = 250, cpus_per_node = 1, submit = FALSE,

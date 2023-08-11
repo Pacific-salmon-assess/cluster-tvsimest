@@ -8,7 +8,8 @@ library(cmdstanr)
 library(rstan)
 library(samEst)
 source("R/stan_func.R")
-
+source("R/utils.R")
+source("R/check_stan_conv.R")
 
 mytheme = list(
     theme_classic(16)+
@@ -19,9 +20,20 @@ mytheme = list(
 
 
 
+file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f.stan")
+mod4=cmdstanr::cmdstan_model(file4)
+file4s=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4f_smax.stan")
+mod4s=cmdstanr::cmdstan_model(file4s)
+
+
+
+
 file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f.stan")
 mod5=cmdstanr::cmdstan_model(file5)
 
+
+file5s=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5f_smax.stan")
+mod5s=cmdstanr::cmdstan_model(file5s)
 
 #---------------------------------------------------------------------------------------------------
 #stan  base scenarios
@@ -30,8 +42,8 @@ mod5=cmdstanr::cmdstan_model(file5)
 simPars <- read.csv("data/generic/SimPars.csv")
 
 path="."
-a=4
-u=19
+a=6
+u=455
 
   
   
@@ -50,31 +62,131 @@ allsimest <- list()
              ii=as.numeric(as.factor(dat$year)),
              N=nrow(dat),
              K=2,
-             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2)
+             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
+             pSmax_mean=max(dat$obsSpawners)*.3,
+             pSmax_sig=max(dat$obsSpawners)*.3,
+             psig_b=.3
+  )
+  df_smax <- list(by=dat$year,
+             S=dat$obsSpawners,
+             R=dat$obsRecruits,
+             R_S=log(dat$obsRecruits/dat$obsSpawners),
+             L=max(dat$year)-min(dat$year)+1,
+             ii=as.numeric(as.factor(dat$year)),
+             N=nrow(dat),
+             K=2,
+             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2),
+             pSmax_mean=max(dat$obsSpawners)*.5,
+             pSmax_sig=max(dat$obsSpawners)*.5,
+             psig_b=max(dat$obsSpawners)*.5
   )
 
+ 
 
   df_tmb <- data.frame(by=dat$year,
                   S=dat$obsSpawners,
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
   
+  Smax_mean<-(max(df_tmb$S)*.5)
+  Smax_sd<-Smax_mean
+ 
+  logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
+  logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
+ 
+  
  
   
 rstan_options(auto_write = TRUE)
-options(mc.cores = (parallel::detectCores()-1))
+options(mc.cores = 5)
 
 
-f5 <- mod5$sample(data=df,
+rwb_tmb <-ricker_rw_TMB(data=df_tmb ,tv.par="b",sig_p_sd=1,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+
+
+
+#print("rwb")
+#  f4 <- mod4$sample(data=df,
+#                    seed = 123,
+#                    chains = 20, 
+#                    iter_warmup = 2000,
+#                    iter_sampling = 15000,
+#                    refresh = 0,
+#                    adapt_delta = 0.99,
+#                    max_treedepth = 15)
+#  f4_ip<-f4$summary()
+  #conv_f4_ip <- check_stan_conv(stansum=f4_ip)
+  
+  print("rwbs")
+  f4smax <- mod4s$sample(data=df_smax,
                     seed = 123,
-                    chains = 30, 
-                    iter_warmup = 4000,
-                    iter_sampling = 30000,
+                    chains = 6, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
+                    refresh = 0,
+                    adapt_delta = 0.99,
+                    max_treedepth = 15)
+  f4_ip_smax<-f4smax$summary()
+  #conv_f4_ip_smax <- check_stan_conv(stansum=f4_ip_smax)
+drf4<-as.data.frame(f4smax$draws( format="matrix"))
+smax_f4 <- apply(drf4[,grep("Smax\\[",colnames(drf4))],2,mode)
+
+bayesplot::mcmc_areas(
+  f4smax$draws(),
+  regex_pars = "Smax\\[", 
+  prob = .05,
+   prob_outer = 0.9,
+   point_est = "mean"
+)+
+#coord_cartesian(xlim = c(70000,500000))+ 
+theme_bw(12)
+  
+
+
+dfsmax<-data.frame(param="smax",
+  model=rep(c("rwb_tmb", "rwsmax_stan","rwsmax_stan_mode","sim"),each=40),
+  by=1:40,
+  iteration=u,
+  scenario=simPars$scenario[a],
+  value=c(rwb_tmb$Smax,
+    f4_ip_smax[grep("Smax\\[",f4_ip_smax$variable),"median"][[1]], 
+    smax_f4,  
+    dat$capacity)
+    )
+
+
+
+
+ggplot(dfsmax)+
+geom_line(aes(x=by,y=value,color=model, group=interaction(model, iteration)),linewidth=1.2)+
+scale_color_viridis_d(begin=.1, end=.8) +
+mytheme
+
+
+f5 <- mod5s$sample(data=df_smax,
+                    seed = 123,
+                    chains = 6, 
+                    iter_warmup = 2000,
+                    iter_sampling = 10000,
                     refresh = 0,
                     adapt_delta = 0.98,
                     max_treedepth = 15)
   
+  f5_smax<-f5$summary()
+  #conv_f4_ip_smax <- check_stan_conv(stansum=f4_ip_smax)
+drf5<-as.data.frame(f5$draws( format="matrix"))
+smax_f5 <- apply(drf5[,grep("Smax\\[",colnames(drf5))],2,mode)
 
+bayesplot::mcmc_areas(
+  f5$draws(),
+  regex_pars = "Smax\\[", 
+  prob = .05,
+   prob_outer = 0.9,
+   point_est = "mean"
+)+
+#coord_cartesian(xlim = c(70000,500000))+ 
+theme_bw(12)
+  
 
 
 
@@ -89,8 +201,6 @@ mod3=cmdstanr::cmdstan_model(file3)
 
 file3noadj=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3f.stan")
 mod3noadj=cmdstanr::cmdstan_model(file3noadj)
-
-
 
 
 simPars <- read.csv("data/generic/SimPars.csv")
@@ -128,7 +238,11 @@ allsimest <- list()
                   S=dat$obsSpawners,
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
-
+  
+   logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
+  logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
+ 
+  
 
 
 rwa_tmb <-ricker_rw_TMB(data=df_tmb ,tv.par="a",sig_p_sd=1)
