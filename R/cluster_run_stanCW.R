@@ -45,7 +45,7 @@ simPars <- read.csv("data/generic/SimPars.csv")
 
 
 pars<-data.frame(path="..",
-  a=rep(seq_len(nrow(simPars)),each=2000),
+  a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
 pars<-data.frame(path="..",

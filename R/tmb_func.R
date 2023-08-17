@@ -14,17 +14,23 @@ tmb_func <- function(path=".",a, u) {
                   S=dat$obsSpawners,
                   R=dat$obsRecruits,
                   logRS=log(dat$obsRecruits/dat$obsSpawners))
+
+  Smax_mean<-(max(df$S)*.5)
+  Smax_sd<-Smax_mean
+ 
+  logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
+  logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
   
   dirpr<-matrix(c(2,1,1,2),2,2)
 
-  p <- ricker_TMB(data=df)
-  pac <- ricker_TMB(data=df, AC=TRUE)
-  ptva <- ricker_rw_TMB(data=df,tv.par='a')
-  ptvb <- ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=.4)
-  ptvab <- ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4)
-  phmma <- ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr)
-  phmmb <- ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr)
-  phmm  <- ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr)
+  p <- ricker_TMB(data=df,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  pac <- ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  ptva <- ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  ptvb <- ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  ptvab <- ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  phmma <- ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  phmmb <- ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  phmm  <- ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
 
   
 
@@ -57,8 +63,8 @@ tmb_func <- function(path=".",a, u) {
                     phmm$model$convergence + phmm$conv_problem
                     ),each=nrow(df))))
                     
-  dfa$pbias<- ((dfa$mode-dfa$sim)/dfa$sim)*100
-  dfa$bias<- (dfa$mode-dfa$sim)
+  dfa$pbias <- ((dfa$mode-dfa$sim)/dfa$sim)*100
+  dfa$bias <- (dfa$mode-dfa$sim)
   
   #Smax
   dfsmax<- data.frame(parameter="Smax",
@@ -89,8 +95,8 @@ tmb_func <- function(path=".",a, u) {
         phmmb$model$convergence + phmmb$conv_problem,
         phmm$model$convergence + phmm$conv_problem),each=nrow(df)))
       
-    dfsmax$pbias<- ((dfsmax$mode-dfsmax$sim)/dfsmax$sim)*100
-    dfsmax$bias<- (dfsmax$mode-dfsmax$sim)
+    dfsmax$pbias <- ((dfsmax$mode-dfsmax$sim)/dfsmax$sim)*100
+    dfsmax$bias <- (dfsmax$mode-dfsmax$sim)
        
     #sigma
     dfsig<- data.frame(parameter="sigma",
@@ -122,8 +128,8 @@ tmb_func <- function(path=".",a, u) {
         phmmb$model$convergence + phmmb$conv_problem,
         phmm$model$convergence + phmm$conv_problem),each=nrow(df)))
     
-    dfsig$pbias<- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
-    dfsig$bias<- (dfsig$mode-dfsig$sim)
+    dfsig$pbias <- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
+    dfsig$bias <- (dfsig$mode-dfsig$sim)
 
     #sigma_a
     dfsiga<- data.frame(parameter="sigma_a",
@@ -155,8 +161,8 @@ tmb_func <- function(path=".",a, u) {
       convergence=c( ptvb$model$convergence + ptvb$conv_problem,        
         ptvab$model$convergence + ptvab$conv_problem))
     
-    dfsigb$pbias<- ((dfsigb$mode-dfsigb$sim)/dfsigb$sim)*100
-    dfsigb$bias<- (dfsigb$mode-dfsigb$sim)
+    dfsigb$pbias <- ((dfsigb$mode-dfsigb$sim)/dfsigb$sim)*100
+    dfsigb$bias <- (dfsigb$mode-dfsigb$sim)
               
     #Smsy
     smsysim<-smsyCalc(dat$alpha,dat$beta)
@@ -243,9 +249,8 @@ tmb_func <- function(path=".",a, u) {
     dfsgen$bias<- (dfsgen$mode-dfsgen$sim)
          
   #umsy
-  #1-gsl::lambert_W0(exp(1 - ptva$alpha))) /ptva$beta
-
-    dfumsy<- data.frame(parameter="umsy",
+ 
+  dfumsy<- data.frame(parameter="umsy",
     iteration=u,
     scenario= simPars$scenario[a],
     method=rep(c(rep("MLE",8)),each=nrow(df)),
@@ -339,14 +344,14 @@ tmb_func <- function(path=".",a, u) {
                        bias=rep(NA,8))
   
    #lfo
-    lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15)
-    lfoac <- tmb_mod_lfo_cv(data=df,model='staticAC', L=15)
-    lfoalpha <- tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=15)
-    lfobeta <- tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=15)
-    lfoalphabeta <- tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=15)
-    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15, dirichlet_prior=dirpr)
-    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15, dirichlet_prior=dirpr)
-    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15, dirichlet_prior=dirpr)
+    lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15, priorlogb="maxobsS")
+    lfoac <- tmb_mod_lfo_cv(data=df,model='staticAC', L=15, priorlogb="maxobsS")
+    lfoalpha <- tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=15, priorlogb="maxobsS")
+    lfobeta <- tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=15, priorlogb="maxobsS")
+    lfoalphabeta <- tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=15, priorlogb="maxobsS")
+    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15, dirichlet_prior=dirpr, priorlogb="maxobsS")
+    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15, dirichlet_prior=dirpr, priorlogb="maxobsS")
+    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15, dirichlet_prior=dirpr, priorlogb="maxobsS")
     
     dflfo<- data.frame(parameter="LFO",
                        iteration=u,
