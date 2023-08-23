@@ -344,14 +344,14 @@ tmb_func <- function(path=".",a, u) {
                        bias=rep(NA,8))
   
    #lfo
-    lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15, priorlogb="maxobsS")
-    lfoac <- tmb_mod_lfo_cv(data=df,model='staticAC', L=15, priorlogb="maxobsS")
-    lfoalpha <- tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=15, priorlogb="maxobsS")
-    lfobeta <- tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=15, priorlogb="maxobsS")
-    lfoalphabeta <- tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=15, priorlogb="maxobsS")
-    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15, dirichlet_prior=dirpr, priorlogb="maxobsS")
-    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15, dirichlet_prior=dirpr, priorlogb="maxobsS")
-    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15, dirichlet_prior=dirpr, priorlogb="maxobsS")
+    lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfoac <- tmb_mod_lfo_cv(data=df,model='staticAC', L=15, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfoalpha <- tmb_mod_lfo_cv(data=df,model='rw_a', siglfo="obs", L=15,priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfobeta <- tmb_mod_lfo_cv(data=df,model='rw_b', siglfo="obs", L=15, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfoalphabeta <- tmb_mod_lfo_cv(data=df,model='rw_both', siglfo="obs", L=15, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfohmma <- tmb_mod_lfo_cv(data=df,model='HMM_a', L=15, dirichlet_prior=dirpr, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfohmmb <- tmb_mod_lfo_cv(data=df,model='HMM_b', L=15, dirichlet_prior=dirpr, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+    lfohmm <- tmb_mod_lfo_cv(data=df,model='HMM', L=15, dirichlet_prior=dirpr, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
     
     dflfo<- data.frame(parameter="LFO",
                        iteration=u,

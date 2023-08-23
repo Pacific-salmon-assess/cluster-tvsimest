@@ -22,7 +22,7 @@ simPars<-rbind(simPars1,simPars2,simPars3,simPars4,simPars5,simPars6,simPars7,si
 
 
 parsall<-data.frame(path="..",
-  a=rep(seq_len(nrow(simParsall)),each=1000),
+  a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
 
@@ -34,7 +34,25 @@ sjobtmball <- slurm_apply(tmb_func, parsall, jobname = 'TMBrunall',
                     global_objects=c("simPars"))
 
 resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
-#The following files are missing: results_45.RDS, results_48.RDS, results_116.RDS, results_142.RDS, results_147.RDS, results_225.RDS, results_245.RDS
+#The following files are missing: results_40.RDS, results_47.RDS, results_112.RDS, results_142.RDS, results_165.RDS
+
+rslurm_result<-list()
+
+#run 40 that failed
+.rslurm_id <- 47
+.rslurm_istart <- (.rslurm_id)*  376 + 1
+.rslurm_iend <- min((.rslurm_id + 1) *  376, nrow(parsall))
+rslurm_result14<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_result[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=parsall$a[i],
+  u=parsall$u[i])
+}
+result47<-do.call(rbind, rslurm_result)
+saveRDS(result440, file = "res47.rds")
+
+
+
 
 #rowsby scenario
 nrow(simParsall)
