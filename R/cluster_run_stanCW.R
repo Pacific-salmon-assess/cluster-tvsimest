@@ -82,7 +82,7 @@ saveRDS(resstan[resstan$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(si
 
 #---------------------------------------------------------------------------------------------------
 #stan  sensitivity a scenarios
-(export TMPDIR="/home/caw001/Documents/tvsimest/stantmp" ; R )
+#(export TMPDIR="/home/caw001/Documents/tvsimest/stantmp" ; R )
 
 
 simPars <- read.csv("data/sensitivity/SimPars.csv")

@@ -220,8 +220,8 @@ stan_func<- function(path=".", a,u){
                         loga_f8_conv))
 
 
-  dfa$pbias<- ((dfa$mode-dfa$sim)/dfa$sim)*100
-  dfa$bias<- (dfa$mode-dfa$sim)
+  dfa$pbias<- ((as.numeric(dfa$mode)-dfa$sim)/dfa$sim)*100
+  dfa$bias<- (as.numeric(dfa$mode)-dfa$sim)
  
 
   #Smax
@@ -295,8 +295,8 @@ stan_func<- function(path=".", a,u){
                         smax_f7_conv,
                         smax_f8_conv))
                       
-  dfsmax$pbias <- ((dfsmax$mode-dfsmax$sim)/dfsmax$sim)*100
-  dfsmax$bias <- (dfsmax$mode-dfsmax$sim)
+  dfsmax$pbias <- ((as.numeric(dfsmax$mode)-dfsmax$sim)/dfsmax$sim)*100
+  dfsmax$bias <- (as.numeric(dfsmax$mode)-dfsmax$sim)
 
 
   #sigma -obs error
@@ -348,8 +348,8 @@ stan_func<- function(path=".", a,u){
                       conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=='sigma'],
                       conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']),each=nrow(dat)))
   
-  dfsig$pbias<- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
-  dfsig$bias<- (dfsig$mode-dfsig$sim)
+  dfsig$pbias<- ((as.numeric(dfsig$mode)-dfsig$sim)/dfsig$sim)*100
+  dfsig$bias<- (as.numeric(dfsig$mode)-dfsig$sim)
   
   #sigma a
 
@@ -473,8 +473,8 @@ stan_func<- function(path=".", a,u){
                          Smsy_f8_conv
                         ) )
   
-  dfsmsy$pbias<- ((dfsmsy$mode-dfsmsy$sim)/dfsmsy$sim)*100
-  dfsmsy$bias<- (dfsmsy$mode-dfsmsy$sim)
+  dfsmsy$pbias<- ((as.numeric(dfsmsy$mode)-dfsmsy$sim)/dfsmsy$sim)*100
+  dfsmsy$bias<- (as.numeric(dfsmsy$mode)-dfsmsy$sim)
   
   
   #sgen
@@ -543,8 +543,8 @@ stan_func<- function(path=".", a,u){
                       convergence=dfsmsy$convergence
                        )
   
-  dfsgen$pbias<- ((dfsgen$mode-dfsgen$sim)/dfsgen$sim)*100   
-  dfsgen$bias<- (dfsgen$mode-dfsgen$sim) 
+  dfsgen$pbias<- ((as.numeric(dfsgen$mode)-dfsgen$sim)/dfsgen$sim)*100   
+  dfsgen$bias<- (as.numeric(dfsgen$mode)-dfsgen$sim) 
   
   #umsy
   #S msy
@@ -612,8 +612,8 @@ stan_func<- function(path=".", a,u){
                          rep(conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=="U_msy"],nrow(dat)),
                          umsy_f8_conv))
   
-  dfumsy$pbias<- ((dfumsy$mode-dfumsy$sim)/dfumsy$sim)*100
-  dfumsy$bias<- (dfumsy$mode-dfumsy$sim)
+  dfumsy$pbias<- ((as.numeric(dfumsy$mode)-dfumsy$sim)/dfumsy$sim)*100
+  dfumsy$bias<- (as.numeric(dfumsy$mode)-dfumsy$sim)
   
   ##logliks
   ll=list(f1$draws(variables=c('log_lik'),format='draws_matrix'),
