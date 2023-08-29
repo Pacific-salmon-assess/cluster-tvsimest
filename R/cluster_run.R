@@ -34,22 +34,24 @@ sjobtmball <- slurm_apply(tmb_func, parsall, jobname = 'TMBrunall',
                     global_objects=c("simPars"))
 
 resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
-#The following files are missing: results_40.RDS, results_47.RDS, results_112.RDS, results_142.RDS, results_165.RDS
+#Warning message:
+#In get_slurm_out(sjobtmball, outtype = "table", wait = TRUE) :
+#  The following files are missing: results_110.RDS, results_148.RDS
 
 rslurm_result<-list()
 
 #run 40 that failed
-.rslurm_id <- 47
+.rslurm_id <- 110
 .rslurm_istart <- (.rslurm_id)*  376 + 1
 .rslurm_iend <- min((.rslurm_id + 1) *  376, nrow(parsall))
-rslurm_result14<-list()
+
 for(i in (.rslurm_istart):(.rslurm_iend)){
    rslurm_result[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
   a=parsall$a[i],
   u=parsall$u[i])
 }
-result47<-do.call(rbind, rslurm_result)
-saveRDS(result440, file = "res47.rds")
+result110<-do.call(rbind, rslurm_result)
+saveRDS(result110, file = "res110.rds")
 
 
 
@@ -59,8 +61,8 @@ nrow(simParsall)
 
 #base
 saveRDS(resall[resall$scenario%in%simPars1$scenario,], file = "resbase.rds")
-saveRDS(resall[resall$scenario%in%simPars1$scenario[seq_len(nrow(simPars1)/2)],],], file = "resbase1.rds")
-saveRDS(resall[resall$scenario%in%simPars1$scenario[(nrow(simPars1)/2+1):nrow(simPars1)],],], file = "resbase2.rds")
+saveRDS(resall[resall$scenario%in%simPars1$scenario[seq_len(nrow(simPars1)/2)],], file = "resbase1.rds")
+saveRDS(resall[resall$scenario%in%simPars1$scenario[(nrow(simPars1)/2+1):nrow(simPars1)],], file = "resbase2.rds")
 
 #sensitivity a
 saveRDS(resall[resall$scenario%in%simPars2$scenario,], file = "res_a.rds")

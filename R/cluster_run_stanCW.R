@@ -82,6 +82,7 @@ saveRDS(resstan[resstan$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(si
 
 #---------------------------------------------------------------------------------------------------
 #stan  sensitivity a scenarios
+(export TMPDIR="/home/caw001/Documents/tvsimest/stantmp" ; R )
 
 
 simPars <- read.csv("data/sensitivity/SimPars.csv")
@@ -123,12 +124,12 @@ pars_asmax<-data.frame(path="..",
 
 
 sjobstan_asmax <- slurm_apply(stan_func, pars_asmax, jobname = 'stanrun_asmax',
-                            nodes = 250, cpus_per_node = 1, submit = FALSE,
+                            nodes = 250, cpus_per_node = 5, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                      "mod4","mod5","mod6","mod7","mod8","check_stan_conv"))
 
 
 

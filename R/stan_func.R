@@ -141,7 +141,6 @@ stan_func<- function(path=".", a,u){
   #Max. prod
   
   
-
   drf1<-as.data.frame(f1$draws( format="matrix"))
   drf2<-as.data.frame(f2$draws( format="matrix"))
   drf3<-as.data.frame(f3$draws( format="matrix"))
