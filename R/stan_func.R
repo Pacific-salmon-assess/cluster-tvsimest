@@ -435,7 +435,7 @@ stan_func<- function(path=".", a,u){
   phmmab_Smsy_regime_median<-f8_ip$median[grep('S_msy\\[',f8_ip$variable)]
   phmmab_Smsy_median <-phmmab_Smsy_regime_median[phmmab_zstar_regime_median]
 
-
+  smsysim<-smsyCalc(dat$alpha,dat$beta)
   
   dfsmsy<- data.frame(parameter="smsy",
                       iteration=u,
@@ -446,7 +446,7 @@ stan_func<- function(path=".", a,u){
                                   "rwa","rwb","rwab",
                                   "hmma","hmmb","hmmab"),each=nrow(dat)),
                       by=rep(dat$year,8),
-                      sim=rep(dat$sMSY,8),
+                      sim=rep(smsysim,8),
                       median=c(rep(f1_ip$median[f1_ip$variable=='S_msy'],nrow(dat)),
                              rep(f2_ip$median[f2_ip$variable=='S_msy'],nrow(dat)),
                              f3_ip$median[grep('S_msy\\[',f3_ip$variable)],
