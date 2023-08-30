@@ -42,7 +42,8 @@ mod8=cmdstanr::cmdstan_model(file8)
 
 
 simPars <- read.csv("data/generic/SimPars.csv")
-
+# a=5
+# u=40
 
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
@@ -69,7 +70,7 @@ sjobstan <- slurm_apply(stan_func, pars, jobname = 'stanrunhi',
                     rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                     global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8","mode", "check_stan_conv" ))
+                      "mod4","mod5","mod6","mod7","mod8","postmode", "check_stan_conv" ))
 
 
 
@@ -98,7 +99,7 @@ sjobstan_a <- slurm_apply(stan_func, pars_a, jobname = 'stanrun_a',
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8","check_stan_conv"))
+                      "mod4","mod5","mod6","mod7","mod8","postmode","check_stan_conv"))
 
 
 

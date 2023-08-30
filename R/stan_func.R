@@ -151,13 +151,13 @@ stan_func<- function(path=".", a,u){
   drf8<-as.data.frame(f8$draws( format="matrix"))
 
   
-  loga_f1 <-  mode(x=drf1$log_a)
-  loga_f2 <- mode(x=drf2$log_a)
-  loga_f3 <- apply(drf3[,grep("log_a\\[",colnames(drf3))],2,mode)
-  loga_f4 <- mode(x=drf4$log_a)
-  loga_f5 <- apply(drf5[,grep("log_a\\[",colnames(drf5))],2,mode)
+  loga_f1 <- postmode(x=drf1$log_a)
+  loga_f2 <- postmode(x=drf2$log_a)
+  loga_f3 <- apply(drf3[,grep("log_a\\[",colnames(drf3))],2,postmode)
+  loga_f4 <- postmode(x=drf4$log_a)
+  loga_f5 <- apply(drf5[,grep("log_a\\[",colnames(drf5))],2,postmode)
   
-  loga_f6_regime <- apply(drf6[,grep("log_a\\[",colnames(drf6))],2,mode)
+  loga_f6_regime <- apply(drf6[,grep("log_a\\[",colnames(drf6))],2,postmode)
   zstar_f6 <- apply(drf6[,grep("zstar\\[",colnames(drf6))],2,function(x)which.max(tabulate(as.integer(x))))
   loga_f6 <- loga_f6_regime[zstar_f6]
   loga_f6_conv <- 
@@ -165,9 +165,9 @@ stan_func<- function(path=".", a,u){
     conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
 
 
-  loga_f7 <- mode(x=drf7$log_a)
+  loga_f7 <- postmode(x=drf7$log_a)
 
-  loga_f8_regime <- apply(drf8[,grep("log_a\\[",colnames(drf8))],2,mode)
+  loga_f8_regime <- apply(drf8[,grep("log_a\\[",colnames(drf8))],2,postmode)
   zstar_f8 <- apply(drf8[,grep("zstar\\[",colnames(drf8))],2,function(x)which.max(tabulate(as.integer(x))))
   loga_f8 <- loga_f8_regime[zstar_f8] 
   loga_f8_conv <- 
@@ -181,7 +181,7 @@ stan_func<- function(path=".", a,u){
   phmmab_alpha_regime_median<- f8_ip$median[grep('log_a\\[',f8_ip$variable)]
   phmmab_zstar_regime_median<- f8_ip$median[grep('zstar\\[',f8_ip$variable)]
   phmmab_alpha_median <- phmmab_alpha_regime_median[phmmab_zstar_regime_median]
-
+  #plot(dat$year,phmmab_alpha_median)
 
   dfa<- data.frame(parameter="alpha",
                    iteration=u,
@@ -225,16 +225,16 @@ stan_func<- function(path=".", a,u){
  
 
   #Smax
-  smax_f1 <-  mode(x=drf1$S_max)
-  smax_f2 <- mode(x=drf2$S_max)
-  smax_f3 <- mode(x=drf3$S_max)
+  smax_f1 <- postmode(x=drf1$S_max)
+  smax_f2 <- postmode(x=drf2$S_max)
+  smax_f3 <- postmode(x=drf3$S_max)
 
-  smax_f4 <- apply(drf4[,grep("Smax\\[",colnames(drf4))],2,mode)
-  smax_f5 <- apply(drf5[,grep("Smax\\[",colnames(drf5))],2,mode)
+  smax_f4 <- apply(drf4[,grep("Smax\\[",colnames(drf4))],2,postmode)
+  smax_f5 <- apply(drf5[,grep("Smax\\[",colnames(drf5))],2,postmode)
 
-  smax_f6 <- mode(x=drf6$S_max)
+  smax_f6 <- postmode(x=drf6$S_max)
 
-  smax_f7_regime <- apply(drf7[,grep("S_max\\[",colnames(drf7))],2,mode)
+  smax_f7_regime <- apply(drf7[,grep("S_max\\[",colnames(drf7))],2,postmode)
   zstar_f7 <- apply(drf7[,grep("zstar\\[",colnames(drf7))],2,function(x)which.max(tabulate(as.integer(x))))
   smax_f7 <- smax_f7_regime[zstar_f7]
 
@@ -243,7 +243,7 @@ stan_func<- function(path=".", a,u){
     conv_f7_ip[[2]]$sumconv[grep('zstar\\[',conv_f7_ip[[2]]$variable)]
 
 
-  smax_f8_regime <- apply(drf8[,grep("S_max\\[",colnames(drf8))],2,mode)
+  smax_f8_regime <- apply(drf8[,grep("S_max\\[",colnames(drf8))],2,postmode)
   smax_f8 <- smax_f8_regime[zstar_f8]
  
   smax_f8_conv <- 
@@ -300,14 +300,14 @@ stan_func<- function(path=".", a,u){
 
 
   #sigma -obs error
-  sig_f1 <- mode(x=drf1$sigma)
-  sig_f2 <- mode(x=drf2$sigma)
-  sig_f3 <- mode(x=drf3$sigma)
-  sig_f4 <- mode(x=drf4$sigma)
-  sig_f5 <- mode(x=drf5$sigma)
-  sig_f6 <- mode(x=drf6$sigma)
-  sig_f7 <- mode(x=drf7$sigma)
-  sig_f8 <- mode(x=drf8$sigma)
+  sig_f1 <- postmode(x=drf1$sigma)
+  sig_f2 <- postmode(x=drf2$sigma)
+  sig_f3 <- postmode(x=drf3$sigma)
+  sig_f4 <- postmode(x=drf4$sigma)
+  sig_f5 <- postmode(x=drf5$sigma)
+  sig_f6 <- postmode(x=drf6$sigma)
+  sig_f7 <- postmode(x=drf7$sigma)
+  sig_f8 <- postmode(x=drf8$sigma)
 
  
  
@@ -353,8 +353,8 @@ stan_func<- function(path=".", a,u){
   
   #sigma a
 
-  siga_f3 <- mode(x=drf3$"sigma_a")
-  siga_f5 <- mode(x=drf5$"sigma_a")
+  siga_f3 <- postmode(x=drf3$"sigma_a")
+  siga_f5 <- postmode(x=drf5$"sigma_a")
  
   dfsiga<- data.frame(parameter="sigma_a",
                       iteration=u,
@@ -375,8 +375,8 @@ stan_func<- function(path=".", a,u){
   dfsiga$bias<- NA
   
   #sigma b
-  sigb_f4 <- mode(x=drf4$"sigma_b")
-  sigb_f5 <- mode(x=drf5$"sigma_b")
+  sigb_f4 <- postmode(x=drf4$"sigma_b")
+  sigb_f5 <- postmode(x=drf5$"sigma_b")
  
   dfsigb<- data.frame(parameter="sigma_b",
                       iteration=u,
@@ -398,28 +398,28 @@ stan_func<- function(path=".", a,u){
   
 
   #S msy
-  Smsy_f1 <- mode(x=drf1$"S_msy")
-  Smsy_f2 <- mode(x=drf2$"S_msy")
+  Smsy_f1 <- postmode(x=drf1$"S_msy")
+  Smsy_f2 <- postmode(x=drf2$"S_msy")
 
-  Smsy_f3 <- apply(drf3[,grep("S_msy\\[",colnames(drf3))],2,mode)
-  Smsy_f4 <- apply(drf4[,grep("S_msy\\[",colnames(drf4))],2,mode)
-  Smsy_f5 <- apply(drf5[,grep("S_msy\\[",colnames(drf5))],2,mode)
+  Smsy_f3 <- apply(drf3[,grep("S_msy\\[",colnames(drf3))],2,postmode)
+  Smsy_f4 <- apply(drf4[,grep("S_msy\\[",colnames(drf4))],2,postmode)
+  Smsy_f5 <- apply(drf5[,grep("S_msy\\[",colnames(drf5))],2,postmode)
   
 
-  Smsy_f6_regime <- apply(drf6[,grep("S_msy\\[",colnames(drf6))],2,mode)
+  Smsy_f6_regime <- apply(drf6[,grep("S_msy\\[",colnames(drf6))],2,postmode)
   Smsy_f6 <- Smsy_f6_regime[zstar_f6]
   Smsy_f6_conv <- 
     conv_f6_ip[[2]]$sumconv[grep('S_msy\\[',conv_f6_ip[[2]]$variable)][f6_ip$median[grep('zstar\\[',f6_ip$variable)]] +
     conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
 
-  Smsy_f7_regime <- apply(drf7[,grep("S_msy\\[",colnames(drf7))],2,mode)
+  Smsy_f7_regime <- apply(drf7[,grep("S_msy\\[",colnames(drf7))],2,postmode)
   Smsy_f7 <- Smsy_f7_regime[zstar_f7]
   Smsy_f7_conv <- 
     conv_f7_ip[[2]]$sumconv[grep('S_msy\\[',conv_f7_ip[[2]]$variable)][f7_ip$median[grep('zstar\\[',f7_ip$variable)]] +
     conv_f7_ip[[2]]$sumconv[grep('zstar\\[',conv_f7_ip[[2]]$variable)]
 
-  Smsy_f8_regime <- apply(drf8[,grep("S_msy\\[",colnames(drf8))],2,mode)
-  Smsy_f8 <- Smsy_f7_regime[zstar_f8]
+  Smsy_f8_regime <- apply(drf8[,grep("S_msy\\[",colnames(drf8))],2,postmode)
+  Smsy_f8 <- Smsy_f8_regime[zstar_f8]
   Smsy_f8_conv <- 
     conv_f8_ip[[2]]$sumconv[grep('S_msy\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
     conv_f8_ip[[2]]$sumconv[grep('zstar\\[',conv_f8_ip[[2]]$variable)]
@@ -548,23 +548,23 @@ stan_func<- function(path=".", a,u){
   
   #umsy
   #S msy
-  umsy_f1 <- mode(x=drf1$"U_msy")
-  umsy_f2 <- mode(x=drf2$"U_msy")
+  umsy_f1 <- postmode(x=drf1$"U_msy")
+  umsy_f2 <- postmode(x=drf2$"U_msy")
 
-  umsy_f3 <- apply(drf3[,grep("U_msy\\[",colnames(drf3))],2,mode)
-  umsy_f4 <- mode(x=drf4$"U_msy")
-  umsy_f5 <- apply(drf5[,grep("U_msy\\[",colnames(drf5))],2,mode)
+  umsy_f3 <- apply(drf3[,grep("U_msy\\[",colnames(drf3))],2,postmode)
+  umsy_f4 <- postmode(x=drf4$"U_msy")
+  umsy_f5 <- apply(drf5[,grep("U_msy\\[",colnames(drf5))],2,postmode)
   
 
-  umsy_f6_regime <- apply(drf6[,grep("U_msy\\[",colnames(drf6))],2,mode)
+  umsy_f6_regime <- apply(drf6[,grep("U_msy\\[",colnames(drf6))],2,postmode)
   umsy_f6 <- Smsy_f6_regime[zstar_f6]
   umsy_f6_conv <- 
     conv_f6_ip[[2]]$sumconv[grep('U_msy\\[',conv_f6_ip[[2]]$variable)][f6_ip$median[grep('zstar\\[',f6_ip$variable)]] +
     conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
 
-  umsy_f7 <- mode(x=drf7$"U_msy")
+  umsy_f7 <- postmode(x=drf7$"U_msy")
 
-  umsy_f8_regime <- apply(drf8[,grep("U_msy\\[",colnames(drf8))],2,mode)
+  umsy_f8_regime <- apply(drf8[,grep("U_msy\\[",colnames(drf8))],2,postmode)
   umsy_f8 <- Smsy_f7_regime[zstar_f8]
   umsy_f8_conv <- 
     conv_f8_ip[[2]]$sumconv[grep('U_msy\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
