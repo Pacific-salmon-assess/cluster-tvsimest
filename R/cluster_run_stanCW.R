@@ -130,7 +130,7 @@ sjobstan_asmax <- slurm_apply(stan_func, pars_asmax, jobname = 'stanrun_asmax',
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8","check_stan_conv"))
+                      "mod4","mod5","mod6","mod7","mod8","postmode","check_stan_conv"))
 
 
 

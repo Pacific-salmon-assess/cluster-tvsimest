@@ -26,7 +26,7 @@ tmb_func <- function(path=".",a, u) {
   p <- ricker_TMB(data=df,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   pac <- ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   ptva <- ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  ptvb <- ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+  ptvb <- ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   ptvab <- ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   phmma <- ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
   phmmb <- ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
@@ -53,14 +53,23 @@ tmb_func <- function(path=".",a, u) {
                     phmma$alpha[phmma$regime],
                     rep(phmmb$alpha,nrow(df)),
                     phmm$alpha[phmm$regime]), 
-              convergence=c(rep(c(p$model$convergence + p$conv_problem,
-                    pac$model$convergence + pac$conv_problem,
-                    ptva$model$convergence + ptva$conv_problem,
-                    ptvb$model$convergence + ptvb$conv_problem,
-                    ptvab$model$convergence + ptvab$conv_problem,
-                    phmma$model$convergence + phmma$conv_problem,
-                    phmmb$model$convergence + phmmb$conv_problem,
-                    phmm$model$convergence + phmm$conv_problem
+              convergence=c(rep(c(p$model$convergence,
+                    pac$model$convergence ,
+                    ptva$model$convergence,
+                    ptvb$model$convergence,
+                    ptvab$model$convergence ,
+                    phmma$model$convergence ,
+                    phmmb$model$convergence ,
+                    phmm$model$convergence
+                    ),each=nrow(df))),
+              conv_warning=c(rep(c( p$conv_problem,
+                     pac$conv_problem,
+                    ptva$conv_problem,
+                    ptvb$conv_problem,
+                    ptvab$conv_problem,
+                     phmma$conv_problem,
+                     phmmb$conv_problem,
+                    phmm$conv_problem
                     ),each=nrow(df))))
                     
   dfa$pbias <- ((dfa$mode-dfa$sim)/dfa$sim)*100
@@ -86,14 +95,24 @@ tmb_func <- function(path=".",a, u) {
         rep(phmma$Smax,nrow(df)),
         phmmb$Smax[phmmb$regime],
         phmm$Smax[phmm$regime]),
-      convergence=rep(c(p$model$convergence + p$conv_problem,
-        pac$model$convergence + pac$conv_problem,
-        ptva$model$convergence + ptva$conv_problem,
-        ptvb$model$convergence + ptvb$conv_problem,
-        ptvab$model$convergence + ptvab$conv_problem,
-        phmma$model$convergence + phmma$conv_problem,
-        phmmb$model$convergence + phmmb$conv_problem,
-        phmm$model$convergence + phmm$conv_problem),each=nrow(df)))
+      convergence=c(rep(c(p$model$convergence,
+                    pac$model$convergence ,
+                    ptva$model$convergence,
+                    ptvb$model$convergence,
+                    ptvab$model$convergence ,
+                    phmma$model$convergence ,
+                    phmmb$model$convergence ,
+                    phmm$model$convergence
+                    ),each=nrow(df))),
+      conv_warning=c(rep(c( p$conv_problem,
+                     pac$conv_problem,
+                    ptva$conv_problem,
+                    ptvb$conv_problem,
+                    ptvab$conv_problem,
+                     phmma$conv_problem,
+                     phmmb$conv_problem,
+                    phmm$conv_problem
+                    ),each=nrow(df))))
       
     dfsmax$pbias <- ((dfsmax$mode-dfsmax$sim)/dfsmax$sim)*100
     dfsmax$bias <- (dfsmax$mode-dfsmax$sim)
@@ -126,7 +145,16 @@ tmb_func <- function(path=".",a, u) {
         ptvab$model$convergence + ptvab$conv_problem,
         phmma$model$convergence + phmma$conv_problem,
         phmmb$model$convergence + phmmb$conv_problem,
-        phmm$model$convergence + phmm$conv_problem),each=nrow(df)))
+        phmm$model$convergence + phmm$conv_problem),each=nrow(df)),
+      conv_warning=rep(c( p$conv_problem,
+                     pac$conv_problem,
+                    ptva$conv_problem,
+                    ptvb$conv_problem,
+                    ptvab$conv_problem,
+                     phmma$conv_problem,
+                     phmmb$conv_problem,
+                    phmm$conv_problem
+                    ),each=nrow(df)))
     
     dfsig$pbias <- ((dfsig$mode-dfsig$sim)/dfsig$sim)*100
     dfsig$bias <- (dfsig$mode-dfsig$sim)
@@ -141,9 +169,10 @@ tmb_func <- function(path=".",a, u) {
       sim=NA,
       median=NA,
       mode=c(ptva$siga,ptvab$siga),
-      convergence=c( ptva$model$convergence + ptva$conv_problem,
-        
-        ptvab$model$convergence + ptvab$conv_problem))
+      convergence=c( ptva$model$convergence ,       
+        ptvab$model$convergence ),
+      conv_warning=c( ptva$conv_problem,
+         ptvab$conv_problem))
     
     dfsiga$pbias<- ((dfsiga$mode-dfsiga$sim)/dfsiga$sim)*100
     dfsiga$bias<- (dfsiga$mode-dfsiga$sim)
@@ -158,8 +187,11 @@ tmb_func <- function(path=".",a, u) {
       sim=NA,
       median=NA,
       mode=c(ptvb$sigb,ptvab$sigb),
-      convergence=c( ptvb$model$convergence + ptvb$conv_problem,        
-        ptvab$model$convergence + ptvab$conv_problem))
+      convergence=c( ptvb$model$convergence,        
+        ptvab$model$convergence),
+      conv_warning=c(ptvb$conv_problem,        
+        ptvab$conv_problem)
+      )
     
     dfsigb$pbias <- ((dfsigb$mode-dfsigb$sim)/dfsigb$sim)*100
     dfsigb$bias <- (dfsigb$mode-dfsigb$sim)
@@ -186,14 +218,24 @@ tmb_func <- function(path=".",a, u) {
             phmma$Smsy[phmma$regime],
             phmmb$Smsy[phmmb$regime],
             phmm$Smsy[phmm$regime]),    
-      convergence=rep(c(p$model$convergence + p$conv_problem,
-        pac$model$convergence + pac$conv_problem,
-        ptva$model$convergence + ptva$conv_problem,
-        ptvb$model$convergence + ptvb$conv_problem,
-        ptvab$model$convergence + ptvab$conv_problem,
-        phmma$model$convergence + phmma$conv_problem,
-        phmmb$model$convergence + phmmb$conv_problem,
-        phmm$model$convergence + phmm$conv_problem),each=nrow(df))) 
+        convergence=rep(c(p$model$convergence,
+                    pac$model$convergence ,
+                    ptva$model$convergence,
+                    ptvb$model$convergence,
+                    ptvab$model$convergence ,
+                    phmma$model$convergence ,
+                    phmmb$model$convergence ,
+                    phmm$model$convergence
+                    ),each=nrow(df)),
+        conv_warning=rep(c( p$conv_problem,
+                     pac$conv_problem,
+                    ptva$conv_problem,
+                    ptvb$conv_problem,
+                    ptvab$conv_problem,
+                     phmma$conv_problem,
+                     phmmb$conv_problem,
+                    phmm$conv_problem
+                    ),each=nrow(df))) 
   
   dfsmsy$pbias<- ((dfsmsy$mode-dfsmsy$sim)/dfsmsy$sim)*100
   dfsmsy$bias<- (dfsmsy$mode-dfsmsy$sim)
@@ -235,15 +277,24 @@ tmb_func <- function(path=".",a, u) {
         unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmab"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmab"&dfsmsy$method=="MLE"], 
           b=1/dfsmax$mode[dfsmax$model=="hmmab"&dfsmax$method=="MLE"]))),
-     convergence=rep(c(p$model$convergence + p$conv_problem,
-      pac$model$convergence + pac$conv_problem,
-      ptva$model$convergence + ptvab$conv_problem,
-      ptvb$model$convergence + ptvab$conv_problem,
-      ptvab$model$convergence + ptvab$conv_problem,
-      phmma$model$convergence + phmma$conv_problem,
-      phmmb$model$convergence + phmmb$conv_problem,
-      phmm$model$convergence + phmm$conv_problem),
-      each=nrow(df)))
+    convergence=rep(c(p$model$convergence,
+                    pac$model$convergence ,
+                    ptva$model$convergence,
+                    ptvb$model$convergence,
+                    ptvab$model$convergence ,
+                    phmma$model$convergence ,
+                    phmmb$model$convergence ,
+                    phmm$model$convergence
+                    ),each=nrow(df)),
+    conv_warning=rep(c( p$conv_problem,
+                     pac$conv_problem,
+                    ptva$conv_problem,
+                    ptvb$conv_problem,
+                    ptvab$conv_problem,
+                     phmma$conv_problem,
+                     phmmb$conv_problem,
+                    phmm$conv_problem
+                    ),each=nrow(df)))
   
     dfsgen$pbias<- ((dfsgen$mode-dfsgen$sim)/dfsgen$sim)*100
     dfsgen$bias<- (dfsgen$mode-dfsgen$sim)
@@ -269,14 +320,24 @@ tmb_func <- function(path=".",a, u) {
           phmma$umsy[phmma$regime],
           rep(phmmb$umsy,nrow(df)),
           phmm$umsy[phmm$regime]),
-     convergence=rep(c(p$model$convergence + p$conv_problem,
-      pac$model$convergence + pac$conv_problem,
-      ptva$model$convergence+ ptva$conv_problem,
-      ptvb$model$convergence+ ptvb$conv_problem,
-      ptvab$model$convergence + ptvab$conv_problem,
-      phmma$model$convergence + phmma$conv_problem,
-      phmmb$model$convergence + phmmb$conv_problem,
-      phmm$model$convergence + phmm$conv_problem),each=nrow(df)))
+    convergence=rep(c(p$model$convergence,
+                    pac$model$convergence ,
+                    ptva$model$convergence,
+                    ptvb$model$convergence,
+                    ptvab$model$convergence ,
+                    phmma$model$convergence ,
+                    phmmb$model$convergence ,
+                    phmm$model$convergence
+                    ),each=nrow(df)),
+    conv_warning=rep(c( p$conv_problem,
+                     pac$conv_problem,
+                    ptva$conv_problem,
+                    ptvb$conv_problem,
+                    ptvab$conv_problem,
+                     phmma$conv_problem,
+                     phmmb$conv_problem,
+                    phmm$conv_problem
+                    ),each=nrow(df)))
 
     dfumsy$pbias<- ((dfumsy$mode-dfumsy$sim)/dfumsy$sim)*100
     dfumsy$bias<- (dfumsy$mode-dfumsy$sim)
@@ -302,14 +363,22 @@ tmb_func <- function(path=".",a, u) {
                              phmma$AICc,
                              phmmb$AICc,
                              phmm$AICc),
-                       convergence=c(p$model$convergence + p$conv_problem,
-                                     pac$model$convergence + pac$conv_problem,
-                                     ptva$model$convergence+ ptva$conv_problem,
-                                     ptvb$model$convergence+ ptvb$conv_problem,
-                                     ptvab$model$convergence + ptvab$conv_problem,
-                                     phmma$model$convergence + phmma$conv_problem,
-                                     phmmb$model$convergence + phmmb$conv_problem,
-                                     phmm$model$convergence + phmm$conv_problem),
+                       convergence=c(p$model$convergence ,
+                                     pac$model$convergence ,
+                                     ptva$model$convergence ,
+                                     ptvb$model$convergence,
+                                     ptvab$model$convergence ,
+                                     phmma$model$convergence ,
+                                     phmmb$model$convergence ,
+                                     phmm$model$convergence ),
+                       conv_warning= c( p$conv_problem,
+                                      pac$conv_problem,
+                                      ptva$conv_problem,
+                                      ptvb$conv_problem,
+                                      ptvab$conv_problem,
+                                      phmma$conv_problem,
+                                      phmmb$conv_problem,
+                                      phmm$conv_problem),
                        pbias=rep(NA,8),
                        bias=rep(NA,8))
     #BIC
@@ -332,14 +401,22 @@ tmb_func <- function(path=".",a, u) {
                              phmma$BIC,
                              phmmb$BIC,
                              phmm$BIC),
-                       convergence=c(p$model$convergence + p$conv_problem,
-                                     pac$model$convergence + pac$conv_problem,
-                                     ptva$model$convergence+ ptva$conv_problem,
-                                     ptvb$model$convergence+ ptvb$conv_problem,
-                                     ptvab$model$convergence + ptvab$conv_problem,
-                                     phmma$model$convergence + phmma$conv_problem,
-                                     phmmb$model$convergence + phmmb$conv_problem,
-                                     phmm$model$convergence + phmm$conv_problem),
+                       convergence=c(p$model$convergence ,
+                                     pac$model$convergence ,
+                                     ptva$model$convergence,
+                                     ptvb$model$convergence,
+                                     ptvab$model$convergence ,
+                                     phmma$model$convergence ,
+                                     phmmb$model$convergence,
+                                     phmm$model$convergence),
+                       conv_warning= c( p$conv_problem,
+                                      pac$conv_problem,
+                                      ptva$conv_problem,
+                                      ptvb$conv_problem,
+                                      ptvab$conv_problem,
+                                      phmma$conv_problem,
+                                      phmmb$conv_problem,
+                                      phmm$conv_problem),
                        pbias=rep(NA,8),
                        bias=rep(NA,8))
   
@@ -408,15 +485,12 @@ tmb_func <- function(path=".",a, u) {
                            sum(lfohmmb$conv_problem),
                            sum(lfohmm$conv_problem),
                            sum(lfohmm$conv_problem),
-                           sum(lfohmm$conv_problem)
-                                     ),
+                           sum(lfohmm$conv_problem) ),
+                       conv_warning=NA,
                        pbias=rep(NA,20),
                        bias=rep(NA,20))
 
-
-
-   
-    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfaic,dfbic,dflfo)
+    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfsiga,dfsigb,dfaic,dfbic,dflfo)
 
   return(dff)
 

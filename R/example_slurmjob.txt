@@ -14,5 +14,5 @@
 #SBATCH --comment="image=registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04"
 #SBATCH --output=slurm_%a.out
 
-cd /fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest/_rslurm_stanrun_a
+cd /fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest/stanrun_asmax
 (export TMPDIR="/home/caw001/Documents/tvsimest/stantmp" ; /usr/bin/Rscript --vanilla slurm_run.R )
