@@ -217,7 +217,8 @@ stan_func<- function(path=".", a,u){
                         conv_f5_ip[[2]]$sumconv[grep('log_a\\[',conv_f5_ip[[2]]$variable)],
                         loga_f6_conv,
                         rep(conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=="log_a"],nrow(dat)),
-                        loga_f8_conv))
+                        loga_f8_conv),
+                   conv_warning=NA)
 
 
   dfa$pbias<- ((as.numeric(dfa$mode)-dfa$sim)/dfa$sim)*100
@@ -293,7 +294,8 @@ stan_func<- function(path=".", a,u){
                         conv_f5_ip[[2]]$sumconv[grep('Smax\\[',conv_f5_ip[[2]]$variable)],
                         rep(conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=="S_max"],nrow(dat)),
                         smax_f7_conv,
-                        smax_f8_conv))
+                        smax_f8_conv),
+                      conv_warning=NA)
                       
   dfsmax$pbias <- ((as.numeric(dfsmax$mode)-dfsmax$sim)/dfsmax$sim)*100
   dfsmax$bias <- (as.numeric(dfsmax$mode)-dfsmax$sim)
@@ -346,7 +348,8 @@ stan_func<- function(path=".", a,u){
                       conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma'],
                       conv_f6_ip[[2]]$sumconv[conv_f6_ip[[2]]$variable=='sigma'],
                       conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=='sigma'],
-                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']),each=nrow(dat)))
+                      conv_f8_ip[[2]]$sumconv[conv_f8_ip[[2]]$variable=='sigma']),each=nrow(dat)),
+                    conv_warning=NA)
   
   dfsig$pbias<- ((as.numeric(dfsig$mode)-dfsig$sim)/dfsig$sim)*100
   dfsig$bias<- (as.numeric(dfsig$mode)-dfsig$sim)
@@ -368,7 +371,8 @@ stan_func<- function(path=".", a,u){
                       mode=c(siga_f3,
                         siga_f5),
                       convergence=c(conv_f3_ip[[2]]$sumconv[conv_f3_ip[[2]]$variable=='sigma_a'],
-                        conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma_a'])
+                        conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma_a']),
+                      conv_warning=NA
                         )
 
   dfsiga$pbias<- NA
@@ -390,14 +394,15 @@ stan_func<- function(path=".", a,u){
                       mode=c(sigb_f4,
                           sigb_f5),
                       convergence=c(conv_f4_ip[[2]]$sumconv[conv_f4_ip[[2]]$variable=='sigma_b'],
-                        conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma_b']))
+                        conv_f5_ip[[2]]$sumconv[conv_f5_ip[[2]]$variable=='sigma_b']),
+                      conv_warning=NA)
 
                      
   dfsigb$pbias<- NA
   dfsigb$bias<- NA
   
 
-  #S msy
+  #S_msy
   Smsy_f1 <- postmode(x=drf1$"S_msy")
   Smsy_f2 <- postmode(x=drf2$"S_msy")
 
@@ -471,16 +476,15 @@ stan_func<- function(path=".", a,u){
                          Smsy_f6_conv,
                          Smsy_f7_conv,
                          Smsy_f8_conv
-                        ) )
+                        ),
+                        conv_warning=NA )
   
   dfsmsy$pbias<- ((as.numeric(dfsmsy$mode)-dfsmsy$sim)/dfsmsy$sim)*100
   dfsmsy$bias<- (as.numeric(dfsmsy$mode)-dfsmsy$sim)
   
   
   #sgen
-  head(dat)
-   #S msy
-  
+
 
   dfsgen <- data.frame(parameter="sgen",
                        iteration=u,
@@ -540,7 +544,8 @@ stan_func<- function(path=".", a,u){
                              unlist(mapply(samEst::sGenCalc,a=dfa$mode[dfa$model=="hmmab"],
                                            Smsy=dfsmsy$mode[dfsmsy$model=="hmmab"], 
                                            b=1/dfsmax$mode[dfsmax$model=="hmmab"]))),
-                      convergence=dfsmsy$convergence
+                      convergence=dfsmsy$convergence,
+                      conv_warning=NA
                        )
   
   dfsgen$pbias<- ((as.numeric(dfsgen$mode)-dfsgen$sim)/dfsgen$sim)*100   
@@ -610,7 +615,8 @@ stan_func<- function(path=".", a,u){
                          conv_f5_ip[[2]]$sumconv[grep('U_msy\\[',conv_f5_ip[[2]]$variable)],
                          umsy_f6_conv,
                          rep(conv_f7_ip[[2]]$sumconv[conv_f7_ip[[2]]$variable=="U_msy"],nrow(dat)),
-                         umsy_f8_conv))
+                         umsy_f8_conv),
+                      conv_warning=NA)
   
   dfumsy$pbias<- ((as.numeric(dfumsy$mode)-dfumsy$sim)/dfumsy$sim)*100
   dfumsy$bias<- (as.numeric(dfumsy$mode)-dfumsy$sim)
@@ -646,6 +652,7 @@ stan_func<- function(path=".", a,u){
                     sum(apply(ll[[8]],2,samEst::log_mean_exp))),
                       mode=NA,
                       convergence=rep(NA,8),
+                      conv_warning=NA,
                       pbias=rep(NA,8),
                       bias=NA)
   #Stan AIC estimates
@@ -662,6 +669,7 @@ stan_func<- function(path=".", a,u){
                      median=c(samEst::stan_aic(x=ll,form='aic',type='full',k=c(3,4,4,4,5,6,6,7))),
                      mode=NA,
                      convergence=rep(NA,8),
+                     conv_warning=NA,
                      pbias=rep(NA,8),
                      bias=NA)
   
@@ -679,6 +687,7 @@ stan_func<- function(path=".", a,u){
                      median=c(samEst::stan_aic(x=ll,form='bic',type='full',k=c(3,4,4,4,5,6,6,7))),
                      mode=NA,
                      convergence=rep(NA,8),
+                     conv_warning=NA,
                      pbias=rep(NA,8),
                      bias=NA)
 
