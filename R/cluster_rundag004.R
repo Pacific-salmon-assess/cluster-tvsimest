@@ -637,6 +637,7 @@ res_s <- get_slurm_out(sjobstan_1, outtype = 'table', wait = TRUE)
 library(cmdstanr)
 library(rslurm)
 library(samEst)
+setwd('./homey/cluster-tvsimest')
 source("R/emp_lfo.R")
 
 data<- read.csv("data/emp/salmon_productivity_compilation_may2023.csv")

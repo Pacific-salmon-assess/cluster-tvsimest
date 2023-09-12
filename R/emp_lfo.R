@@ -3,17 +3,14 @@ emp_lfo<- function(u){
   #data_f
   dat <- data_f[data_f$stock.id2==stocks_f$stock.id2[u],]
   dat <- dat[complete.cases(dat$spawners),]
-
-  df <- list(by=dat$broodyear,
-             S=dat$spawners,
-             R=dat$recruits,
-             logRS=dat$klogR_S,
-             L=max(dat$broodyear)-min(dat$broodyear)+1,
-             ii=as.numeric(as.factor(dat$broodyear)),
-             N=nrow(dat),
-             K=2,
-             alpha_dirichlet=matrix(c(2,1,1,2),ncol=2,nrow=2)
+  df <- data.frame(by=dat$broodyear,
+                   S=dat$spawners,
+                   R=dat$recruits,
+                   logRS=log(dat$recruits/dat$spawners)
   )
+  
+  
+  options(mc.cores = 6)
   
   #LFO cross-validation
   #model 1 - static Ricker
