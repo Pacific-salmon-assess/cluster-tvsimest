@@ -636,8 +636,7 @@ res_s <- get_slurm_out(sjobstan_1, outtype = 'table', wait = TRUE)
 #empirical - lfo stan runs####
 library(cmdstanr)
 library(rslurm)
-library(samEst)
-setwd('./homey/cluster-tvsimest')
+#library(samEst)
 source("R/emp_lfo.R")
 
 data<- read.csv("data/emp/salmon_productivity_compilation_may2023.csv")
@@ -677,15 +676,83 @@ if(any(data_f$spawners==0)){data_f$spawners=data_f$spawners+1;data_f$logR_S=log(
 if(any(data_f$recruits==0)){data_f$recruits=data_f$recruits+1;data_f$logR_S=log(data_f$recruits/data_f$spawners)}
 data_f$logR_S=log(data_f$recruits/data_f$spawners)
 
-pars=data.frame(u=1:nrow(stocks_f))
+tst=emp_lfo(u=1)
+
+pars=data.frame(u=1:5)
 
 sjobstan_emp <- slurm_apply(emp_lfo, pars, jobname = 'emprun',
-                            nodes = 300, cpus_per_node = 1, submit = FALSE,
-                            pkgs=c("samEst", "cmdstanr"),
+                            nodes = 50, cpus_per_node = 1, submit = FALSE,
+                            pkgs=c("cmdstanr","rlang"),
                             rscript_path = "/home/dag004/Documents/cluster-tvsimest",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
                             global_objects=c("data_f","stocks_f", "mod1lfo", "mod2lfo", "mod3lfo",
                                              "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
+save.image(file = "emp.RData")
+q()
+
+library(rslurm)
+load("emp.RData")
+res <- get_slurm_out(sjobstan_emp, outtype = 'table', wait = TRUE)
+
+
+
+#empirical - lfo stan runs####
+library(rstan)
+rstan_options(auto_write = TRUE)
+library(rslurm)
+#library(samEst)
+source("R/emp_lfo2.R")
+
+data<- read.csv("data/emp/salmon_productivity_compilation_may2023.csv")
+stocks<- read.csv("data/emp/all_stocks_info_may2023.csv")
+
+###Load in data####
+options(mc.cores = parallel::detectCores())
+
+mod1lfo=rstan::stan_model('./src/sr models/m1loo.stan')
+mod2lfo=rstan::stan_model('./src/sr models/m2loo.stan')
+mod3lfo=rstan::stan_model('./src/sr models/m3loo.stan')
+mod4lfo=rstan::stan_model('./src/sr models/m4loo.stan')
+mod5lfo=rstan::stan_model('./src/sr models/m5loo.stan')
+mod6lfo=rstan::stan_model('./src/sr models/m6loo.stan')
+mod7lfo=rstan::stan_model('./src/sr models/m7loo.stan')
+mod8lfo=rstan::stan_model('./src/sr models/m8loo.stan')
+
+#Remove stocks with less than 15 years of recruitment data
+stocks_f=subset(stocks,n.years>=16) #264 stocks
+stocks_f$stock.name=gsub('/','_',stocks_f$stock.name)
+stocks_f$stock.name=gsub('&','and',stocks_f$stock.name)
+
+data_f=subset(data,stock.id %in% stocks_f$stock.id)
+length(unique(data_f$stock.id)) #264
+stocks_f$stock.id2=seq(1:nrow(stocks_f))
+data_f$stock.id2=stocks_f$stock.id2[match(data_f$stock.id,stocks_f$stock.id)]
+
+if(any(data_f$spawners==0)){data_f$spawners=data_f$spawners+1;data_f$logR_S=log(data_f$recruits/data_f$spawners)}
+if(any(data_f$recruits==0)){data_f$recruits=data_f$recruits+1;data_f$logR_S=log(data_f$recruits/data_f$spawners)}
+data_f$logR_S=log(data_f$recruits/data_f$spawners)
+
+tst=emp_lfo(u=1)
+
+pars=data.frame(u=1:5)
+
+sjobstan_emp <- slurm_apply(emp_lfo, pars, jobname = 'emprun2',
+                            nodes = 50, cpus_per_node = 1, submit = FALSE,
+                            pkgs=c("rstan","ggplot2"),
+                            rscript_path = "/home/dag004/Documents/cluster-tvsimest",
+                            libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
+                            global_objects=c("data_f","stocks_f", "mod1lfo", "mod2lfo", "mod3lfo",
+                                             "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo","stan_lfo_cv","stan_refit",
+                                             'log_sum_exp','log_mean_exp'))
+save.image(file = "emp.RData")
+q()
+
+library(rslurm)
+load("emp.RData")
+res <- get_slurm_out(sjobstan_emp, outtype = 'table', wait = TRUE)
+
+
+
 
 #log_a sensitivity
 
