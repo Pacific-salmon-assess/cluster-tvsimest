@@ -36,8 +36,6 @@ transformed parameters {
 vector[K] logalpha[N];
 ordered[K] b;
 
-  pi1=rep_vector(1.0/K,K);
-
 b=exp(log_b);
 
 { // Forward algorithm log p(z_t = j | y_{1:t})
