@@ -94,7 +94,7 @@ pars_a<-data.frame(path="..",
 
 
 sjobstan_a <- slurm_apply(stan_func, pars_a, jobname = 'stanrun_a',
-                            nodes = 250, cpus_per_node = 5, submit = FALSE,
+                            nodes = 250, cpus_per_node = 1, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -163,7 +163,7 @@ sjobstan_smax <- slurm_apply(stan_func, pars_smax, jobname = 'stanrun_smax',
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                      "mod4","mod5","mod6","mod7","mod8","postmode","check_stan_conv"))
 
 
 
@@ -229,7 +229,7 @@ sjobstan_siglow <- slurm_apply(stan_func, pars_siglow, jobname = 'stanrun_siglow
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                      "mod4","mod5","mod6","mod7","mod8","postmode","check_stan_conv"))
 
 
 resstan_siglow <- get_slurm_out(sjobstan_siglow, outtype = 'table', wait = TRUE)
@@ -263,7 +263,7 @@ sjobstan_sigmed <- slurm_apply(stan_func, pars_sigmed, jobname = 'stanrun_sigmed
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                      "mod4","mod5","mod6","mod7","mod8","postmode","check_stan_conv"))
 
 
 resstan_sigmed <- get_slurm_out(sjobstan_sigmed, outtype = 'table', wait = TRUE)
@@ -293,7 +293,7 @@ sjobstan_baseER<- slurm_apply(stan_func, pars_baseER, jobname = 'stanrun_baseER'
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
                             global_objects=c("simPars", "mod1", "mod2", "mod3",
-                      "mod4","mod5","mod6","mod7","mod8"))
+                      "mod4","mod5","mod6","mod7","mod8","postmode","check_stan_conv"))
 
 
 resstan_baseER <- get_slurm_out(sjobstan_baseER, outtype = 'table', wait = TRUE)
