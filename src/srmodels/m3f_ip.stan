@@ -43,8 +43,8 @@ model{
   //priors
   log_a0 ~ normal(1.5,2.5); //initial productivity - wide prior
   log_b ~ normal(logbeta_pr,logbeta_pr_sig); //per capita capacity parameter - wide prior
-   a_dev ~ std_normal(); //standardized (z-scales) deviances
-  
+  a_dev ~ std_normal(); //standardized (z-scales) deviances
+
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)

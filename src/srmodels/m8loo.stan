@@ -11,55 +11,64 @@ data {
   matrix[K,K] alpha_dirichlet; //prior inputs for dirichlet 
   real y_oos; //out of sample (1-year ahead) log(R/S)
   real x_oos; //spawners 1-year ahead
- }
+  real pSmax_mean;
+  real pSmax_sig;
+}
+transformed data{
+  real logbeta_pr;
+  real logbeta_pr_sig;
+
+  logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax_mean)))); //this converts sigma on the untransformed scale to a log scale
+  logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax prior to per capita slope - transform to log scale with bias correction
+}
 parameters {
-// Discrete state model
-simplex[K] A[K]; // transition probabilities
+  // Discrete state model
+  simplex[K] A[K]; // transition probabilities
+  simplex[K] pi1; // initial state probabilities
 
-// A[i][j] = p(z_t = j | z_{t-1} = i)
-// Continuous observation model
-ordered[K] log_a; // regime max. productivity
-vector[K] log_b; // regime rate capacity 
-real<lower=0> sigma; // observation standard deviations
+  // A[i][j] = p(z_t = j | z_{t-1} = i)
+  // Continuous observation model
+  ordered[K] log_a; // regime max. productivity
+  vector[K] log_b; // regime rate capacity 
+  real<lower=0> sigma; // observation standard deviations
 }
-
 transformed parameters {
-vector[K] logalpha[N];
-vector[K] b; //
-simplex[K] pi1; // initial state probabilities
+  vector[K] logalpha[N];
+  vector[K] b; //
+  //simplex[K] pi1; // initial state probabilities
 
-b=exp(log_b);
+  b=exp(log_b);
 
-pi1=rep_vector(1.0/K,K);
+  //pi1=rep_vector(1.0/K,K);
 
- 
-{ // Forward algorithm log p(z_t = j | y_{1:t})
-real accumulator[K];
+  { // Forward algorithm log p(z_t = j | y_{1:t})
+  real accumulator[K];
 
-logalpha[1] = log(pi1) + normal_lpdf(R_S[1] |log_a - b*S[1], sigma);
-for (t in 2:N) {
-for (j in 1:K) { // j = current (t)
-for (i in 1:K) { // i = previous (t-1)
-// Murphy (2012) p. 609 eq. 17.48
-// belief state + transition prob + local evidence at t
-accumulator[i] = logalpha[t-1, i] + log(A[i, j]) + normal_lpdf(R_S[t] |log_a[j] - b[j]*S[t], sigma);
-}
-logalpha[t, j] = log_sum_exp(accumulator);
-}
-}
-} // Forward
+  logalpha[1] = log(pi1) + normal_lpdf(R_S[1] |log_a - b*S[1], sigma);
+  for (t in 2:N) {
+    for (j in 1:K) { // j = current (t)
+      for (i in 1:K) { // i = previous (t-1)
+        // Murphy (2012) p. 609 eq. 17.48
+        // belief state + transition prob + local evidence at t
+        accumulator[i] = logalpha[t-1, i] + log(A[i, j]) + normal_lpdf(R_S[t] |log_a[j] - b[j]*S[t], sigma);
+      }
+      logalpha[t, j] = log_sum_exp(accumulator);
+    }
+  }
+  } // Forward
 }
 model{
 
-log_a ~ normal(1.5,2.5);
-log_b ~ normal(-12,3);
-sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+  log_a ~ normal(1.5,2.5);
+  log_b ~ normal(logbeta_pr,logbeta_pr_sig); //capacity
+  sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+  pi1~ dirichlet(rep_vector(1,K));
 
-for(k in 1:K){
-A[k,] ~ dirichlet(alpha_dirichlet[k,]);
-}
+  for(k in 1:K){
+    A[k,] ~ dirichlet(alpha_dirichlet[k,]);
+  }
 
-target += log_sum_exp(logalpha[N]);
+  target += log_sum_exp(logalpha[N]);
 }
 generated quantities {
 int<lower=1, upper=K> zstar[N];

@@ -17,7 +17,7 @@ logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax p
 }
 parameters{
   real log_a;// initial productivity (on log scale)
-  real log_b; // rate capacity - fixed in this
+  real<upper = 0> log_b; // rate capacity - fixed in this
 
   //variance components  
   real<lower = 0> sigma;

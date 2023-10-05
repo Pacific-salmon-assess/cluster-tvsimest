@@ -3,13 +3,13 @@ functions {
         return x / sum(x);
       }
     }
-    data {
-      int<lower=1> N;//number of annual samples (time-series length)
-      vector[N] R_S; //log(recruits per spawner)
-      vector[N] S; //spawners in time T
-      int<lower=1> K; //number of hidden regime states
-      matrix[K,K] alpha_dirichlet; //prior inputs for dirichlet 
-      real pSmax_mean;
+data {
+  int<lower=1> N;//number of annual samples (time-series length)
+  vector[N] R_S; //log(recruits per spawner)
+  vector[N] S; //spawners in time T
+  int<lower=1> K; //number of hidden regime states
+  matrix[K,K] alpha_dirichlet; //prior inputs for dirichlet 
+  real pSmax_mean;
   real pSmax_sig;
 }
 transformed data{
@@ -20,21 +20,20 @@ logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax
 logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax prior to per capita slope - transform to log scale with bias correction
 
 }
-    parameters {
-      // Discrete state model
-      simplex[K] A[K]; // transition probabilities
-      simplex[K] pi1; // initial state probabilities
+parameters {
+  // Discrete state model
+  simplex[K] A[K]; // transition probabilities
+  simplex[K] pi1; // initial state probabilities
 
-      // A[i][j] = p(z_t = j | z_{t-1} = i)
-      // Continuous observation model
-      ordered[K] log_a; // regime max. productivity
-      vector[K] log_b; // regime rate capacity 
-      real<lower=0> sigma; // observation standard deviations
-    }
-    
-    transformed parameters {
-	    vector[K] logalpha[N];
-      vector[K] b; //
+  // A[i][j] = p(z_t = j | z_{t-1} = i)
+  // Continuous observation model
+  ordered[K] log_a; // regime max. productivity
+  vector[K] log_b; // regime rate capacity 
+  real<lower=0> sigma; // observation standard deviations
+}
+transformed parameters {
+  vector[K] logalpha[N];
+  vector[K] b; //
         
         b=exp(log_b);
         

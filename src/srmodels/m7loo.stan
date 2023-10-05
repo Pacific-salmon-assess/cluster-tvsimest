@@ -11,10 +11,21 @@ data {
   matrix[K,K] alpha_dirichlet; //prior inputs for dirichlet 
   real y_oos; //out of sample (1-year ahead) log(R/S)
   real x_oos; //spawners 1-year ahead
+  real pSmax_mean;
+  real pSmax_sig;
  }
+transformed data{
+real logbeta_pr;
+real logbeta_pr_sig;
+
+logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax_mean)))); //this converts sigma on the untransformed scale to a log scale
+logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax prior to per capita slope - transform to log scale with bias correction
+
+}
 parameters {
 // Discrete state model
 simplex[K] A[K]; // transition probabilities
+simplex[K] pi1; // initial state probabilities
 
 // A[i][j] = p(z_t = j | z_{t-1} = i)
 // Continuous observation model
@@ -24,13 +35,13 @@ real<lower=0> sigma; // observation standard deviations
 }
 
 transformed parameters {
-simplex[K] pi1; // initial state probabilities
-vector[K] logalpha[N];
-vector[K] b;
+  //simplex[K] pi1; // initial state probabilities
+  vector[K] logalpha[N];
+  vector[K] b;
 
-  pi1=rep_vector(1.0/K,K);
+  //pi1=rep_vector(1.0/K,K);
 
-b=exp(log_b);
+  b=exp(log_b);
  
 { // Forward algorithm log p(z_t = j | y_{1:t})
 real accumulator[K];
@@ -51,9 +62,10 @@ logalpha[t, j] = log_sum_exp(accumulator);
 model{
 
 log_a ~ normal(1.5,2.5);
-log_b ~ normal(-12,3);
+log_b ~ normal(logbeta_pr,logbeta_pr_sig); //capacity
 
 sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+pi1~ dirichlet(rep_vector(1,K));
 
 for(k in 1:K){
 A[k,] ~ dirichlet(alpha_dirichlet[k,]);

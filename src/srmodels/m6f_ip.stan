@@ -23,7 +23,7 @@ logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax p
 parameters {
   // Discrete state model
   simplex[K] A[K]; // transition probabilities
- simplex[K] pi1; // initial state probabilities
+  simplex[K] pi1; // initial state probabilities
  
   // A[i][j] = p(z_t = j | z_{t-1} = i)
   // Continuous observation model
@@ -60,7 +60,7 @@ model{
   log_a ~ normal(1.5,2.5);
   log_b ~ normal(logbeta_pr,logbeta_pr_sig); //capacity
   
- sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   pi1~ dirichlet(rep_vector(1,K)); 
   for(k in 1:K){
   A[k,] ~ dirichlet(alpha_dirichlet[k,]);
