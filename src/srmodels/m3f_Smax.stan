@@ -11,7 +11,7 @@ parameters{
   real log_a0;// initial productivity (on log scale)
   real<lower = 0> Smax; // rate capacity - fixed in this
 
- //variance components  
+  //variance components  
   real<lower = 0> sigma;
   real<lower = 0> sigma_a;
 
@@ -26,8 +26,7 @@ model{
   //priors
   log_a0 ~ normal(1.5,2.5); //initial productivity - wide prior
   Smax ~ normal(pSmax_mean,pSmax_sig); //per capita capacity parameter - wide prior
-   
-  
+     
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)

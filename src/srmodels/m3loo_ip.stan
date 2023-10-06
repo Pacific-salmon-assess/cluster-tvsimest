@@ -10,11 +10,11 @@ data{
   real pSmax_sig;
 }
 transformed data{
-real logbeta_pr;
-real logbeta_pr_sig;
+  real logbeta_pr;
+  real logbeta_pr_sig;
 
-logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax_mean)))); //this converts sigma on the untransformed scale to a log scale
-logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax prior to per capita slope - transform to log scale with bias correction
+  logbeta_pr_sig=sqrt(log(1+((1/pSmax_sig)*(1/pSmax_sig))/((1/pSmax_mean)*(1/pSmax_mean)))); //this converts sigma on the untransformed scale to a log scale
+  logbeta_pr=log(1/pSmax_mean)-0.5*logbeta_pr_sig*logbeta_pr_sig; //convert smax prior to per capita slope - transform to log scale with bias correction
 
 }
 parameters{
@@ -53,7 +53,7 @@ model{
 
   for(n in 1:N) R_S[n] ~ normal(log_a[ii[n]] - S[n]*b, sigma);
 }
-  generated quantities{
+generated quantities{
   real log_a_3b;
   real log_a_5b;
   real log_lik_oos_1b;

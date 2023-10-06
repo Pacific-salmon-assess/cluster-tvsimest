@@ -14,7 +14,7 @@ parameters{
   real log_a0;// initial productivity (on log scale) - fixed in this
   real<lower = 0> Smax0; // rate capacity - fixed in this
 
- //variance components  
+  //variance components  
   real<lower = 0> sigma;
   real<lower = 0> sigma_a;
   real<lower = 0> sigma_b;
@@ -33,8 +33,7 @@ transformed parameters{
 
   for(t in 2:L){
     log_a[t] = log_a[t-1] + a_dev[t-1]*sigma_a;
-    Smax[t] = Smax[t-1] + smax_dev[t-1]*sigma_b;
-     
+    Smax[t] = Smax[t-1] + smax_dev[t-1]*sigma_b;    
   } 
   
 }  
@@ -48,7 +47,6 @@ model{
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_b ~ normal(0,psig_b); //half normal on variance (lower limit of zero)
-  
   
   a_dev ~ std_normal();
   smax_dev ~ std_normal();

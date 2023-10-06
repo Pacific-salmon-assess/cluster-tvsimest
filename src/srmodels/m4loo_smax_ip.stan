@@ -29,8 +29,7 @@ transformed parameters{
   Smax[1]=Smax0;
 
   for(t in 2:L){
-    Smax[t] = Smax[t-1] + smax_dev[t-1]*sigma_b;
-     
+    Smax[t] = Smax[t-1] + smax_dev[t-1]*sigma_b;   
   } 
   
 }  
@@ -44,8 +43,7 @@ model{
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)
   sigma_b ~ normal(0,psig_b); //half normal on variance (lower limit of zero)
-  
-  
+    
   smax_dev ~ std_normal();
   
   for(n in 1:N) R_S[n] ~ normal(log_a-S[n]/Smax[ii[n]], sigma);
