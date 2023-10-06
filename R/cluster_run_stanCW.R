@@ -42,7 +42,7 @@ mod8=cmdstanr::cmdstan_model(file8)
 
 
 simPars <- read.csv("data/generic/SimPars.csv")
-# a=5
+# a=1
 # u=40
 
 pars<-data.frame(path="..",
@@ -333,9 +333,9 @@ file2=file.path(cmdstanr::cmdstan_path(),'srmodels', "m2loo.stan")
 mod2lfo=cmdstanr::cmdstan_model(file2)
 file3=file.path(cmdstanr::cmdstan_path(),'srmodels', "m3loo.stan")
 mod3lfo=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4loo.stan")
+file4=file.path(cmdstanr::cmdstan_path(),'srmodels', "m4loo_smax.stan")
 mod4lfo=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5loo.stan")
+file5=file.path(cmdstanr::cmdstan_path(),'srmodels', "m5loo_smax.stan")
 mod5lfo=cmdstanr::cmdstan_model(file5)
 file6=file.path(cmdstanr::cmdstan_path(),'srmodels', "m6loo.stan")
 mod6lfo=cmdstanr::cmdstan_model(file6)
