@@ -41,6 +41,7 @@ model{
 
   smax_dev ~ std_normal();
   for(n in 1:N) R_S[n] ~ normal(log_a-S[n]/Smax[ii[n]], sigma);
+  smax_dev ~ std_normal();
 
 }
 generated quantities{
