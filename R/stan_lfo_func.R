@@ -18,21 +18,39 @@ stan_lfo<- function(path=".", a,u){
 
   #LFO cross-validation
   #model 1 - static Ricker
-  lfostatic<- stan_lfo_cv(mod=mod1lfo,type='static',df=df,L=10)
+  lfostatic<- stan_lfo_cv(mod=mod1lfo, type='static', df=df, L=10,
+    pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5)
   #model 2 - static autocorrelated Ricker
-  lfoac<- stan_lfo_cv(mod=mod2lfo,type='static',df=df,L=10)
+  lfoac<- stan_lfo_cv(mod=mod2lfo, type='static', df=df, L=10,
+    pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5)
   #model 3 - dynamic productivity Ricker
-  lfoalpha<- stan_lfo_cv(mod=mod3lfo,type='tv',df=df,L=10)
+  lfoalpha<- stan_lfo_cv(mod=mod3lfo,type='tv', df=df, L=10,
+    pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5)
   #model 4 - dynamic capacity Ricker
-  lfobeta<- stan_lfo_cv(mod=mod4lfo,type='tv',df=df,L=10)
+  lfobeta<- stan_lfo_cv(mod=mod4lfo,type='tv',df=df,L=10,
+    pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5,
+    psig_b=max(df$S)*.5)
   #model 5 - dynamic productivity & capacity Ricker
-  lfoalphabeta<- stan_lfo_cv(mod=mod5lfo,type='tv',df=df,L=10)
+  lfoalphabeta<- stan_lfo_cv(mod=mod5lfo,type='tv',df=df,L=10,
+    pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5,
+    psig_b=max(df$S)*.5)
   #model 6 - productivity regime shift - 2 regimes
-  lfohmma<- stan_lfo_cv(mod=mod6lfo,type='regime',df=df,L=10,K=2,dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2))
+  lfohmma<- stan_lfo_cv(mod=mod6lfo,type='regime',df=df,L=10,K=2,
+    dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2), pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5)
   #model 7 - capacity regime shift
-  lfohmmb<- stan_lfo_cv(mod=mod7lfo,type='regime',df=df,L=10,K=2,dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2))
+  lfohmmb<- stan_lfo_cv(mod=mod7lfo,type='regime',df=df,L=10,K=2,
+    dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2), pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5)
   #model 8 - productivity and capacity regime shift
-  lfohmm<- stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2,dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2))
+  lfohmm<- stan_lfo_cv(mod=mod8lfo,type='regime',df=df,L=10,K=2,
+    dirichlet_prior=matrix(c(2,1,1,2),ncol=2,nrow=2), pSmax_mean=max(df$S)*.5,
+    pSmax_sig=max(df$S)*.5)
   
   dflfo<- data.frame(parameter="LFO",
                      iteration=u,
