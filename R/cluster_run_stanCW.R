@@ -317,7 +317,7 @@ saveRDS(resstan_baseER, file = "resstan_baseER.rds")
 #================================================================================================================
 
 
-
+remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
 #base
 library(rslurm)
 library(samEst)
