@@ -562,7 +562,7 @@ stan_func<- function(path=".", a,u){
   
 
   umsy_f6_regime <- apply(drf6[,grep("U_msy\\[",colnames(drf6))],2,postmode)
-  umsy_f6 <- Smsy_f6_regime[zstar_f6]
+  umsy_f6 <- umsy_f6_regime[zstar_f6]
   umsy_f6_conv <- 
     conv_f6_ip[[2]]$sumconv[grep('U_msy\\[',conv_f6_ip[[2]]$variable)][f6_ip$median[grep('zstar\\[',f6_ip$variable)]] +
     conv_f6_ip[[2]]$sumconv[grep('zstar\\[',conv_f6_ip[[2]]$variable)]
@@ -570,7 +570,7 @@ stan_func<- function(path=".", a,u){
   umsy_f7 <- postmode(x=drf7$"U_msy")
 
   umsy_f8_regime <- apply(drf8[,grep("U_msy\\[",colnames(drf8))],2,postmode)
-  umsy_f8 <- Smsy_f7_regime[zstar_f8]
+  umsy_f8 <- umsy_f8_regime[zstar_f8]
   umsy_f8_conv <- 
     conv_f8_ip[[2]]$sumconv[grep('U_msy\\[',conv_f8_ip[[2]]$variable)][f8_ip$median[grep('zstar\\[',f8_ip$variable)]] +
     conv_f8_ip[[2]]$sumconv[grep('zstar\\[',conv_f8_ip[[2]]$variable)]

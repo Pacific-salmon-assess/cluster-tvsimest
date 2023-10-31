@@ -317,7 +317,7 @@ saveRDS(resstan_baseER, file = "resstan_baseER.rds")
 #================================================================================================================
 
 
-remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
+#remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
 #base
 library(rslurm)
 library(samEst)
@@ -437,7 +437,7 @@ pars_asmax<-data.frame(path="..",
 
 
 sjobstanloo_asmax <- slurm_apply(stan_lfo, pars_asmax, jobname = 'stanloo_asmax',
-                            nodes = 250, cpus_per_node = 1, submit = FALSE,
+                            nodes = 250, cpus_per_node = 3, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
                             rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/caw001/results/cluster-tvsimest/",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
