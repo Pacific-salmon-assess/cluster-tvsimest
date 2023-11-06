@@ -299,8 +299,8 @@ sjobstan_baseER<- slurm_apply(stan_func, pars_baseER, jobname = 'stanrun_baseER'
 resstan_baseER <- get_slurm_out(sjobstan_baseER, outtype = 'table', wait = TRUE)
 
 
-saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstan_baseER1.rds")
-saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstan_baseER2.rds")
+saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "resstan_baseER1.rds")
+saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "resstan_baseER2.rds")
 saveRDS(resstan_baseER, file = "resstan_baseER.rds")
 
 
@@ -604,9 +604,6 @@ pars_baseER<-data.frame(path="..",
   u=1:1000)
 
 
-
-
-
 sjobstanloo_baseER <- slurm_apply(stan_lfo, pars_baseER, jobname = 'stanloo_baseER',
                             nodes = 250, cpus_per_node = 3, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
@@ -620,8 +617,8 @@ resstanloo_baseER <- get_slurm_out(sjobstanloo_baseER, outtype = 'table', wait =
 
 head(resstanloo_baseER, 3)
 
-saveRDS(resstanloo_baseER[resstanloo_baseER$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstanloo_baseER1.rds")
-saveRDS(resstanloo_baseER[resstanloo_baseER$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstanloo_baseER2.rds")
+saveRDS(resstanloo_baseER[resstanloo_baseER$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "resstanloo_baseER1.rds")
+saveRDS(resstanloo_baseER[resstanloo_baseER$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "resstanloo_baseER2.rds")
 saveRDS(resstanloo_baseER, file = "resstanloo_baseER.rds")
 
 
