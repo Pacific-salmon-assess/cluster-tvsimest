@@ -47,7 +47,7 @@ model{
 
   //variance terms
   sigma ~ normal(0,1); //half normal on variance (lower limit of zero)
-  sigma_a ~ normal(0,1); //half normal on variance (lower limit of zero)
+  sigma_a ~ normal(0,0.1); //half normal on variance (lower limit of zero)
    
  
   for(n in 1:N) R_S[n] ~ normal(log_a[ii[n]] - S[n]*b, sigma); 

@@ -639,26 +639,26 @@ library(rslurm)
 #library(samEst)
 source("R/emp_lfo.R")
 
-data<- read.csv("data/emp/salmon_productivity_compilation_may2023.csv")
-stocks<- read.csv("data/emp/all_stocks_info_may2023.csv")
+data<- read.csv("data/emp/salmon_productivity_compilation_feb2023.csv")
+stocks<- read.csv("data/emp/all_stocks_info_feb2023.csv")
 
 ###Load in data####
 set_cmdstan_path("/fs/vnas_Hdfo/comda/dag004/.cmdstan/cmdstan-2.31.0")
-file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
+file1lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo_ip.stan")
 mod1lfo=cmdstanr::cmdstan_model(file1lfo)
-file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
+file2lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo_ip.stan")
 mod2lfo=cmdstanr::cmdstan_model(file2lfo)
-file3lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
+file3lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo_ip.stan")
 mod3lfo=cmdstanr::cmdstan_model(file3lfo)
-file4lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
+file4lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo_ip.stan")
 mod4lfo=cmdstanr::cmdstan_model(file4lfo)
-file5lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
+file5lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo_ip.stan")
 mod5lfo=cmdstanr::cmdstan_model(file5lfo)
-file6lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
+file6lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo_ip.stan")
 mod6lfo=cmdstanr::cmdstan_model(file6lfo)
-file7lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
+file7lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo_ip.stan")
 mod7lfo=cmdstanr::cmdstan_model(file7lfo)
-file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
+file8lfo=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo_ip.stan")
 mod8lfo=cmdstanr::cmdstan_model(file8lfo)
 
 
@@ -678,14 +678,14 @@ data_f$logR_S=log(data_f$recruits/data_f$spawners)
 
 tst=emp_lfo(u=1)
 
-pars=data.frame(u=1:5)
+pars=data.frame(u=2:5)
 
 sjobstan_emp <- slurm_apply(emp_lfo, pars, jobname = 'emprun',
                             nodes = 50, cpus_per_node = 1, submit = FALSE,
-                            pkgs=c("cmdstanr","rlang"),
+                            pkgs=c("cmdstanr","samEst"),
                             rscript_path = "/home/dag004/Documents/cluster-tvsimest",
                             libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
-                            global_objects=c("data_f","stocks_f", "mod1lfo", "mod2lfo", "mod3lfo",
+                            global_objects=c("data_f", "mod1lfo", "mod2lfo", "mod3lfo",
                                              "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
 save.image(file = "emp.RData")
 q()

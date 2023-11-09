@@ -126,26 +126,26 @@ stan_lfo_cv=function(mod,type=c('static','tv','regime'),df,L=10,K=2,dirichlet_pr
 
 
 emp_lfo<- function(u){
-  #stocks_f
   #data_f
-  dat <- data_f[data_f$stock.id2==stocks_f$stock.id2[u],]
+  dat <- data_f[data_f$stock.id2==unique(data_f$stock.id2)[u],]
   dat <- dat[complete.cases(dat$spawners),]
   df <- data.frame(by=dat$broodyear,
                    S=dat$spawners,
                    R=dat$recruits,
-                   logRS=log(dat$recruits/dat$spawners)
-  )
+                   logRS=log(dat$recruits/dat$spawners),
+                   pSmax_mean=max(dfdat$spawners)*0.5,
+                   pSmax_sig=max(dfdat$spawners)*0.5)
   
   
   options(mc.cores = 6)
   
   #LFO cross-validation
   #model 1 - static Ricker
-  lfostatic<- stan_lfo_cv(mod=mod1lfo,type='static',df=df,L=10)
+  lfostatic<-stan_lfo_cv(mod=mod1lfo,type='static',df=df,L=10)
   #model 2 - static autocorrelated Ricker
   lfoac<- stan_lfo_cv(mod=mod2lfo,type='static',df=df,L=10)
   #model 3 - dynamic productivity Ricker
-  lfoalpha<- stan_lfo_cv(mod=mod3lfo,type='tv',df=df,L=10)
+  lfoalpha<-stan_lfo_cv(mod=mod3lfo,type='tv',df=df,L=10)
   #model 4 - dynamic capacity Ricker
   lfobeta<- stan_lfo_cv(mod=mod4lfo,type='tv',df=df,L=10)
   #model 5 - dynamic productivity & capacity Ricker
@@ -159,7 +159,7 @@ emp_lfo<- function(u){
   
   dflfo<- data.frame(parameter="LFO",
                      stock.id=u,
-                     stock=stocks_f$stock.name[u] ,
+                     stock=unique(data_f$stock.name)[u] ,
                      model=c("simple",
                              "autocorr",
                              "rwa","rwb","rwab",
