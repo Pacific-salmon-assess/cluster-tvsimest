@@ -29,7 +29,7 @@ parameters{
 }
 transformed parameters{
   real b;
-  vector[L] log_a; //a in each year (on log scale)
+  vector<lower = 0>[L] log_a; //a in each year (on log scale)
   
   b=exp(log_b);
   
