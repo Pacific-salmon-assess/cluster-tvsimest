@@ -392,3 +392,16 @@ saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2
 saveRDS(res_er[res_er$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_er2.rds")
 saveRDS(res_er, file = "res_er.rds")
 
+
+
+.rslurm_id <- 138
+.rslurm_istart <- (.rslurm_id)* 48 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 48, nrow(pars_ER))
+rslurm_res_ER138<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+   rslurm_res_ER138[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_ER$a[i],
+  u=pars_ER$u[i])
+}
+result_ER_138<-do.call(rbind, rslurm_res_ER138)
+saveRDS(result_ER_138, file = "C:/Users/worc/Documents/timevar/simest-tv/outs/simest/genericER/result_ER_138.rds")

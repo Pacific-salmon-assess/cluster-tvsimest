@@ -1,4 +1,4 @@
-data{
+\\\data{
   int<lower=1> N;//number of annual samples (time-series length)
   vector[N] R_S; //log(recruits per spawner)
   vector[N] S; //spawners in time T

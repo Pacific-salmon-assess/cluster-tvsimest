@@ -269,8 +269,8 @@ sjobstan_sigmed <- slurm_apply(stan_func, pars_sigmed, jobname = 'stanrun_sigmed
 resstan_sigmed <- get_slurm_out(sjobstan_sigmed, outtype = 'table', wait = TRUE)
 
 
-saveRDS(resstan_sigmed[resstan_sigmed$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstan_sigmed1.rds")
-saveRDS(resstan_sigmed[resstan_sigmed$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstan_sigmed2.rds")
+saveRDS(resstan_sigmed[resstan_sigmed$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "resstan_sigmed1.rds")
+saveRDS(resstan_sigmed[resstan_sigmed$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "resstan_sigmed2.rds")
 saveRDS(resstan_sigmed, file = "resstan_sigmed.rds")
 
 
