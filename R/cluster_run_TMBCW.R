@@ -92,9 +92,79 @@ res_a <- get_slurm_out(sjobtmb_a, outtype = 'table', wait = TRUE)
 
 head(res_a, 3)
 
-saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_a1.rds")
-saveRDS(res_a[res_a$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_a2.rds")
+
+seq1<-seq_len(round(nrow(simPars)/4))
+seq2<-(round(nrow(simPars)/4)+1):round(nrow(simPars)/2)
+seq3<-(round(nrow(simPars)/2)+1):(round(nrow(simPars)/2)+round(nrow(simPars)/4))
+seq4<-(round(nrow(simPars)/2)+round(nrow(simPars)/4)+1):nrow(simPars)
+
+
+
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "res_a1.rds")
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_a2.rds")
+
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq1],], file = "res_aq1.rds")
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq2],], file = "res_aq2.rds")
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq3],], file = "res_aq3.rds")
+saveRDS(res_a[res_a$scenario%in%simPars$scenario[seq4],], file = "res_aq4.rds")
+
+
+
 saveRDS(res_a, file = "res_a.rds")
+
+
+
+tmb_func(path=".",
+  a=5,
+  u=1)
+#run 58103rm_id <- 1
+.rslurm_istart <- (.rslurm_id)* 50 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 50, nrow(pars_asmax))
+rslurm_result1<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+  print(i)
+   rslurm_result1[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  a=pars_a$a[i],
+  u=pars_a$u[i])
+}
+result1<-do.call(rbind, rslurm_result1)
+saveRDS(result1, file = "res_a1.rds")
+
+#The following files are missing: results_1.RDS
+
+
+
+#============================================================================
+#sensitivity a  with double alpha scenarios
+library(rslurm)
+library(samEst)
+source("R/tmb_func.R")
+
+
+simPars <- read.csv("data/sensitivity/SimPars_da.csv")
+
+pars_a<-data.frame(path="..",
+  a=rep(seq_len(nrow(simPars)),each=1000),
+  u=1:1000)
+
+
+sjobtmb_a <- slurm_apply(tmb_func, pars_a, jobname = 'TMBrun_a_da',
+                    nodes = 250, cpus_per_node = 1, submit = FALSE,
+                    pkgs=c("samEst"),
+                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    global_objects=c("simPars"))
+
+
+
+#AFTER JOB IS DONE IMPORT  the results
+res_ada <- get_slurm_out(sjobtmb_a, outtype = 'table', wait = TRUE)
+
+head(res_ada, 3)
+
+saveRDS(res_ada[res_a$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_ada1.rds")
+saveRDS(res_ada[res_a$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_ada2.rds")
+saveRDS(res_ada, file = "res_ada.rds")
 
 
 
@@ -387,9 +457,20 @@ sjobtmb_er <- slurm_apply(tmb_func, pars_ER, jobname = 'TMBrun_ER',
 
 res_er <- get_slurm_out(sjobtmb_er, outtype = 'table', wait = TRUE)
 
+seq1<-seq_len(round(nrow(simPars)/4))
+seq2<-(round(nrow(simPars)/4)+1):round(nrow(simPars)/2)
+seq3<-(round(nrow(simPars)/2)+1):(round(nrow(simPars)/2)+round(nrow(simPars)/4))
+seq4<-(round(nrow(simPars)/2)+round(nrow(simPars)/4)+1):nrow(simPars)
+
 
 saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "res_er1.rds")
 saveRDS(res_er[res_er$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_er2.rds")
+
+saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq1],], file = "res_erq1.rds")
+saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq2],], file = "res_erq2.rds")
+saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq3],], file = "res_erq3.rds")
+saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq4],], file = "res_erq4.rds")
+
 saveRDS(res_er, file = "res_er.rds")
 
 

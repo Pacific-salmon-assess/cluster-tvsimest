@@ -109,9 +109,21 @@ resstan_a <- get_slurm_out(sjobstan_a, outtype = 'table', wait = TRUE)
 
 head(resstan_a, 3)
 
-saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstan_a1.rds")
-saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstan_a2.rds")
+saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "resstan_a1.rds")
+saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "resstan_a2.rds")
 saveRDS(resstan_a, file = "resstan_a.rds")
+
+
+seq1<-seq_len(round(nrow(simPars)/4))
+seq2<-(round(nrow(simPars)/4)+1):round(nrow(simPars)/2)
+seq3<-(round(nrow(simPars)/2)+1):(round(nrow(simPars)/2)+round(nrow(simPars)/4))
+seq4<-(round(nrow(simPars)/2)+round(nrow(simPars)/4)+1):nrow(simPars)
+
+
+saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[seq1],], file = "resstan_aq1.rds")
+saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[seq2],], file = "resstan_aq2.rds")
+saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[seq3],], file = "resstan_aq3.rds")
+saveRDS(resstan_a[resstan_a$scenario%in%simPars$scenario[seq4],], file = "resstan_aq4.rds")
 
 
 #---------------------------------------------------------------------------------------------------
@@ -304,6 +316,17 @@ saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[(round(nrow(s
 saveRDS(resstan_baseER, file = "resstan_baseER.rds")
 
 
+seq1<-seq_len(round(nrow(simPars)/4))
+seq2<-(round(nrow(simPars)/4)+1):round(nrow(simPars)/2)
+seq3<-(round(nrow(simPars)/2)+1):(round(nrow(simPars)/2)+round(nrow(simPars)/4))
+seq4<-(round(nrow(simPars)/2)+round(nrow(simPars)/4)+1):nrow(simPars)
+
+saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq1],], file = "resstan_erq1.rds")
+saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq2],], file = "resstan_erq2.rds")
+saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq3],], file = "resstan_erq3.rds")
+saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq4],], file = "resstan_erq4.rds")
+
+
 
 #---------------------------------------------------------------------------------------------------
 #No need to run bias corr for stan as it does not make much sense in a bayesian context.
@@ -416,8 +439,8 @@ resstanloo_a <- get_slurm_out(sjobstanloo_a, outtype = 'table', wait = TRUE)
 
 head(resstan_a, 3)
 
-saveRDS(resstanloo_a[resstanloo_a$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstanloo_a1.rds")
-saveRDS(resstanloo_a[resstanloo_a$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstanloo_a2.rds")
+#saveRDS(resstanloo_a[resstanloo_a$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resstanloo_a1.rds")
+#saveRDS(resstanloo_a[resstanloo_a$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resstanloo_a2.rds")
 saveRDS(resstanloo_a, file = "resstanloo_a.rds")
 
 
