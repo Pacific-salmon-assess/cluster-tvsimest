@@ -420,6 +420,7 @@ saveRDS(result_sigmed_12, file = "res_sigmed_12.rds")
 
 library(rslurm)
 source("R/stan_func.R") #stan lfo function
+source("R/check_stan_conv.R") #stan lfo function
 library(cmdstanr)
 
 #load in cmdstanr models for LFO
@@ -437,7 +438,7 @@ mod3=cmdstanr::cmdstan_model(file3.1)
 mod3lfo=cmdstanr::cmdstan_model(file3.2)
 file4.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m4f_smax.stan")
 file4.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo_smax_ip.stan")
-mod4f=cmdstanr::cmdstan_model(file4.1)
+mod4=cmdstanr::cmdstan_model(file4.1)
 mod4lfo=cmdstanr::cmdstan_model(file4.2)
 file5.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m5f_ip.stan")
 file5.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo_ip.stan")
@@ -457,10 +458,10 @@ mod8=cmdstanr::cmdstan_model(file8.1)
 mod8lfo=cmdstanr::cmdstan_model(file8.2)
 
 #simulation parameters
-simPars <- read.csv("data/generic/SimPars.csv")
+simPars <- read.csv("data/sigmamed_sensitivity/SimPars.csv")
 
 #test function- this takes awhile....
-tst <- stan_lfo(path=".",
+tst <- stan_func(path=".",
                 a=1,
                 u=1)
 
