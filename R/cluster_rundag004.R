@@ -317,7 +317,7 @@ pars_siglow<-data.frame(path="..",
 
 
 sjobtmb_siglow <- slurm_apply(tmb_func, pars_siglow, jobname = 'TMBrun_siglow',
-                              nodes = 100, cpus_per_node = 1, submit = FALSE,
+                              nodes = 50, cpus_per_node = 1, submit = FALSE,
                               pkgs=c("samEst"),
                               rscript_path = "/home/homey/cluster-tvsimest",
                               libPaths="/gpfs/fs7/dfo/hpcmc/comda/dag004/Rlib/4.1",
@@ -337,22 +337,21 @@ res_siglow <- get_slurm_out(sjobtmb_siglow, outtype = 'table', wait = TRUE)
 
 saveRDS(res_siglow[res_siglow$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_siglow1.rds")
 saveRDS(res_siglow[res_siglow$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_siglow2.rds")
-saveRDS(res_siglow, file = "res_siglow.rds")
 
 
 #The following files are missing: results_5.RDS, results_26.RDS
 
-.rslurm_id <- 36
+.rslurm_id <- 15
 .rslurm_istart <- (.rslurm_id)* 90 + 1
 .rslurm_iend <- min((.rslurm_id + 1) * 90, nrow(pars_siglow))
-rslurm_res_siglow5<-list()
+rslurm_res_siglow15<-list()
 for(i in (.rslurm_istart):(.rslurm_iend)){
-  rslurm_res_siglow5[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+  rslurm_res_siglow15[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
                                                        a=pars_siglow$a[i],
                                                        u=pars_siglow$u[i])
 }
-result_siglow_5<-do.call(rbind, rslurm_res_siglow5)
-saveRDS(result_siglow_5, file = "res_siglow_36.rds")
+result_siglow_15<-do.call(rbind, rslurm_res_siglow15)
+saveRDS(result_siglow_15, file = "res_siglow_15.rds")
 
 
 
@@ -403,6 +402,84 @@ res_sigmed <- get_slurm_out(sjobtmb_sigmed, outtype = 'table', wait = TRUE)
 saveRDS(res_sigmed[res_sigmed$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_sigmed1.rds")
 saveRDS(res_sigmed[res_sigmed$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "res_sigmed2.rds")
 saveRDS(res_sigmed, file = "res_sigmed.rds")
+
+.rslurm_id <- 25
+.rslurm_istart <- (.rslurm_id)* 90 + 1
+.rslurm_iend <- min((.rslurm_id + 1) * 90, nrow(pars_sigmed))
+rslurm_res_sigmed12<-list()
+for(i in (.rslurm_istart):(.rslurm_iend)){
+  rslurm_res_sigmed12[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+                                                        a=pars_sigmed$a[i],
+                                                        u=pars_sigmed$u[i])
+}
+result_sigmed_12<-do.call(rbind, rslurm_res_sigmed12)
+saveRDS(result_sigmed_12, file = "res_sigmed_12.rds")
+
+
+#stan & stan loo
+
+library(rslurm)
+source("R/stan_func.R") #stan lfo function
+source("R/check_stan_conv.R") #stan lfo function
+library(cmdstanr)
+
+#load in cmdstanr models for LFO
+file1.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1f_ip.stan")
+file1.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo_ip.stan")
+mod1=cmdstanr::cmdstan_model(file1.1)
+mod1lfo=cmdstanr::cmdstan_model(file1.2)
+file2.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m2f_ip.stan")
+file2.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo_ip.stan")
+mod2=cmdstanr::cmdstan_model(file2.1)
+mod2lfo=cmdstanr::cmdstan_model(file2.2)
+file3.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m3f_ip.stan")
+file3.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo_ip.stan")
+mod3=cmdstanr::cmdstan_model(file3.1)
+mod3lfo=cmdstanr::cmdstan_model(file3.2)
+file4.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m4f_smax.stan")
+file4.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo_smax_ip.stan")
+mod4=cmdstanr::cmdstan_model(file4.1)
+mod4lfo=cmdstanr::cmdstan_model(file4.2)
+file5.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m5f_ip.stan")
+file5.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo_ip.stan")
+mod5=cmdstanr::cmdstan_model(file5.1)
+mod5lfo=cmdstanr::cmdstan_model(file5.2)
+file6.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m6f_ip.stan")
+file6.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo_ip.stan")
+mod6=cmdstanr::cmdstan_model(file6.1)
+mod6lfo=cmdstanr::cmdstan_model(file6.2)
+file7.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m7f_ip.stan")
+file7.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo_ip.stan")
+mod7=cmdstanr::cmdstan_model(file7.1)
+mod7lfo=cmdstanr::cmdstan_model(file7.2)
+file8.1=file.path(cmdstanr::cmdstan_path(),'sr models', "m8f_ip.stan")
+file8.2=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo_ip.stan")
+mod8=cmdstanr::cmdstan_model(file8.1)
+mod8lfo=cmdstanr::cmdstan_model(file8.2)
+
+#simulation parameters
+simPars <- read.csv("data/sigmamed_sensitivity/SimPars.csv")
+
+#test function- this takes awhile....
+tst <- stan_func(path=".",
+                a=1,
+                u=1)
+
+#test some pars
+pars<-data.frame(path="..",
+                 a=rep(seq_len(nrow(simPars)),each=5),
+                 u=1:5)
+#slurm job
+sjobstan_1 <- slurm_apply(stan_lfo, pars, jobname = 'stanrun1',
+                          nodes = 60, cpus_per_node = 1, submit = FALSE,
+                          pkgs=c("cmdstanr"),
+                          rscript_path = "/gpfs/fs7/dfo/hpcmc/comda/dag004/results/cluster-tvsimest/",
+                          libPaths="/fs/vnas_Hdfo/comda/dag004/Rlib/",
+                          global_objects=c("simPars", "mod1lfo", "mod2lfo", "mod3lfo",
+                                           "mod4lfo","mod5lfo","mod6lfo","mod7lfo","mod8lfo"))
+
+save.image(file = "sj_st.RData")
+q()
 
 #============================================================================
 #base scenario - bias corrected
@@ -469,20 +546,8 @@ load("sj_er.RData")
 res_er <- get_slurm_out(sjobtmb_er, outtype = 'table', wait = TRUE)
 
 
-saveRDS(res_er, file = "res_eor.rds")
-#The following files are missing: results_73.RDS
+saveRDS(res_er, file = "res_er.rds")
 
-.rslurm_id <- 73
-.rslurm_istart <- (.rslurm_id)* 90 + 1
-.rslurm_iend <- min((.rslurm_id + 1) * 90, nrow(pars_sigmed))
-rslurm_res_sigmed73<-list()
-for(i in (.rslurm_istart):(.rslurm_iend)){
-  rslurm_res_sigmed73[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
-                                                        a=pars_sigmed$a[i],
-                                                        u=pars_sigmed$u[i])
-}
-result_sigmed_73<-do.call(rbind, rslurm_res_sigmed73)
-saveRDS(result_sigmed_73, file = "res_sigmed_73.rds")
 
 
 
@@ -586,21 +651,21 @@ source("R/stan_lfo_func.R") #stan lfo function
 library(cmdstanr)
 
 #load in cmdstanr models for LFO
-file1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo.stan")
+file1=file.path(cmdstanr::cmdstan_path(),'sr models', "m1loo_ip.stan")
 mod1lfo=cmdstanr::cmdstan_model(file1)
-file2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo.stan")
+file2=file.path(cmdstanr::cmdstan_path(),'sr models', "m2loo_ip.stan")
 mod2lfo=cmdstanr::cmdstan_model(file2)
-file3=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo.stan")
+file3=file.path(cmdstanr::cmdstan_path(),'sr models', "m3loo_ip.stan")
 mod3lfo=cmdstanr::cmdstan_model(file3)
-file4=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo.stan")
+file4=file.path(cmdstanr::cmdstan_path(),'sr models', "m4loo_smax_ip.stan")
 mod4lfo=cmdstanr::cmdstan_model(file4)
-file5=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo.stan")
+file5=file.path(cmdstanr::cmdstan_path(),'sr models', "m5loo_ip.stan")
 mod5lfo=cmdstanr::cmdstan_model(file5)
-file6=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo.stan")
+file6=file.path(cmdstanr::cmdstan_path(),'sr models', "m6loo_ip.stan")
 mod6lfo=cmdstanr::cmdstan_model(file6)
-file7=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo.stan")
+file7=file.path(cmdstanr::cmdstan_path(),'sr models', "m7loo_ip.stan")
 mod7lfo=cmdstanr::cmdstan_model(file7)
-file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo.stan")
+file8=file.path(cmdstanr::cmdstan_path(),'sr models', "m8loo_ip.stan")
 mod8lfo=cmdstanr::cmdstan_model(file8)
 
 #simulation parameters
