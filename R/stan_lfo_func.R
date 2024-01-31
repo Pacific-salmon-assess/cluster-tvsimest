@@ -14,7 +14,7 @@ stan_lfo<- function(path=".", a,u){
   )
   
   
-  options(mc.cores = 3)
+  #options(mc.cores = 3)
 
   #LFO cross-validation
   #model 1 - static Ricker

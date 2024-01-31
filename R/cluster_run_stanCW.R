@@ -342,11 +342,11 @@ saveRDS(resstan_baseER[resstan_baseER$scenario%in%simPars$scenario[seq4],], file
 
 #remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
 #base
+
 library(rslurm)
 library(samEst)
 source("R/stan_lfo_func.R") #stan lfo function
 library(cmdstanr)
-
 
 
 #load in cmdstanr models for LFO
@@ -625,8 +625,7 @@ simPars <- read.csv("data/genericER/SimPars_ER.csv")
 pars_baseER<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
-
-
+stan_lfo(path="..",a=1, u=1)
 sjobstanloo_baseER <- slurm_apply(stan_lfo, pars_baseER, jobname = 'stanloo_baseER',
                             nodes = 250, cpus_per_node = 3, submit = FALSE,
                             pkgs=c("cmdstanr", "samEst"),
