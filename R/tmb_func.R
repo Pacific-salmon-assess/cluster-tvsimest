@@ -23,17 +23,56 @@ tmb_func <- function(path=".",a, u) {
   
   dirpr<-matrix(c(2,1,1,2),2,2)
 
-  p <- ricker_TMB(data=df,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  pac <- ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  ptva <- ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  ptvb <- ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  ptvab <- ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  phmma <- ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  phmmb <- ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
-  phmm  <- ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
+ 
 
+  p <-tryCatch({ ricker_TMB(data=df,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  pac <-tryCatch({ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  ptva <-tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  ptvb <-tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
   
+  ptvab <-tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
 
+  phmma <-tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  phmmb <-tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  phmm<-tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))} )
+  
   dfa<- data.frame(parameter="alpha",
               iteration=u,
               scenario= simPars$scenario[a],
@@ -45,24 +84,25 @@ tmb_func <- function(path=".",a, u) {
               by=rep(dat$year,8),
               sim=rep(dat$alpha,8),
               median=NA,
-              mode=c(rep(p$alpha,nrow(df)),
-                    rep(pac$alpha,nrow(df)),
-                    ptva$alpha,
-                    rep(ptvb$alpha,nrow(df)),
-                    ptvab$alpha,
-                    phmma$alpha[phmma$regime],
-                    rep(phmmb$alpha,nrow(df)),
-                    phmm$alpha[phmm$regime]), 
-              convergence=c(rep(c(p$model$convergence,
-                    pac$model$convergence ,
-                    ptva$model$convergence,
-                    ptvb$model$convergence,
-                    ptvab$model$convergence ,
-                    phmma$model$convergence ,
-                    phmmb$model$convergence ,
-                    phmm$model$convergence
-                    ),each=nrow(df))),
-              conv_warning=c(rep(c( p$conv_problem,
+              mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$alpha}, nrow(df)),
+                    rep(if(!is.null(pac$fail_conv)){NA}else{pac$alpha}, nrow(df)),
+                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$alpha},
+                    rep(if(!is.null(ptvb$fail_conv)){NA}else{ptvb$alpha}, nrow(df)),
+                    if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$alpha},
+                    if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$alpha[phmma$regime]},
+                    rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$alpha}, nrow(df)),
+                    if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$alpha[phmm$regime]}), 
+              convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                    ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                    ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                    ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                    ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                    ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
+                    ),each=nrow(df)),
+              conv_warning=rep(c( 
+                     p$conv_problem,
                      pac$conv_problem,
                     ptva$conv_problem,
                     ptvb$conv_problem,
@@ -70,7 +110,7 @@ tmb_func <- function(path=".",a, u) {
                      phmma$conv_problem,
                      phmmb$conv_problem,
                     phmm$conv_problem
-                    ),each=nrow(df))))
+                    ),each=nrow(df)))
                     
   dfa$pbias <- ((dfa$mode-dfa$sim)/dfa$sim)*100
   dfa$bias <- (dfa$mode-dfa$sim)
@@ -87,24 +127,24 @@ tmb_func <- function(path=".",a, u) {
       by=rep(dat$year,8),
       sim=rep(1/dat$beta,8),
       median=NA,
-      mode=c(rep(p$Smax,nrow(df)),
-        rep(pac$Smax,nrow(df)),
-        rep(ptva$Smax,nrow(df)),
-        ptvb$Smax,
-        ptvab$Smax,
-        rep(phmma$Smax,nrow(df)),
-        phmmb$Smax[phmmb$regime],
-        phmm$Smax[phmm$regime]),
-      convergence=c(rep(c(p$model$convergence,
-                    pac$model$convergence ,
-                    ptva$model$convergence,
-                    ptvb$model$convergence,
-                    ptvab$model$convergence ,
-                    phmma$model$convergence ,
-                    phmmb$model$convergence ,
-                    phmm$model$convergence
-                    ),each=nrow(df))),
-      conv_warning=c(rep(c( p$conv_problem,
+      mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$Smax}, nrow(df)),
+        rep(if(!is.null(pac$fail_conv)){NA}else{pac$Smax}, nrow(df)),
+        rep(if(!is.null(ptva$fail_conv)){NA}else{ptva$Smax}, nrow(df)),
+        if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$Smax},
+        if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$Smax},
+        rep(if(!is.null(phmma$fail_conv)){NA}else{phmma$Smax}, nrow(df)),
+        if(!is.null(phmmb$fail_conv)){rep(NA, nrow(df))}else{phmmb$Smax[phmmb$regime]},
+        if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$Smax[phmm$regime]}),
+      convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                    ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                    ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                    ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                    ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                    ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
+                    ),each=nrow(df)),
+      conv_warning=rep(c( p$conv_problem,
                      pac$conv_problem,
                     ptva$conv_problem,
                     ptvb$conv_problem,
@@ -112,7 +152,7 @@ tmb_func <- function(path=".",a, u) {
                      phmma$conv_problem,
                      phmmb$conv_problem,
                     phmm$conv_problem
-                    ),each=nrow(df))))
+                    ),each=nrow(df)))
       
     dfsmax$pbias <- ((dfsmax$mode-dfsmax$sim)/dfsmax$sim)*100
     dfsmax$bias <- (dfsmax$mode-dfsmax$sim)
@@ -129,23 +169,23 @@ tmb_func <- function(path=".",a, u) {
       by=rep(dat$year,8),
       sim=rep(dat$sigma,8),
       median=NA,
-      mode=c(rep(p$sig,nrow(df)),
-        rep(pac$sig,nrow(df)),
-        rep(ptva$sig,nrow(df)),
-        rep(ptvb$sig,nrow(df)),
-        rep(ptvab$sig,nrow(df)),
-        rep(phmma$sigma,nrow(df)),
-        rep(phmmb$sigma,nrow(df)),
-        rep(phmm$sigma,nrow(df))),
-      
-      convergence=rep(c(p$model$convergence ,
-        pac$model$convergence ,
-        ptva$model$convergence ,
-        ptvb$model$convergence ,
-        ptvab$model$convergence ,
-        phmma$model$convergence ,
-        phmmb$model$convergence ,
-        phmm$model$convergence),each=nrow(df)),
+      mode=rep(c(ifelse(is.null(p$fail_conv),p$sig,NA),
+                 ifelse(is.null(pac$fail_conv),pac$sig,NA),
+                 ifelse(is.null(ptva$fail_conv),ptva$sig,NA),
+                 ifelse(is.null(ptvb$fail_conv),ptvb$sig,NA),
+                 ifelse(is.null(ptvab$fail_conv),ptvab$sig,NA),
+                 ifelse(is.null(phmma$fail_conv),phmma$sigma,NA),
+                 ifelse(is.null(phmmb$fail_conv),phmmb$sigma,NA),
+                 ifelse(is.null(phmm$fail_conv),phmm$sigma,NA)),each=nrow(df)), 
+      convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                    ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                    ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                    ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                    ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                    ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
+                    ),each=nrow(df)),
       conv_warning=rep(c( p$conv_problem,
                      pac$conv_problem,
                     ptva$conv_problem,
@@ -168,9 +208,10 @@ tmb_func <- function(path=".",a, u) {
       by=NA,
       sim=NA,
       median=NA,
-      mode=c(ptva$siga,ptvab$siga),
-      convergence=c( ptva$model$convergence ,       
-        ptvab$model$convergence ),
+      mode=c(ifelse(is.null(ptva$fail_conv),ptva$siga,NA),
+        ifelse(is.null(ptvab$fail_conv),ptvab$siga,NA)),
+      convergence=c( ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv)),
       conv_warning=c( ptva$conv_problem,
          ptvab$conv_problem))
     
@@ -186,9 +227,10 @@ tmb_func <- function(path=".",a, u) {
       by=NA,
       sim=NA,
       median=NA,
-      mode=c(ptvb$sigb,ptvab$sigb),
-      convergence=c( ptvb$model$convergence,        
-        ptvab$model$convergence),
+      mode=c(ifelse(is.null(ptvb$fail_conv),ptvb$sigb,NA),
+        ifelse(is.null(ptvab$fail_conv),ptvab$sigb,NA)),
+      convergence=c( ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv)),
       conv_warning=c(ptvb$conv_problem,        
         ptvab$conv_problem)
       )
@@ -210,22 +252,22 @@ tmb_func <- function(path=".",a, u) {
       by=rep(dat$year,8),
       sim=rep(smsysim,8),
       median=NA,
-      mode=c(rep(p$Smsy,nrow(df)),
-            rep(pac$Smsy,nrow(df)),
-            ptva$Smsy,
-            ptvb$Smsy,
-            ptvab$Smsy,
-            phmma$Smsy[phmma$regime],
-            phmmb$Smsy[phmmb$regime],
-            phmm$Smsy[phmm$regime]),    
-        convergence=rep(c(p$model$convergence,
-                    pac$model$convergence ,
-                    ptva$model$convergence,
-                    ptvb$model$convergence,
-                    ptvab$model$convergence ,
-                    phmma$model$convergence ,
-                    phmmb$model$convergence ,
-                    phmm$model$convergence
+      mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$Smsy}, nrow(df)),
+        rep(if(!is.null(pac$fail_conv)){NA}else{pac$Smsy}, nrow(df)),
+        if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$Smsy},
+        if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$Smsy},
+        if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$Smsy},
+        if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$Smsy[phmma$regime]},
+        if(!is.null(phmmb$fail_conv)){rep(NA, nrow(df))}else{phmmb$Smsy[phmmb$regime]},
+        if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$Smsy[phmm$regime]}),    
+        convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                    ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                    ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                    ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                    ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                    ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
                     ),each=nrow(df)),
         conv_warning=rep(c( p$conv_problem,
                      pac$conv_problem,
@@ -253,38 +295,47 @@ tmb_func <- function(path=".",a, u) {
     by=rep(dat$year,8),
     sim=rep(unlist(mapply(sGenCalc,a=dat$alpha,Smsy=smsysim, b=dat$beta)),8),
     median=NA,
-    mode=c(unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="simple"&dfa$method=="MLE"],
+    mode=c(
+      if(is.null(p$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="simple"&dfa$method=="MLE"],
             Smsy=dfsmsy$mode[dfsmsy$model=="simple"&dfsmsy$method=="MLE"], 
-            b=1/dfsmax$mode[dfsmax$model=="simple"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="autocorr"&dfa$method=="MLE"],
+            b=1/dfsmax$mode[dfsmax$model=="simple"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+      
+      if(is.null(pac$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="autocorr"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="autocorr"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$mode[dfsmax$model=="autocorr"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="rwa"&dfa$method=="MLE"],
+          b=1/dfsmax$mode[dfsmax$model=="autocorr"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+
+       if(is.null(ptva$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="rwa"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="rwa"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$mode[dfsmax$model=="rwa"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="rwb"&dfa$method=="MLE"],
+          b=1/dfsmax$mode[dfsmax$model=="rwa"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+
+       if(is.null(ptvb$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="rwb"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="rwb"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$mode[dfsmax$model=="rwb"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="rwab"&dfa$method=="MLE"],
+          b=1/dfsmax$mode[dfsmax$model=="rwb"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+
+       if(is.null(ptvab$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="rwab"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="rwab"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$mode[dfsmax$model=="rwab"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmma"&dfa$method=="MLE"],
+          b=1/dfsmax$mode[dfsmax$model=="rwab"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+
+       if(is.null(phmma$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmma"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmma"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$mode[dfsmax$model=="hmma"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmb"&dfa$method=="MLE"],
+          b=1/dfsmax$mode[dfsmax$model=="hmma"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+
+       if(is.null(phmmb$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmb"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmb"&dfsmsy$method=="MLE"],
-           b=1/dfsmax$mode[dfsmax$model=="hmmb"&dfsmax$method=="MLE"])),
-        unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmab"&dfa$method=="MLE"],
+           b=1/dfsmax$mode[dfsmax$model=="hmmb"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
+
+       if(is.null(phmm$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmab"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmab"&dfsmsy$method=="MLE"], 
-          b=1/dfsmax$mode[dfsmax$model=="hmmab"&dfsmax$method=="MLE"]))),
-    convergence=rep(c(p$model$convergence,
-                    pac$model$convergence ,
-                    ptva$model$convergence,
-                    ptvb$model$convergence,
-                    ptvab$model$convergence ,
-                    phmma$model$convergence ,
-                    phmmb$model$convergence ,
-                    phmm$model$convergence
+          b=1/dfsmax$mode[dfsmax$model=="hmmab"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))}),
+     
+    convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                    ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                    ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                    ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                    ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                    ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
                     ),each=nrow(df)),
     conv_warning=rep(c( p$conv_problem,
                      pac$conv_problem,
@@ -312,22 +363,22 @@ tmb_func <- function(path=".",a, u) {
     by=rep(dat$year,8),
     sim=rep(umsyCalc(dat$alpha),8),
     median=NA,
-    mode=c(rep(p$umsy, nrow(df)),
-          rep(pac$umsy, nrow(df)),
-           ptva$umsy,
-          rep(ptvb$umsy, nrow(df)),
-          ptvab$umsy,
-          phmma$umsy[phmma$regime],
-          rep(phmmb$umsy,nrow(df)),
-          phmm$umsy[phmm$regime]),
-    convergence=rep(c(p$model$convergence,
-                    pac$model$convergence ,
-                    ptva$model$convergence,
-                    ptvb$model$convergence,
-                    ptvab$model$convergence ,
-                    phmma$model$convergence ,
-                    phmmb$model$convergence ,
-                    phmm$model$convergence
+    mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$umsy}, nrow(df)),
+                    rep(if(!is.null(pac$fail_conv)){NA}else{pac$umsy}, nrow(df)),
+                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$umsy},
+                    rep(if(!is.null(ptvb$fail_conv)){NA}else{ptvb$umsy}, nrow(df)),
+                    if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$umsy},
+                    if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$umsy[phmma$regime]},
+                    rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$umsy}, nrow(df)),
+                    if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$umsy[phmm$regime]}), 
+    convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                    ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                    ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                    ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                    ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                    ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                    ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                    ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
                     ),each=nrow(df)),
     conv_warning=rep(c( p$conv_problem,
                      pac$conv_problem,
@@ -355,22 +406,22 @@ tmb_func <- function(path=".",a, u) {
                        by=rep(NA,8),
                        sim=rep(NA,8),
                        median=NA,
-                       mode=c(p$AICc,
-                             pac$AICc,
-                             ptva$AICc,
-                             ptvb$AICc,
-                             ptvab$AICc,
-                             phmma$AICc,
-                             phmmb$AICc,
-                             phmm$AICc),
-                       convergence=c(p$model$convergence ,
-                                     pac$model$convergence ,
-                                     ptva$model$convergence ,
-                                     ptvb$model$convergence,
-                                     ptvab$model$convergence ,
-                                     phmma$model$convergence ,
-                                     phmmb$model$convergence ,
-                                     phmm$model$convergence ),
+                       mode=c(ifelse(is.null(p$fail_conv),p$AICc, NA),
+                              ifelse(is.null(pac$fail_conv), pac$AICc, NA),
+                              ifelse(is.null(ptva$fail_conv),  ptva$AICc, NA),
+                              ifelse(is.null(ptvb$fail_conv), ptvb$AICc, NA),
+                              ifelse(is.null(ptvab$fail_conv), ptvab$AICc, NA),
+                              ifelse(is.null(phmma$fail_conv), phmma$AICc, NA),
+                              ifelse(is.null(phmmb$fail_conv), phmmb$AICc, NA),
+                              ifelse(is.null(phmm$fail_conv), phmm$AICc, NA)),
+                       convergence=c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                              ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                              ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                              ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                              ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                              ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                              ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                              ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv) ),
                        conv_warning= c( p$conv_problem,
                                       pac$conv_problem,
                                       ptva$conv_problem,
@@ -393,22 +444,22 @@ tmb_func <- function(path=".",a, u) {
                        by=rep(NA,8),
                        sim=rep(NA,8),
                        median=NA,
-                       mode=c(p$BIC,
-                             pac$BIC,
-                             ptva$BIC,
-                             ptvb$BIC,
-                             ptvab$BIC,
-                             phmma$BIC,
-                             phmmb$BIC,
-                             phmm$BIC),
-                       convergence=c(p$model$convergence ,
-                                     pac$model$convergence ,
-                                     ptva$model$convergence,
-                                     ptvb$model$convergence,
-                                     ptvab$model$convergence ,
-                                     phmma$model$convergence ,
-                                     phmmb$model$convergence,
-                                     phmm$model$convergence),
+                       mode=c(ifelse(is.null(p$fail_conv),p$BIC, NA),
+                              ifelse(is.null(pac$fail_conv), pac$BIC, NA),
+                              ifelse(is.null(ptva$fail_conv), ptva$BIC, NA),
+                              ifelse(is.null(ptvb$fail_conv), ptvb$BIC, NA),
+                              ifelse(is.null(ptvab$fail_conv), ptvab$BIC, NA),
+                              ifelse(is.null(phmma$fail_conv), phmma$BIC, NA),
+                              ifelse(is.null(phmmb$fail_conv), phmmb$BIC, NA),
+                              ifelse(is.null(phmm$fail_conv), phmm$BIC, NA)),
+                       convergence=c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                                     ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                                     ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                                     ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                                     ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                                     ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                                     ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                                     ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv) ),
                        conv_warning= c( p$conv_problem,
                                       pac$conv_problem,
                                       ptva$conv_problem,

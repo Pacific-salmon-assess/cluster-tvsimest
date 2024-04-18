@@ -27,8 +27,8 @@ pars<-data.frame(path="..",
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
                     nodes = 250, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
-                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 
@@ -38,12 +38,12 @@ res <- get_slurm_out(sjobtmb, outtype = 'table', wait = TRUE)
 
 
 
-
+,
 
 #AFTER JOB IS DONE IMPORT  the results
 
-saveRDS(res[res$scenario%in%simPars$scenario[1:6],], file = "resbase1.rds")
-saveRDS(res[res$scenario%in%simPars$scenario[7:12],], file = "resbase2.rds")
+saveRDS(res$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)], file = "resbase1.rds")
+saveRDS(res$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)], file = "resbase2.rds")
 saveRDS(res, file = "resbase.rds")
 
 
@@ -346,8 +346,8 @@ pars_siglow<-data.frame(path="..",
 sjobtmb_siglow <- slurm_apply(tmb_func, pars_siglow, jobname = 'TMBrun_siglow',
                     nodes = 250, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
-                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    rscript_path = "/home/caw001/Documents/pfmln/results/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 

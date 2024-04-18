@@ -36,22 +36,33 @@ sjobtmball <- slurm_apply(tmb_func, parsall, jobname = 'TMBrunall',
 resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
 #Warning message:
 #In get_slurm_out(sjobtmball, outtype = "table", wait = TRUE) :
-#  The following files are missing: results_110.RDS, results_148.RDS
+#  results_10.RDS, results_73.RDS, results_111.RDS, results_147.RDS, results_181.RDS
+
 
 rslurm_result<-list()
-
 #run 40 that failed
-.rslurm_id <- 110
-.rslurm_istart <- (.rslurm_id)*  376 + 1
-.rslurm_iend <- min((.rslurm_id + 1) *  376, nrow(parsall))
+failedrun<-c(10,73,111,147,181)
 
-for(i in (.rslurm_istart):(.rslurm_iend)){
-   rslurm_result[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
-  a=parsall$a[i],
-  u=parsall$u[i])
+for(n in seq_along(failedrun)){
+   temp_result<-list()
+  .rslurm_id <- failedrun[n]
+  .rslurm_istart <- (.rslurm_id)*  392 + 1
+  .rslurm_iend <- min((.rslurm_id + 1) *  392, nrow(parsall))
+
+  for(i in (.rslurm_istart):(.rslurm_iend)){
+    temp_result[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
+    a=parsall$a[i],
+    u=parsall$u[i])
+  }
+  rslurm_result[n]<-do.call(rbind, temp_result)
+
 }
-result110<-do.call(rbind, rslurm_result)
-saveRDS(result110, file = "res110.rds")
+
+fail_result<-do.call(rbind, rslurm_result)
+
+resall2<-rbind(resall, fail_result)
+
+#saveRDS(result110, file = "res110.rds")
 
 
 
