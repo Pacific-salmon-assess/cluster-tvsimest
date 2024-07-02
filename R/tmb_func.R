@@ -31,43 +31,50 @@ tmb_func <- function(path=".",a, u) {
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  pac <-tryCatch({ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  pac <-tryCatch({ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,
+                 logb_p_sd=logbeta_pr_sig)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptva <-tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  ptva <-tryCatch({ricker_rw_TMBall(data=df,tv.par='a',logb_p_mean=logbeta_pr,
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.000001)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvb <-tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  ptvb <-tryCatch({ricker_rw_TMBall(data=df, tv.par='b',sigb_p_sd=1,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
-  ptvab <-tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  ptvab <-tryCatch({ricker_rw_TMBall(data=df, tv.par='both',sigb_p_sd=.4,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  phmma <-tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  phmma <-tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,
+                  logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  phmmb <-tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  phmmb <-tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,
+                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  phmm<-tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  phmm<-tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,
+                  logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
@@ -408,7 +415,7 @@ tmb_func <- function(path=".",a, u) {
                        median=NA,
                        mode=c(ifelse(is.null(p$fail_conv),p$AICc, NA),
                               ifelse(is.null(pac$fail_conv), pac$AICc, NA),
-                              ifelse(is.null(ptva$fail_conv),  ptva$AICc, NA),
+                              ifelse(is.null(ptva$fail_conv), ptva$AICc, NA),
                               ifelse(is.null(ptvb$fail_conv), ptvb$AICc, NA),
                               ifelse(is.null(ptvab$fail_conv), ptvab$AICc, NA),
                               ifelse(is.null(phmma$fail_conv), phmma$AICc, NA),
@@ -470,6 +477,47 @@ tmb_func <- function(path=".",a, u) {
                                       phmm$conv_problem),
                        pbias=rep(NA,8),
                        bias=rep(NA,8))
+
+    #EDF
+    dfedf<- data.frame(parameter="EDF",
+                       iteration=u,
+                       scenario= simPars$scenario[a],
+                       method=rep("MLE[",8),
+                       model=c("simple",
+                               "autocorr",
+                               "rwa","rwb","rwab",
+                               "hmma", "hmmb","hmmab"),
+                       by=rep(NA,8),
+                       sim=rep(NA,8),
+                       median=NA,
+                       mode=c(ifelse(is.null(p$fail_conv),3, NA),
+                              ifelse(is.null(pac$fail_conv),4, NA),
+                              ifelse(is.null(ptva$fail_conv), ptva$EDF, NA),
+                              ifelse(is.null(ptvb$fail_conv), ptvb$EDF, NA),
+                              ifelse(is.null(ptvab$fail_conv), ptvab$EDF, NA),
+                              ifelse(is.null(phmma$fail_conv), length(unlist(phmma$tmb_params)), NA),
+                              ifelse(is.null(phmmb$fail_conv), length(unlist(phmmb$tmb_params)), NA),
+                              ifelse(is.null(phmm$fail_conv), length(unlist(phmm$tmb_params)), NA)),
+                       convergence=c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
+                                     ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
+                                     ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
+                                     ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
+                                     ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
+                                     ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
+                                     ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
+                                     ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv) ),
+                       conv_warning= c( p$conv_problem,
+                                      pac$conv_problem,
+                                      ptva$conv_problem,
+                                      ptvb$conv_problem,
+                                      ptvab$conv_problem,
+                                      phmma$conv_problem,
+                                      phmmb$conv_problem,
+                                      phmm$conv_problem),
+                       pbias=rep(NA,8),
+                       bias=rep(NA,8))
+  
+
   
    #lfo
     lfostatic <- tmb_mod_lfo_cv(data=df,model='static', L=15, priorlogb="default",logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)
@@ -541,7 +589,8 @@ tmb_func <- function(path=".",a, u) {
                        pbias=rep(NA,20),
                        bias=rep(NA,20))
 
-    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfsiga,dfsigb,dfaic,dfbic,dflfo)
+    dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfsiga,dfsigb,
+      dfaic,dfbic,dflfo,dfedf)
 
   return(dff)
 

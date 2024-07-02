@@ -1,3 +1,5 @@
+#install samest
+#remotes::install_git('https://github.com/Pacific-salmon-assess/samEst', force=TRUE)
 
 #============================================================================
 #all scenarios
@@ -18,7 +20,9 @@ simPars9 <- read.csv("data/generic_biascorr/SimPars_biascorr.csv")
 
 
 simPars<-rbind(simPars1,simPars2,simPars3,simPars4,simPars5,simPars6,simPars7,simPars8,simPars9)
-
+tst<-tmb_func(path="/gpfs/fs7/dfo/hpcmc/pfm/caw001/results/cluster-tvsimest",
+  a=5,
+  u=1)
 
 
 parsall<-data.frame(path="..",
@@ -27,7 +31,7 @@ parsall<-data.frame(path="..",
 
 
 sjobtmball <- slurm_apply(tmb_func, parsall, jobname = 'TMBrunall',
-                    nodes = 250, cpus_per_node = 1, submit = FALSE,
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/tvsimest/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
@@ -41,20 +45,20 @@ resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
 
 rslurm_result<-list()
 #run 40 that failed
-failedrun<-c(10,73,111,147,181)
+failedrun<-c(43,80,118,133,160)
 
 for(n in seq_along(failedrun)){
    temp_result<-list()
   .rslurm_id <- failedrun[n]
-  .rslurm_istart <- (.rslurm_id)*  392 + 1
-  .rslurm_iend <- min((.rslurm_id + 1) *  392, nrow(parsall))
+  .rslurm_istart <- (.rslurm_id)*  327 + 1
+  .rslurm_iend <- min((.rslurm_id + 1) *  327, nrow(parsall))
 
   for(i in (.rslurm_istart):(.rslurm_iend)){
     temp_result[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
     a=parsall$a[i],
-    u=parsall$u[i])
+    u=parsall$u[i]) 
   }
-  rslurm_result[n]<-do.call(rbind, temp_result)
+  rslurm_result[[n]]<-do.call(rbind, temp_result)
 
 }
 
@@ -62,60 +66,55 @@ fail_result<-do.call(rbind, rslurm_result)
 
 resall2<-rbind(resall, fail_result)
 
-#saveRDS(result110, file = "res110.rds")
 
 
-
-
-#rowsby scenario
-nrow(simParsall)
 
 #base
-saveRDS(resall[resall$scenario%in%simPars1$scenario,], file = "resbase.rds")
-saveRDS(resall[resall$scenario%in%simPars1$scenario[seq_len(nrow(simPars1)/2)],], file = "resbase1.rds")
-saveRDS(resall[resall$scenario%in%simPars1$scenario[(nrow(simPars1)/2+1):nrow(simPars1)],], file = "resbase2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars1$scenario,], file = "resbase.rds")
+saveRDS(resall2[resall2$scenario%in%simPars1$scenario[seq_len(nrow(simPars1)/2)],], file = "resbase1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars1$scenario[(nrow(simPars1)/2+1):nrow(simPars1)],], file = "resbase2.rds")
 
 #sensitivity a
-saveRDS(resall[resall$scenario%in%simPars2$scenario,], file = "res_a.rds")
-saveRDS(resall[resall$scenario%in%simPars2$scenario[seq_len(nrow(simPars2)/2)],], file = "res_a1.rds")
-saveRDS(resall[resall$scenario%in%simPars2$scenario[(nrow(simPars2)/2+1):nrow(simPars2)],], file = "res_a2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars2$scenario,], file = "res_a.rds")
+saveRDS(resall2[resall2$scenario%in%simPars2$scenario[seq_len(nrow(simPars2)/2)],], file = "res_a1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars2$scenario[(nrow(simPars2)/2+1):nrow(simPars2)],], file = "res_a2.rds")
 
 #sensitivity a scenarios half smax
-saveRDS(resall[resall$scenario%in%simPars3$scenario,], file = "res_asmax.rds")
-saveRDS(resall[resall$scenario%in%simPars3$scenario[seq_len(nrow(simPars3)/2)],], file = "res_asmax1.rds")
-saveRDS(resall[resall$scenario%in%simPars3$scenario[(nrow(simPars3)/2+1):nrow(simPars3)],], file = "res_asmax2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars3$scenario,], file = "res_asmax.rds")
+saveRDS(resall2[resall2$scenario%in%simPars3$scenario[seq_len(nrow(simPars3)/2)],], file = "res_asmax1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars3$scenario[(nrow(simPars3)/2+1):nrow(simPars3)],], file = "res_asmax2.rds")
 
 #smax scenarios 
-saveRDS(resall[resall$scenario%in%simPars4$scenario,], file = "res_smax.rds")
-saveRDS(resall[resall$scenario%in%simPars4$scenario[seq_len(nrow(simPars4)/2)],], file = "res_smax1.rds")
-saveRDS(resall[resall$scenario%in%simPars4$scenario[(nrow(simPars4)/2+1):nrow(simPars4)],], file = "res_smax2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars4$scenario,], file = "res_smax.rds")
+saveRDS(resall2[resall2$scenario%in%simPars4$scenario[seq_len(nrow(simPars4)/2)],], file = "res_smax1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars4$scenario[(nrow(simPars4)/2+1):nrow(simPars4)],], file = "res_smax2.rds")
 
 #smax scenarios double alpha
-saveRDS(resall[resall$scenario%in%simPars5$scenario,], file = "res_smaxda.rds")
-saveRDS(resall[resall$scenario%in%simPars5$scenario[seq_len(nrow(simPars5)/2)],], file = "res_smaxda1.rds")
-saveRDS(resall[resall$scenario%in%simPars5$scenario[(nrow(simPars5)/2+1):nrow(simPars5)],], file = "res_smaxda2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars5$scenario,], file = "res_smaxda.rds")
+saveRDS(resall2[resall2$scenario%in%simPars5$scenario[seq_len(nrow(simPars5)/2)],], file = "res_smaxda1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars5$scenario[(nrow(simPars5)/2+1):nrow(simPars5)],], file = "res_smaxda2.rds")
 
 #sensitivity sigma scenarios low
-saveRDS(resall[resall$scenario%in%simPars6$scenario,], file = "res_siglow.rds")
-saveRDS(resall[resall$scenario%in%simPars6$scenario[seq_len(nrow(simPars6)/2)],], file = "res_siglow1.rds")
-saveRDS(resall[resall$scenario%in%simPars6$scenario[(nrow(simPars6)/2+1):nrow(simPars6)],], file = "res_siglow2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars6$scenario,], file = "res_siglow.rds")
+saveRDS(resall2[resall2$scenario%in%simPars6$scenario[seq_len(nrow(simPars6)/2)],], file = "res_siglow1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars6$scenario[(floor(nrow(simPars6)/2+1)):nrow(simPars6)],], file = "res_siglow2.rds")
 
 #sensitivity sigma scenarios med
-saveRDS(resall[resall$scenario%in%simPars7$scenario,], file = "res_sigmed.rds")
-saveRDS(resall[resall$scenario%in%simPars7$scenario[seq_len(nrow(simPars7)/2)],], file = "res_sigmed1.rds")
-saveRDS(resall[resall$scenario%in%simPars7$scenario[(nrow(simPars7)/2+1):nrow(simPars7)],], file = "res_sigmed2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars7$scenario,], file = "res_sigmed.rds")
+saveRDS(resall2[resall2$scenario%in%simPars7$scenario[seq_len(nrow(simPars7)/2)],], file = "res_sigmed1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars7$scenario[(floor(nrow(simPars7)/2+1)):nrow(simPars7)],], file = "res_sigmed2.rds")
 
 
 #sensitivity baseER
-saveRDS(resall[resall$scenario%in%simPars8$scenario,], file = "resbase_ER.rds")
-saveRDS(resall[resall$scenario%in%simPars8$scenario[seq_len(nrow(simPars8)/2)],], file = "resbase_ER1.rds")
-saveRDS(resall[resall$scenario%in%simPars8$scenario[(nrow(simPars8)/2+1):nrow(simPars8)],], file = "resbase_ER2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars8$scenario,], file = "resbase_ER.rds")
+saveRDS(resall2[resall2$scenario%in%simPars8$scenario[seq_len(nrow(simPars8)/2)],], file = "resbase_ER1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars8$scenario[(nrow(simPars8)/2+1):nrow(simPars8)],], file = "resbase_ER2.rds")
 
 
 #sensitivity base_biascorr
-saveRDS(resall[resall$scenario%in%simPars9$scenario,], file = "resbase_biascorr.rds")
-saveRDS(resall[resall$scenario%in%simPars9$scenario[seq_len(nrow(simPars9)/2)],], file = "resbase_biascorr1.rds")
-saveRDS(resall[resall$scenario%in%simPars9$scenario[(nrow(simPars9)/2+1):nrow(simPars9)],], file = "resbase_biascorr2.rds")
+saveRDS(resall2[resall2$scenario%in%simPars9$scenario,], file = "resbase_biascorr.rds")
+saveRDS(resall2[resall2$scenario%in%simPars9$scenario[seq_len(nrow(simPars9)/2)],], file = "resbase_biascorr1.rds")
+saveRDS(resall2[resall2$scenario%in%simPars9$scenario[(nrow(simPars9)/2+1):nrow(simPars9)],], file = "resbase_biascorr2.rds")
 
 #============================================================================
 #sbase case scenarios

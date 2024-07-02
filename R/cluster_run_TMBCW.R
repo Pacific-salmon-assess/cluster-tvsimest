@@ -15,17 +15,17 @@ simPars <- read.csv("data/generic/SimPars.csv")
 #  a=5,
 #  u=1)
   
- 
+tst<-tmb_func(path=".",
+  a=5,
+  u=1)
 
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)
 
 
-
-
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
-                    nodes = 250, cpus_per_node = 1, submit = FALSE,
+                    nodes = 280, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
@@ -42,26 +42,26 @@ res <- get_slurm_out(sjobtmb, outtype = 'table', wait = TRUE)
 
 #AFTER JOB IS DONE IMPORT  the results
 
-saveRDS(res$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)], file = "resbase1.rds")
-saveRDS(res$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)], file = "resbase2.rds")
+saveRDS(res[res$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resbase1.rds")
+saveRDS(res[res$scenario%in%simPars$scenario[(nrow(simPars)/2+1):nrow(simPars)],], file = "resbase2.rds")
 saveRDS(res, file = "resbase.rds")
 
 
 tmb_func(path=".",
   a=5,
   u=1)
-#run 14 that failed
-.rslurm_id <- 14
-.rslurm_istart <- (.rslurm_id)* 240 + 1
-.rslurm_iend <- min((.rslurm_id + 1) * 240, nrow(pars))
-rslurm_result14<-list()
+#run 7 that failed
+.rslurm_id <- 7
+.rslurm_istart <- (.rslurm_id)* 43+ 1
+.rslurm_iend <- min((.rslurm_id + 1) * 43, nrow(pars))
+rslurm_result7<-list()
 for(i in (.rslurm_istart):(.rslurm_iend)){
-   rslurm_result14[[i-3360]]<-tmb_func(path=".",
+   rslurm_result7[[i-301]]<-tmb_func(path=".",
   a=pars$a[i],
   u=pars$u[i])
 }
-result14<-do.call(rbind, rslurm_result14)
-saveRDS(result14, file = "res14.rds")
+result7<-do.call(rbind, rslurm_result7)
+saveRDS(result7, file = "resbase7.rds")
 
 
 #============================================================================
