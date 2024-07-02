@@ -25,7 +25,7 @@ pars<-data.frame(path="..",
 
 
 sjobtmb <- slurm_apply(tmb_func, pars, jobname = 'TMBrun',
-                    nodes = 280, cpus_per_node = 1, submit = FALSE,
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
