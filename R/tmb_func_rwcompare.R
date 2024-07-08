@@ -1,5 +1,5 @@
 
-tmb_func <- function(path=".",a, u) {
+tmb_func_rw_comp <- function(path=".",a, u) {
   
   
   simData <- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
