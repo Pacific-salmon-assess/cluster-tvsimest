@@ -14,7 +14,7 @@
 #SBATCH --comment="image=registry.maze.science.gc.ca/ssc-hpcs/generic-job:ubuntu22.04"
 #SBATCH --output=slurm_%a.out
 
-cd /fs/vnas_Hdfo/comda/caw001/Documents/pfmln/results/cluster-tvsimest/_rslurm_TMBrun   
+cd /fs/vnas_Hdfo/comda/caw001/Documents/pfmln/results/cluster-tvsimest/_rslurm_TMBrun_sigmed   
 (export TMPDIR="/home/caw001/Documents/pfmln/results/stantmp" ;
 export R_LIBS_USER='/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1'; /usr/bin/Rscript --vanilla slurm_run.R )
 

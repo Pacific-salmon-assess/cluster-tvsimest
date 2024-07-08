@@ -38,21 +38,21 @@ tmb_func <- function(path=".",a, u) {
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptva <-tryCatch({ricker_rw_TMBall(data=df,tv.par='a',logb_p_mean=logbeta_pr,
-                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.000001)},
+  ptva <-tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvb <-tryCatch({ricker_rw_TMBall(data=df, tv.par='b',sigb_p_sd=1,
+  ptvb <-tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
-  ptvab <-tryCatch({ricker_rw_TMBall(data=df, tv.par='both',sigb_p_sd=.4,
+  ptvab <-tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
                                   error=function(cond){
                                     message(cond)
@@ -482,7 +482,7 @@ tmb_func <- function(path=".",a, u) {
     dfedf<- data.frame(parameter="EDF",
                        iteration=u,
                        scenario= simPars$scenario[a],
-                       method=rep("MLE[",8),
+                       method=rep("MLE",8),
                        model=c("simple",
                                "autocorr",
                                "rwa","rwb","rwab",

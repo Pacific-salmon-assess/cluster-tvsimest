@@ -34,7 +34,7 @@ sjobtmball <- slurm_apply(tmb_func, parsall, jobname = 'TMBrunall',
                     nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
                     rscript_path = "/home/caw001/Documents/pfmln/results/cluster-tvsimest",
-                    libPaths="gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 resall <- get_slurm_out(sjobtmball, outtype = 'table', wait = TRUE)
