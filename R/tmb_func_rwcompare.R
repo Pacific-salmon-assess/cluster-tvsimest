@@ -22,7 +22,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
   logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
   
 
-  ptva <-tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
+  ptva <-tryCatch({ ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
                   logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=FALSE)},
                                   error=function(cond){
                                     message(cond)
@@ -208,7 +208,6 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                     ifelse(is.null(ptvac$fail_conv), ptvac$model$convergence, ptvac$fail_conv),
                     ifelse(is.null(ptvb$fail_conv), ptvb$model$convergence, ptvb$fail_conv),
                     ifelse(is.null(ptvbc$fail_conv), ptvbc$model$convergence, ptvbc$fail_conv),
-                    
                     ifelse(is.null(ptvab$fail_conv), ptvab$model$convergence, ptvab$fail_conv),
                     ifelse(is.null(ptvabc$fail_conv), ptvabc$model$convergence, ptvabc$fail_conv)),each=nrow(df)),
      conv_warning=rep(c( 
@@ -606,7 +605,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
   
 
     dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfsiga,dfsigb,
-      dfaic,dfbic,dfedf)
+      dfaic,dfbic,dfedf,dfgrad_i)
 
   return(dff)
 
