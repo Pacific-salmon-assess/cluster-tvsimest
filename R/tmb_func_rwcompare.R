@@ -597,7 +597,9 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                     ptvbc$conv_problem,
                     ptvab$conv_problem,
                     ptvabc$conv_problem
-                    ),each=nrow(df)))
+                    ),each=nrow(df)),
+              pbias=rep(NA,12),
+              bias=rep(NA,12))
     
   
 
@@ -606,6 +608,8 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
     dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,dfsiga,dfsigb,
       dfaic,dfbic,dfedf,dfgrad_i)
+
+    print(paste("a is ",a," u is ", u))
 
   return(dff)
 
