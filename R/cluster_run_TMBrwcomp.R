@@ -17,7 +17,7 @@ simPars <- read.csv("data/generic/SimPars.csv")
   
 tst<-tmb_func_rw_comp(path=".",
   a=2,
-  u=500)
+  u=495)
 
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
