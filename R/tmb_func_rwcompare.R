@@ -56,7 +56,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001,useEDF=FALSE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
@@ -64,7 +64,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001,useEDF=TRUE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
@@ -72,7 +72,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001,useEDF=FALSE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
@@ -80,7 +80,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001,useEDF=TRUE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
@@ -88,7 +88,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001, useEDF=FALSE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
@@ -96,7 +96,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001, useEDF=TRUE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
@@ -104,7 +104,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001, useEDF=FALSE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
@@ -112,7 +112,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
                    deltaEDF=0.0001, useEDF=TRUE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
@@ -429,9 +429,9 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                               ifelse(is.null(ptvb$fail_conv), ptvbc$AICc, NA),
                               ifelse(is.null(ptvb$fail_conv), ptvbcEDF$AICc, NA),
                               ifelse(is.null(ptvab$fail_conv), ptvab$AICc, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabEDF$AICc, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabc$AICc, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabcEDF$AICc, NA)),
+                              ifelse(is.null(ptvabEDF$fail_conv), ptvabEDF$AICc, NA),
+                              ifelse(is.null(ptvabc$fail_conv), ptvabc$AICc, NA),
+                              ifelse(is.null(ptvabcEDF$fail_conv), ptvabcEDF$AICc, NA)),
                        convergence=c(ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
                               ifelse(is.null(ptvaEDF$fail_conv), ptvaEDF$model$convergence, ptvaEDF$fail_conv),
                               ifelse(is.null(ptvac$fail_conv), ptvac$model$convergence, ptvac$fail_conv),
@@ -481,9 +481,9 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                               ifelse(is.null(ptvb$fail_conv), ptvbc$BIC, NA),
                               ifelse(is.null(ptvb$fail_conv), ptvbcEDF$BIC, NA),
                               ifelse(is.null(ptvab$fail_conv), ptvab$BIC, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabEDF$BIC, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabc$BIC, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabcEDF$BIC, NA)),
+                              ifelse(is.null(ptvabEDF$fail_conv), ptvabEDF$BIC, NA),
+                              ifelse(is.null(ptvabc$fail_conv), ptvabc$BIC, NA),
+                              ifelse(is.null(ptvabcEDF$fail_conv), ptvabcEDF$BIC, NA)),
                        convergence=c(ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
                               ifelse(is.null(ptvaEDF$fail_conv), ptvaEDF$model$convergence, ptvaEDF$fail_conv),
                               ifelse(is.null(ptvac$fail_conv), ptvac$model$convergence, ptvac$fail_conv),
@@ -536,9 +536,9 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                               ifelse(is.null(ptvb$fail_conv), 4, NA),
                               ifelse(is.null(ptvb$fail_conv), ptvbcEDF$EDF, NA),
                               ifelse(is.null(ptvab$fail_conv), 5, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabEDF$EDF, NA),
-                              ifelse(is.null(ptvab$fail_conv), 5, NA),
-                              ifelse(is.null(ptvab$fail_conv), ptvabcEDF$EDF, NA)),
+                              ifelse(is.null(ptvabEDF$fail_conv), ptvabEDF$EDF, NA),
+                              ifelse(is.null(ptvabc$fail_conv), 5, NA),
+                              ifelse(is.null(ptvabcEDF$fail_conv), ptvabcEDF$EDF, NA)),
                        convergence=c(ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
                               ifelse(is.null(ptvaEDF$fail_conv), ptvaEDF$model$convergence, ptvaEDF$fail_conv),
                               ifelse(is.null(ptvac$fail_conv), ptvac$model$convergence, ptvac$fail_conv),
