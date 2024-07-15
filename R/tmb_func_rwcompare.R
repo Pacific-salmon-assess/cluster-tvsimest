@@ -22,93 +22,95 @@ tmb_func_rw_comp <- function(path=".",a, u) {
   logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
   
 
-  ptva <-tryCatch({ ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
-                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=FALSE)},
+  ptva <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=FALSE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvaEDF <-tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
-                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=TRUE)},
+  ptvaEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=TRUE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvac <-tryCatch({ricker_rw_TMB_centered(data=df,tv.par='a',sig_p_sd=1,
+  ptvac <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df,tv.par='a',sig_p_sd=1,
                     logb_p_mean=logbeta_pr, logb_p_sd=logbeta_pr_sig,   
-                     deltaEDF=0.0001,useEDF=FALSE)},
+                     deltaEDF=0.0001,useEDF=FALSE))},
                                   error=function(cond){
-                                    message(cond)
+                                    print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvacEDF <-tryCatch({ricker_rw_TMB_centered(data=df,tv.par='a',sig_p_sd=1,
+  ptvacEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df,tv.par='a',sig_p_sd=1,
                     logb_p_mean=logbeta_pr, logb_p_sd=logbeta_pr_sig,   
-                     deltaEDF=0.0001,useEDF=TRUE)},
+                     deltaEDF=0.0001,useEDF=TRUE))},
+                                  error=function(cond){
+                                    print(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  ptvb <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
+                   deltaEDF=0.0001,useEDF=FALSE))},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvb <-tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
+  ptvbEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=FALSE)},
+                   deltaEDF=0.0001,useEDF=TRUE))},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvbEDF <-tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
+  ptvbc <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=TRUE)},
-                                  error=function(cond){
-                                    message(cond)
-                                    return(list(fail_conv=1,
-                                      conv_problem=1))})
-
-  ptvbc <-tryCatch({ricker_rw_TMB_centered(data=df, tv.par='b',sigb_p_sd=1,
-                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=FALSE)},
+                   deltaEDF=0.0001,useEDF=FALSE))},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
-  ptvbcEDF <-tryCatch({ricker_rw_TMB_centered(data=df, tv.par='b',sigb_p_sd=1,
+  ptvbcEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=TRUE)},
+                   deltaEDF=0.0001,useEDF=TRUE))},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
-  ptvab <-tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
-                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
-                                  error=function(cond){
-                                    message(cond)
-                                    return(list(fail_conv=1,
-                                      conv_problem=1))})
-
-  ptvabEDF <-tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
+  ptvab <- tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001, useEDF=TRUE)},
+                   deltaEDF=0.0001, useEDF=FALSE))},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvabc <-tryCatch({ricker_rw_TMB_centered(data=df, tv.par='both',sigb_p_sd=.4,
-                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
-                                  error=function(cond){
-                                    message(cond)
-                                    return(list(fail_conv=1,
-                                      conv_problem=1))})
-
-  ptvabcEDF <-tryCatch({ricker_rw_TMB_centered(data=df, tv.par='both',sigb_p_sd=.4,
+  ptvabEDF <- tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001, useEDF=TRUE)},
+                   deltaEDF=0.0001, useEDF=TRUE))},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  ptvabc <- tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='both',sigb_p_sd=.4,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
+                   deltaEDF=0.0001, useEDF=FALSE))},
+                                  error=function(cond){
+                                    message(cond)
+                                    return(list(fail_conv=1,
+                                      conv_problem=1))})
+
+  ptvabcEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='both',sigb_p_sd=.4,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
+                   deltaEDF=0.0001, useEDF=TRUE))},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
