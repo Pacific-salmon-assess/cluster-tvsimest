@@ -23,14 +23,14 @@ tmb_func_rw_comp <- function(path=".",a, u) {
   
 
   ptva <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
-                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=FALSE))},
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=FALSE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
   ptvaEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
-                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=TRUE))},
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001,useEDF=TRUE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
