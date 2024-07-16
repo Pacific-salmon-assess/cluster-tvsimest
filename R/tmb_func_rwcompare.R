@@ -38,7 +38,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvac <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df,tv.par='a',sig_p_sd=1,
                     logb_p_mean=logbeta_pr, logb_p_sd=logbeta_pr_sig,   
-                     deltaEDF=0.0001,useEDF=FALSE))},
+                     deltaEDF=0.0001,useEDF=FALSE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -46,7 +46,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvacEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df,tv.par='a',sig_p_sd=1,
                     logb_p_mean=logbeta_pr, logb_p_sd=logbeta_pr_sig,   
-                     deltaEDF=0.0001,useEDF=TRUE))},
+                     deltaEDF=0.0001,useEDF=TRUE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -54,7 +54,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvb <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=FALSE))},
+                   deltaEDF=0.0001,useEDF=FALSE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -62,7 +62,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvbEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=TRUE))},
+                   deltaEDF=0.0001,useEDF=TRUE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -70,7 +70,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvbc <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=FALSE))},
+                   deltaEDF=0.0001,useEDF=FALSE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -78,7 +78,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
   
   ptvbcEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001,useEDF=TRUE))},
+                   deltaEDF=0.0001,useEDF=TRUE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -86,7 +86,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
   
   ptvab <- tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001, useEDF=FALSE))},
+                   deltaEDF=0.0001, useEDF=FALSE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -94,7 +94,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvabEDF <- tryCatch(expr= { suppressMessages(ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001, useEDF=TRUE))},
+                   deltaEDF=0.0001, useEDF=TRUE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -102,7 +102,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvabc <- tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001, useEDF=FALSE))},
+                   deltaEDF=0.0001, useEDF=FALSE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -110,7 +110,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
 
   ptvabcEDF <-tryCatch(expr= { suppressMessages(ricker_rw_TMB_centered(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, 
-                   deltaEDF=0.0001, useEDF=TRUE))},
+                   deltaEDF=0.0001, useEDF=TRUE, silent=TRUE))},
                                   error=function(cond){
                                     print(cond)
                                     return(list(fail_conv=1,
@@ -461,6 +461,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                     ptvabcEDF$conv_problem),
                        pbias=rep(NA,12),
                        bias=rep(NA,12))
+    print("end AIC df")
     #BIC
     dfbic<- data.frame(parameter="BIC",
                        iteration=u,
@@ -514,7 +515,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                        pbias=rep(NA,12),
                        bias=rep(NA,12))
                                  
-
+     print("end BIC df")
      #EDF
     
     dfedf<- data.frame(parameter="EDF",
@@ -568,7 +569,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
                               ptvabcEDF$conv_problem),
                        pbias=rep(NA,12),
                        bias=rep(NA,12))
-
+      print("end edf df")
 
       dfgrad_i<- data.frame(parameter="grad_i",
               iteration=u,
@@ -603,7 +604,7 @@ tmb_func_rw_comp <- function(path=".",a, u) {
               pbias=rep(NA,12),
               bias=rep(NA,12))
     
-  
+      print("end grad df")
 
   
   
