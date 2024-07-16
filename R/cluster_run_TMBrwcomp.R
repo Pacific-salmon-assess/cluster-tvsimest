@@ -15,10 +15,10 @@ simPars <- read.csv("data/generic/SimPars.csv")
 #  a=5,
 #  u=1)
   
-tst3<-tmb_func_rw_comp(path=".",
-  a=1,
-  u=549)
-tst3
+tst2<-tmb_func_rw_comp(path=".",
+  a=3,
+  u=141)
+tst2
 
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
