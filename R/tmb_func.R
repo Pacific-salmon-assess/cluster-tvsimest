@@ -80,7 +80,7 @@ tmb_func <- function(path=".",a, u) {
                                     return(list(fail_conv=1,
                                       conv_problem=1))} )
   
-  dfa<- data.frame(parameter="alpha",
+  dfa<- data.frame(parameter="logalpha",
               iteration=u,
               scenario= simPars$scenario[a],
               method=rep(c(rep("MLE",8)),each=nrow(df)),
@@ -91,14 +91,14 @@ tmb_func <- function(path=".",a, u) {
               by=rep(dat$year,8),
               sim=rep(dat$alpha,8),
               median=NA,
-              mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$alpha}, nrow(df)),
-                    rep(if(!is.null(pac$fail_conv)){NA}else{pac$alpha}, nrow(df)),
-                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$alpha},
-                    rep(if(!is.null(ptvb$fail_conv)){NA}else{ptvb$alpha}, nrow(df)),
-                    if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$alpha},
-                    if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$alpha[phmma$regime]},
-                    rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$alpha}, nrow(df)),
-                    if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$alpha[phmm$regime]}), 
+              mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$logalpha}, nrow(df)),
+                    rep(if(!is.null(pac$fail_conv)){NA}else{pac$logalpha}, nrow(df)),
+                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$logalpha},
+                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptvb$logalpha},
+                    if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$logalpha},
+                    if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$logalpha[phmma$regime]},
+                    rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$logalpha}, nrow(df)),
+                    if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$logalpha[phmm$regime]}), 
               convergence=rep(c(ifelse(is.null(p$fail_conv),p$model$convergence, p$fail_conv),
                     ifelse(is.null(pac$fail_conv), pac$model$convergence, pac$fail_conv),
                     ifelse(is.null(ptva$fail_conv), ptva$model$convergence, ptva$fail_conv),
@@ -108,14 +108,13 @@ tmb_func <- function(path=".",a, u) {
                     ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
                     ifelse(is.null(phmm$fail_conv), phmm$model$convergence,phmm$fail_conv)
                     ),each=nrow(df)),
-              conv_warning=rep(c( 
-                     p$conv_problem,
-                     pac$conv_problem,
+              conv_warning=rep(c( p$conv_problem,
+                    pac$conv_problem,
                     ptva$conv_problem,
                     ptvb$conv_problem,
                     ptvab$conv_problem,
-                     phmma$conv_problem,
-                     phmmb$conv_problem,
+                    phmma$conv_problem,
+                    phmmb$conv_problem,
                     phmm$conv_problem
                     ),each=nrow(df)))
                     
@@ -123,7 +122,7 @@ tmb_func <- function(path=".",a, u) {
   dfa$bias <- (dfa$mode-dfa$sim)
   
   #Smax
-  dfsmax<- data.frame(parameter="Smax",
+  dfsmax <- data.frame(parameter="Smax",
       iteration=u,
       scenario= simPars$scenario[a],
       method=rep(c(rep("MLE",8)),each=nrow(df)),
@@ -136,7 +135,7 @@ tmb_func <- function(path=".",a, u) {
       median=NA,
       mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$Smax}, nrow(df)),
         rep(if(!is.null(pac$fail_conv)){NA}else{pac$Smax}, nrow(df)),
-        rep(if(!is.null(ptva$fail_conv)){NA}else{ptva$Smax}, nrow(df)),
+        if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptva$Smax},
         if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$Smax},
         if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$Smax},
         rep(if(!is.null(phmma$fail_conv)){NA}else{phmma$Smax}, nrow(df)),
@@ -373,7 +372,7 @@ tmb_func <- function(path=".",a, u) {
     mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$umsy}, nrow(df)),
                     rep(if(!is.null(pac$fail_conv)){NA}else{pac$umsy}, nrow(df)),
                     if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$umsy},
-                    rep(if(!is.null(ptvb$fail_conv)){NA}else{ptvb$umsy}, nrow(df)),
+                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptvb$umsy},
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$umsy},
                     if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$umsy[phmma$regime]},
                     rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$umsy}, nrow(df)),
@@ -400,8 +399,7 @@ tmb_func <- function(path=".",a, u) {
     dfumsy$pbias<- ((dfumsy$mode-dfumsy$sim)/dfumsy$sim)*100
     dfumsy$bias<- (dfumsy$mode-dfumsy$sim)
 
-
-     #AIC
+    #AIC
     dfaic<- data.frame(parameter="AIC",
                        iteration=u,
                        scenario= simPars$scenario[a],
