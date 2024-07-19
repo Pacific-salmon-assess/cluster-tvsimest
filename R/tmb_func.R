@@ -1,7 +1,7 @@
 
 tmb_func <- function(path=".",a, u) {
   
-  
+  print(paste("a is ",a,"u is ",u))
   simData <- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
                          paste(simPars$nameOM[a],"_", simPars$nameMP[a], "_", "CUsrDat.RData",sep="")))$srDatout
 
@@ -18,69 +18,68 @@ tmb_func <- function(path=".",a, u) {
   Smax_mean<-(max(df$S)*.5)
   Smax_sd<-Smax_mean
  
-  logbeta_pr_sig=sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
-  logbeta_pr=log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
+  logbeta_pr_sig = sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
+  logbeta_pr = log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
   
-  dirpr<-matrix(c(2,1,1,2),2,2)
+  dirpr <- matrix(c(2,1,1,2),2,2)
 
- 
 
-  p <-tryCatch({ ricker_TMB(data=df,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  p <- tryCatch({ ricker_TMB(data=df,logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  pac <-tryCatch({ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,
-                 logb_p_sd=logbeta_pr_sig)},
+  pac <- tryCatch({ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,
+                 logb_p_sd=logbeta_pr_sig, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptva <-tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
-                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
+  ptva <- tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
+                  logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  ptvb <-tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
-                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
+  ptvb <- tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
   
-  ptvab <-tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
-                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001)},
+  ptvab <- tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  phmma <-tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,
-                  logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  phmma <- tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,
+                  logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  phmmb <-tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,
-                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  phmmb <- tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,
+                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
-  phmm<-tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,
-                  logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig)},
+  phmm <- tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,
+                  logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))} )
   
-  dfa<- data.frame(parameter="logalpha",
+  dfa <- data.frame(parameter="logalpha",
               iteration=u,
               scenario= simPars$scenario[a],
               method=rep(c(rep("MLE",8)),each=nrow(df)),
@@ -94,7 +93,7 @@ tmb_func <- function(path=".",a, u) {
               mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$logalpha}, nrow(df)),
                     rep(if(!is.null(pac$fail_conv)){NA}else{pac$logalpha}, nrow(df)),
                     if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$logalpha},
-                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptvb$logalpha},
+                    if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$logalpha},
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$logalpha},
                     if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$logalpha[phmma$regime]},
                     rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$logalpha}, nrow(df)),
@@ -372,7 +371,7 @@ tmb_func <- function(path=".",a, u) {
     mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$umsy}, nrow(df)),
                     rep(if(!is.null(pac$fail_conv)){NA}else{pac$umsy}, nrow(df)),
                     if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$umsy},
-                    if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptvb$umsy},
+                    if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$umsy},
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$umsy},
                     if(!is.null(phmma$fail_conv)){rep(NA, nrow(df))}else{phmma$umsy[phmma$regime]},
                     rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$umsy}, nrow(df)),
