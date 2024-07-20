@@ -134,7 +134,7 @@ tmb_func <- function(path=".",a, u) {
       median=NA,
       mode=c(rep(if(!is.null(p$fail_conv)){NA}else{p$Smax}, nrow(df)),
         rep(if(!is.null(pac$fail_conv)){NA}else{pac$Smax}, nrow(df)),
-        if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptva$Smax},
+        if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$Smax},
         if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$Smax},
         if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$Smax},
         rep(if(!is.null(phmma$fail_conv)){NA}else{phmma$Smax}, nrow(df)),

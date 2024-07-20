@@ -14,10 +14,10 @@ simPars <- read.csv("data/generic/SimPars.csv")
 #tst<-tmb_func(path="/fs/vnas_Hdfo/comda/caw001/Documents/tvsimest/cluster-tvsimest",
 #  a=5,
 #  u=1)
-  for(u in 737:688){
-tst<-tmb_func(path=".",
+  
+tst1<-tmb_func(path=".",
   a=3,
-  u=216)}
+  u=696)
 
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
