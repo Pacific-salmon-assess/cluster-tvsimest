@@ -218,7 +218,7 @@ pars_smax<-data.frame(path="..",
 sjobtmb_smax <- slurm_apply(tmb_func, pars_smax, jobname = 'TMBrun_smax',
                     nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/pfmln/results/cluster-tvsimest",
+                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
@@ -229,6 +229,8 @@ res_smax <- get_slurm_out(sjobtmb_smax, outtype = 'table', wait = TRUE)
 saveRDS(res_smax[res_smax$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "res_smax1.rds")
 saveRDS(res_smax[res_smax$scenario%in%simPars$scenario[floor(nrow(simPars)/2+1):nrow(simPars)],], file = "res_smax2.rds")
 saveRDS(res_smax, file = "res_smax.rds")
+
+
 
 #============================================================================
 #smax scenarios double alpha
@@ -290,19 +292,16 @@ pars_siglow<-data.frame(path="..",
 
 
 sjobtmb_siglow <- slurm_apply(tmb_func, pars_siglow, jobname = 'TMBrun_siglow',
-                    nodes = 250, cpus_per_node = 1, submit = FALSE,
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/pfmln/results/cluster-tvsimest",
+                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 
-
-
 res_siglow <- get_slurm_out(sjobtmb_siglow, outtype = 'table', wait = TRUE)
 
-round(nrow(simPars)/2)
-round(nrow(simPars)/2)+1
+
 
 saveRDS(res_siglow[res_siglow$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "res_siglow1.rds")
 saveRDS(res_siglow[res_siglow$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_siglow2.rds")
@@ -327,9 +326,9 @@ pars_sigmed<-data.frame(path="..",
 
 
 sjobtmb_sigmed <- slurm_apply(tmb_func, pars_sigmed, jobname = 'TMBrun_sigmed',
-                    nodes = 250, cpus_per_node = 1, submit = FALSE,
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/pfmln/results/cluster-tvsimest",
+                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
                     libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
@@ -342,21 +341,6 @@ res_sigmed <- get_slurm_out(sjobtmb_sigmed, outtype = 'table', wait = TRUE)
 saveRDS(res_sigmed[res_sigmed$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "res_sigmed1.rds")
 saveRDS(res_sigmed[res_sigmed$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_sigmed2.rds")
 saveRDS(res_sigmed, file = "res_sigmed.rds")
-
-
-#The following files are missing: results_73.RDS
-.rslurm_id <- 227
-.rslurm_istart <- (.rslurm_id)* 36 + 1
-.rslurm_iend <- min((.rslurm_id + 1) * 36, nrow(pars_sigmed))
-rslurm_res_sigmed227<-list()
-for(i in (.rslurm_istart):(.rslurm_iend)){
-   rslurm_res_sigmed227[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
-  a=pars_sigmed$a[i],
-  u=pars_sigmed$u[i])
-}
-result_sigmed_227<-do.call(rbind, rslurm_res_sigmed227)
-saveRDS(result_sigmed_227, file = "res_sigmed_227.rds")
-saveRDS(result_sigmed_227, file = "C:/Users/worc/Documents/timevar/simest-tv/outs/simest/sigmamed_sensitivity/res_sigmed_227.rds")
 
 
 
@@ -375,10 +359,10 @@ pars_ER<-data.frame(path="..",
 
 
 sjobtmb_er <- slurm_apply(tmb_func, pars_ER, jobname = 'TMBrun_ER',
-                    nodes = 250, cpus_per_node = 1, submit = FALSE,
+                    nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/caw001/Documents/cluster-tvsimest",
-                    libPaths="/gpfs/fs7/dfo/hpcmc/comda/caw001/Rlib/4.1",
+                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
                     global_objects=c("simPars"))
 
 
@@ -386,32 +370,18 @@ sjobtmb_er <- slurm_apply(tmb_func, pars_ER, jobname = 'TMBrun_ER',
 
 res_er <- get_slurm_out(sjobtmb_er, outtype = 'table', wait = TRUE)
 
+
+
+saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "res_er1.rds")
+saveRDS(res_er[res_er$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_er2.rds")
+saveRDS(res_er, file = "res_er.rds")
+
+
 seq1<-seq_len(round(nrow(simPars)/4))
 seq2<-(round(nrow(simPars)/4)+1):round(nrow(simPars)/2)
 seq3<-(round(nrow(simPars)/2)+1):(round(nrow(simPars)/2)+round(nrow(simPars)/4))
 seq4<-(round(nrow(simPars)/2)+round(nrow(simPars)/4)+1):nrow(simPars)
 
 
-saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq_len(round(nrow(simPars)/2))],], file = "res_er1.rds")
-saveRDS(res_er[res_er$scenario%in%simPars$scenario[(round(nrow(simPars)/2)+1):nrow(simPars)],], file = "res_er2.rds")
-
-saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq1],], file = "res_erq1.rds")
-saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq2],], file = "res_erq2.rds")
-saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq3],], file = "res_erq3.rds")
-saveRDS(res_er[res_er$scenario%in%simPars$scenario[seq4],], file = "res_erq4.rds")
-
-saveRDS(res_er, file = "res_er.rds")
 
 
-
-.rslurm_id <- 138
-.rslurm_istart <- (.rslurm_id)* 48 + 1
-.rslurm_iend <- min((.rslurm_id + 1) * 48, nrow(pars_ER))
-rslurm_res_ER138<-list()
-for(i in (.rslurm_istart):(.rslurm_iend)){
-   rslurm_res_ER138[[i-(.rslurm_istart-1)]]<-tmb_func(path=".",
-  a=pars_ER$a[i],
-  u=pars_ER$u[i])
-}
-result_ER_138<-do.call(rbind, rslurm_res_ER138)
-saveRDS(result_ER_138, file = "C:/Users/worc/Documents/timevar/simest-tv/outs/simest/genericER/result_ER_138.rds")
