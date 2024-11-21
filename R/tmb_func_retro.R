@@ -102,7 +102,7 @@ tmb_func_retro <- function(path=".",a, u, minyr=10) {
               by=rep(dat$year[1:i],7),
               sim=rep(dat$alpha[1:i],7),
               median=NA,
-              mode=c(if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{pac$logalpha}
+              mode=c(if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{pac$logalpha},
                     if(!is.null(ptva$fail_conv)){rep(NA, nrow(dfset))}else{ptva$logalpha},
                     if(!is.null(ptvb$fail_conv)){rep(NA, nrow(dfset))}else{ptvb$logalpha},
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(dfset))}else{ptvab$logalpha},
