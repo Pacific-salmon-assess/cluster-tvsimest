@@ -102,7 +102,7 @@ tmb_func_retro <- function(path=".",a, u, minyr=10) {
               by=rep(dat$year[1:i],7),
               sim=rep(dat$alpha[1:i],7),
               median=NA,
-              mode=c(if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{pac$logalpha},
+              mode=c(if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{rep(pac$logalpha, nrow(dfset))},
                     if(!is.null(ptva$fail_conv)){rep(NA, nrow(dfset))}else{ptva$logalpha},
                     if(!is.null(ptvb$fail_conv)){rep(NA, nrow(dfset))}else{ptvb$logalpha},
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(dfset))}else{ptvab$logalpha},
@@ -143,7 +143,7 @@ tmb_func_retro <- function(path=".",a, u, minyr=10) {
       sim=rep(1/dat$beta[1:i],7),
       median=NA,
       mode=c(
-        if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{pac$Smax},
+        if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{rep(pac$Smax, nrow(dfset))},
         if(!is.null(ptva$fail_conv)){rep(NA, nrow(dfset))}else{ptva$Smax},
         if(!is.null(ptvb$fail_conv)){rep(NA, nrow(dfset))}else{ptvb$Smax},
         if(!is.null(ptvab$fail_conv)){rep(NA, nrow(dfset))}else{ptvab$Smax},
@@ -187,7 +187,7 @@ tmb_func_retro <- function(path=".",a, u, minyr=10) {
       sim=rep(smsysim[1:i],7),
       median=NA,
       mode=c(
-        if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{pac$Smsy},
+        if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{rep(pac$Smsy, nrow(dfset))},
         if(!is.null(ptva$fail_conv)){rep(NA, nrow(dfset))}else{ptva$Smsy},
         if(!is.null(ptvb$fail_conv)){rep(NA, nrow(dfset))}else{ptvb$Smsy},
         if(!is.null(ptvab$fail_conv)){rep(NA, nrow(dfset))}else{ptvab$Smsy},
@@ -292,7 +292,7 @@ tmb_func_retro <- function(path=".",a, u, minyr=10) {
     sim=rep(umsyCalc(dat$alpha)[1:i],7),
     median=NA,
     mode=c(
-      if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{pac$umsy},
+      if(!is.null(pac$fail_conv)){rep(NA, nrow(dfset))}else{rep(pac$umsy,nrow(dfset))},
       if(!is.null(ptva$fail_conv)){rep(NA, nrow(dfset))}else{ptva$umsy},
                     if(!is.null(ptvb$fail_conv)){rep(NA, nrow(dfset))}else{ptvb$umsy},
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(dfset))}else{ptvab$umsy},
