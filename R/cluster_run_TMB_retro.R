@@ -11,10 +11,12 @@ simPars <- read.csv("data/generic/SimPars.csv")
 
 regimescn<-which(simPars$scenario%in%c("regimeProd","shiftProd","regimeCap","shiftCap","regimeProdCap","decLinearProdshiftCap"))
 
+test<- tmb_func_retro(path=".",
+  a=regimescn[2],
+  u=5)
+
+
   
-tst1 <- tmb_func_retro(path=".",
-  a=regimescn[1],
-  u=696)
 
 pars<-data.frame(path="..",
   a=rep(regimescn,each=1000),
@@ -22,16 +24,19 @@ pars<-data.frame(path="..",
 
 
 sjobtmb <- slurm_apply(tmb_func_retro, pars, jobname = 'TMBrun_retro',
-                    nodes = 300, cpus_per_node = 1, submit = FALSE,
+                    nodes = 18, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
-                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
+                    rscript_path = "/gpfs/fs7/dfo/hpcmc/pfm/dag004/results/cluster-tvsimest/",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/dag004/Rlib/4.1/",
                     global_objects=c("simPars"))
 
+save.image(file = "sj.RData")
+q()
 
-
+load("sj.RData")
+library(rslurm)
 res <- get_slurm_out(sjobtmb, outtype = 'table', wait = TRUE)
-
+saveRDS(res, file = "res_retro.rds")
 #res <- my_get_slurm_out(slr_job_name='TMBrun', nodes.list=0:39, outtype = 'table')
 
 
