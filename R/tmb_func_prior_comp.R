@@ -1,5 +1,7 @@
 
 tmb_func_prior_comp <- function(path=".",a, u) {
+
+  .libPaths()
   
   print(paste("a is ",a,"u is ",u))
   simData <- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
