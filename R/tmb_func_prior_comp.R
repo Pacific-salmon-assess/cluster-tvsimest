@@ -1,7 +1,7 @@
 
 tmb_func_prior_comp <- function(path=".",a, u) {
 
-  .libPaths()
+  #.libPaths()
   
   print(paste("a is ",a,"u is ",u))
   simData <- readRDS(paste0(path,"/outs/SamSimOutputs/simData/", simPars$nameOM[a],"/",simPars$scenario[a],"/",
@@ -31,12 +31,14 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(p$beta<=0){p<-list(fail_conv=1,conv_problem=1)}
 
   p2 <- tryCatch({ ricker_TMB(data=df, priors_flag=0, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(p2$beta<=0){p2 <-list(fail_conv=1,conv_problem=1)}
 
   pac <- tryCatch({ricker_TMB(data=df, AC=TRUE,logb_p_mean=logbeta_pr,
                  logb_p_sd=logbeta_pr_sig, silent=TRUE)},
@@ -44,12 +46,14 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(pac$beta<=0){pac <-list(fail_conv=1,conv_problem=1)}
 
   pac2 <- tryCatch({ricker_TMB(data=df, AC=TRUE, priors_flag=0, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(pac2$beta<=0){pac2 <-list(fail_conv=1,conv_problem=1)}
 
   ptva <- tryCatch({ricker_rw_TMB(data=df,tv.par='a',logb_p_mean=logbeta_pr,
                   logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)},
@@ -57,12 +61,14 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(ptva$beta)<=0){ptva <-list(fail_conv=1,conv_problem=1)}
 
   ptva2 <- tryCatch({ricker_rw_TMB(data=df,tv.par='a', priors_flag=0, deltaEDF=0.0001, silent=TRUE)},
                                   error=function(cond){
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(ptva2$beta)<=0){ptva2 <-list(fail_conv=1,conv_problem=1)}
 
   ptvb <- tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)},
@@ -70,6 +76,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(ptvb$beta)<=0){ptvb <-list(fail_conv=1,conv_problem=1)}
 
   ptvb2 <- tryCatch({ricker_rw_TMB(data=df, tv.par='b',sigb_p_sd=1,
                     priors_flag=0, deltaEDF=0.0001, silent=TRUE)},
@@ -77,6 +84,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(ptvb2$beta)<=0){ptvb2 <-list(fail_conv=1,conv_problem=1)}
   
   ptvab <- tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)},
@@ -84,6 +92,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(ptvab$beta)<=0){ptvab <-list(fail_conv=1,conv_problem=1)}
 
   ptvab2 <- tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    priors_flag=0, deltaEDF=0.0001, silent=TRUE)},
@@ -91,6 +100,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(ptvab2$beta)<=0){ptvab2 <-list(fail_conv=1,conv_problem=1)}
 
   phmma <- tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,
                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
@@ -98,6 +108,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(phmma$beta<=0){phmma <-list(fail_conv=1,conv_problem=1)}
 
   phmma2 <- tryCatch({ricker_hmm_TMB(data=df, tv.par='a', dirichlet_prior=dirpr,
                   priors_flag=0, silent=TRUE)},
@@ -105,6 +116,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(phmma2$beta<=0){phmma2 <-list(fail_conv=1,conv_problem=1)}
 
   phmmb <- tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,
                     logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
@@ -112,6 +124,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(phmmb$beta)<=0){phmmb <-list(fail_conv=1,conv_problem=1)}
 
   phmmb2 <- tryCatch({ricker_hmm_TMB(data=df, tv.par='b', dirichlet_prior=dirpr,
                     priors_flag=0, silent=TRUE)},
@@ -119,6 +132,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
+  if(sum(phmmb2$beta)<=0){ phmmb2 <-list(fail_conv=1,conv_problem=1)}
 
   phmm <- tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,
                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, silent=TRUE)},
@@ -126,6 +140,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))} )
+  if(sum(phmm$beta)<=0){ phmm <-list(fail_conv=1,conv_problem=1)}
 
   phmm2 <- tryCatch({ricker_hmm_TMB(data=df, tv.par='both', dirichlet_prior=dirpr,
                   priors_flag=0, silent=TRUE)},
@@ -133,6 +148,7 @@ tmb_func_prior_comp <- function(path=".",a, u) {
                                     message(cond)
                                     return(list(fail_conv=1,
                                       conv_problem=1))} )
+  if(sum(phmm2$beta)<=0){ phmm2 <-list(fail_conv=1,conv_problem=1)}
   
   dfa <- data.frame(parameter="logalpha",
               iteration=u,
