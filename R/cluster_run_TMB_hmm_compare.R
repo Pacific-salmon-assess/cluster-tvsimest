@@ -26,6 +26,7 @@ tst1<-tmb_func_comp_hmm(path=".",
   a=3,
   u=696)
 
+
 pars<-data.frame(path="..",
   a=rep(seq_len(nrow(simPars)),each=1000),
   u=1:1000)

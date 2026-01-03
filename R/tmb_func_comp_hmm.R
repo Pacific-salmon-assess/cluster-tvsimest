@@ -20,6 +20,7 @@ tmb_func_comp_hmm <- function(path=".",a, u) {
  
   logbeta_pr_sig = sqrt(log(1+((1/ Smax_sd)*(1/ Smax_sd))/((1/Smax_mean)*(1/Smax_mean))))
   logbeta_pr = log(1/(Smax_mean))-0.5*logbeta_pr_sig^2
+
   
   dirpr <- matrix(c(2,1,1,2),2,2)
 
@@ -78,7 +79,8 @@ tmb_func_comp_hmm <- function(path=".",a, u) {
               by=rep(dat$year,6),
               sim=rep(dat$alpha,6),
               median=NA,
-              mode=c(rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$logalpha}, nrow(df)),
+              mode=c(if(!is.null(phmm2$fail_conv)){rep(NA, nrow(df))}else{phmma$logalpha[phmma$regime]},
+                   rep(if(!is.null(phmmb$fail_conv)){NA}else{phmmb$logalpha}, nrow(df)),
                     if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$logalpha[phmm$regime]},
                    if(!is.null(phmma2$fail_conv)){rep(NA, nrow(df))}else{phmma2$logalpha[phmma2$regime]},
                     rep(if(!is.null(phmmb2$fail_conv)){NA}else{phmmb2$logalpha}, nrow(df)),
@@ -112,10 +114,11 @@ tmb_func_comp_hmm <- function(path=".",a, u) {
       by=rep(dat$year,6),
       sim=rep(1/dat$beta,6),
       median=NA,
-      mode=c(rep(if(!is.null(phmma$fail_conv)){NA}else{phmma$Smax}, nrow(df)),
+      mode=c(
+        rep(if(!is.null(phmma$fail_conv)){NA}else{phmma$Smax}, nrow(df)),
         if(!is.null(phmmb$fail_conv)){rep(NA, nrow(df))}else{phmmb$Smax[phmmb$regime]},
         if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$Smax[phmm$regime]},
-      rep(if(!is.null(phmma2$fail_conv)){NA}else{phmma2$Smax}, nrow(df)),
+        rep(if(!is.null(phmma2$fail_conv)){NA}else{phmma2$Smax}, nrow(df)),
         if(!is.null(phmmb2$fail_conv)){rep(NA, nrow(df))}else{phmmb2$Smax[phmmb2$regime]},
         if(!is.null(phmm2$fail_conv)){rep(NA, nrow(df))}else{phmm2$Smax[phmm2$regime]}
       ),
@@ -190,7 +193,7 @@ tmb_func_comp_hmm <- function(path=".",a, u) {
         if(!is.null(phmm$fail_conv)){rep(NA, nrow(df))}else{phmm$Smsy[phmm$regime]},
         if(!is.null(phmma2$fail_conv)){rep(NA, nrow(df))}else{phmma2$Smsy[phmma2$regime]},
         if(!is.null(phmmb2$fail_conv)){rep(NA, nrow(df))}else{phmmb2$Smsy[phmmb2$regime]},
-        if(!is.null(phmm2$fail_conv)){rep(NA, nrow(df))}else{phmm2$Smsy[phmm2$regime]},
+        if(!is.null(phmm2$fail_conv)){rep(NA, nrow(df))}else{phmm2$Smsy[phmm2$regime]}
       ),    
         convergence=rep(c(ifelse(is.null(phmma$fail_conv), phmma$model$convergence, phmma$fail_conv),
                     ifelse(is.null(phmmb$fail_conv), phmmb$model$convergence, phmmb$fail_conv),
@@ -219,30 +222,30 @@ tmb_func_comp_hmm <- function(path=".",a, u) {
     model=rep(c("hmma","hmmb","hmmab",
       "hmma2","hmmb2","hmmab2"),each=nrow(df)),
     by=rep(dat$year,6),
-    sim=rep(unlist(mapply(sGenCalc,a=dat$alpha,Smsy=smsysim, b=dat$beta)),6),
+    sim=rep(unlist(mapply(sGenCalc,loga=dat$alpha,Smsy=smsysim, b=dat$beta)),6),
     median=NA,
     mode=c(
-      if(is.null(phmma$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmma"&dfa$method=="MLE"],
+      if(is.null(phmma$fail_conv)){unlist(mapply(sGenCalc,loga=dfa$mode[dfa$model=="hmma"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmma"&dfsmsy$method=="MLE"], 
           b=1/dfsmax$mode[dfsmax$model=="hmma"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
 
-       if(is.null(phmmb$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmb"&dfa$method=="MLE"],
+       if(is.null(phmmb$fail_conv)){unlist(mapply(sGenCalc,loga=dfa$mode[dfa$model=="hmmb"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmb"&dfsmsy$method=="MLE"],
            b=1/dfsmax$mode[dfsmax$model=="hmmb"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
 
-       if(is.null(phmm$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmab"&dfa$method=="MLE"],
+       if(is.null(phmm$fail_conv)){unlist(mapply(sGenCalc,loga=dfa$mode[dfa$model=="hmmab"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmab"&dfsmsy$method=="MLE"], 
           b=1/dfsmax$mode[dfsmax$model=="hmmab"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
 
-       if(is.null(phmma2$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmma2"&dfa$method=="MLE"],
+       if(is.null(phmma2$fail_conv)){unlist(mapply(sGenCalc,loga=dfa$mode[dfa$model=="hmma2"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmma2"&dfsmsy$method=="MLE"], 
           b=1/dfsmax$mode[dfsmax$model=="hmma2"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
 
-       if(is.null(phmmb2$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmb2"&dfa$method=="MLE"],
+       if(is.null(phmmb2$fail_conv)){unlist(mapply(sGenCalc,loga=dfa$mode[dfa$model=="hmmb2"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmb2"&dfsmsy$method=="MLE"],
            b=1/dfsmax$mode[dfsmax$model=="hmmb2"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))},
 
-       if(is.null(phmm2$fail_conv)){unlist(mapply(sGenCalc,a=dfa$mode[dfa$model=="hmmab2"&dfa$method=="MLE"],
+       if(is.null(phmm2$fail_conv)){unlist(mapply(sGenCalc,loga=dfa$mode[dfa$model=="hmmab2"&dfa$method=="MLE"],
           Smsy=dfsmsy$mode[dfsmsy$model=="hmmab2"&dfsmsy$method=="MLE"], 
           b=1/dfsmax$mode[dfsmax$model=="hmmab2"&dfsmax$method=="MLE"]))}else{rep(NA, nrow(df))}),
      
@@ -367,7 +370,7 @@ tmb_func_comp_hmm <- function(path=".",a, u) {
 
 
     dff<-rbind(dfa,dfsmax,dfsig,dfsmsy,dfsgen,dfumsy,
-      dfaic,dfbic,)
+      dfaic,dfbic)
 
   return(dff)
 
