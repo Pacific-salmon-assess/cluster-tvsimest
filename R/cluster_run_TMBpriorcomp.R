@@ -40,9 +40,9 @@ res <- get_slurm_out(sjobtmb, outtype = 'table', wait = TRUE)
 
 #AFTER JOB IS DONE IMPORT  the results
 
-saveRDS(res[res$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resbase1.rds")
-saveRDS(res[res$scenario%in%simPars$scenario[floor(nrow(simPars)/2+1):nrow(simPars)],], file = "resbase2.rds")
-saveRDS(res, file = "resbase.rds")
+saveRDS(res[res$scenario%in%simPars$scenario[seq_len(nrow(simPars)/2)],], file = "resprior_comp1.rds")
+saveRDS(res[res$scenario%in%simPars$scenario[floor(nrow(simPars)/2+1):nrow(simPars)],], file = "resprior_comp2.rds")
+saveRDS(res, file = "resprior_comp.rds")
 
 
 
