@@ -19,3 +19,8 @@ cd /fs/vnas_Hdfo/comda/caw001/Documents/pfmln/results/cluster-tvsimest/_rslurm_T
 . --vanilla slurm_run.R )
 
 
+
+cd /gpfs/fs7/dfo/hpcmc/pfm/spfm100/caw001/cluster-tvsimest/_rslurm_TMBrun
+(export TMPDIR="/home/caw001/Documents/tvsimest/stantmp" ;
+export R_LIBS_USER='/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.3';
+ /usr/bin/Rscript --vanilla slurm_run.R )

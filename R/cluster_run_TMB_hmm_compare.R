@@ -34,8 +34,8 @@ pars<-data.frame(path="..",
 sjobtmb <- slurm_apply(tmb_func_comp_hmm, pars, jobname = 'TMBrun',
                     nodes = 300, cpus_per_node = 1, submit = FALSE,
                     pkgs=c("samEst"),
-                    rscript_path = "/home/Documents/pfmln/results/cluster-tvsimest",
-                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/caw001/Rlib/4.1",
+                    rscript_path = "/gpfs/fs7/dfo/hpcmc/pfm/spfm100/caw001/cluster-tvsimest",
+                    libPaths="/gpfs/fs7/dfo/hpcmc/pfm/spfm100/R_4.3_ubuntu2404/x86_64-pc-linux-gnu-library/4.3",
                     global_objects=c("simPars"))
 
 
@@ -57,7 +57,18 @@ saveRDS(res, file = "resbase.rds")
 
 
 #============================================================================
-#sensitivity a scenarios
+#hmmm with smax
+
+source("R/tmb_func_comp_hmm_smax.R")
+
+
+tst1<-tmb_func_comp_hmm_smax(path=".",
+  a=7,
+  u=696)
+
+
+
+
 library(rslurm)
 library(samEst)
 source("R/tmb_func.R")
