@@ -146,46 +146,38 @@ df$scentrend<-dplyr::case_match(df$scenario,
 unique(df$model)
 
 
-df$model<-factor(df$model,levels=c("simple",
-                                   "autocorr", 
-                                   "rwa",
-                                   "hmma",
-                                   "rwb",
-                                   "hmmb",
-                                   "rwab",
-                                   "hmmab"  ))
+df$model<-factor(df$model,levels=c("hmma","hmma2","hmmb","hmmb2","hmmab","hmmab2" ))
 
 
-df$model2<-dplyr::case_match(df$model, 
-     "simple"~"stationary",
-     "autocorr"~"autocorr", 
-     "rwa"~"rw.a",
-     "hmma"~"hmm.a",
-     "rwb"~"rw.b",
-     "hmmb"~"hmm.b",
-     "rwab"~"rw.ab",
-     "hmmab"~"hmm.ab" 
+df$model2<-dplyr::case_match(df$model,
+      "hmma"~"hmm.a",
+      "hmma2"~"hmm.a",
+      "hmmb"~"hmm.b",
+      "hmmb2"~"hmm.b",
+      "hmmab"~"hmm.ab",
+      "hmmab2"~"hmm.ab"
       )   
 
+df$version<-dplyr::case_match(df$model,
+                             "hmma"~"logb",
+                             "hmma2"~"smax",
+                             "hmmb"~"logb",
+                             "hmmb2"~"smax",
+                             "hmmab"~"logb",
+                             "hmmab2"~"smax"
+)   
 
-df$model2<-factor(df$model2,levels=c("stationary",
-                                   "autocorr", 
-                                   "rw.a",
-                                   "hmm.a",
-                                   "rw.b",
-                                   "hmm.b",
-                                   "rw.ab",
-                                   "hmm.ab"  ))
+
 
 
 
 summarydf  <- df %>%
    group_by(scenario,parameter,
-    method,model,model2,by,variable,scencode,scentype,scentrend,scendesc) %>%
+    method,model,model2,by,variable,scentype,scentrend,scendesc,version) %>%
    reframe(qs = quantile(value, c(0.025, .5, 0.975),na.rm=T), prob = c("lower","median", "upper"))
 
 summarydf <- reshape2::dcast(data=summarydf,  
-    scenario + parameter + method + model +model2 + by + variable + scencode + scentype +scentrend +scendesc~ prob, 
+    scenario + parameter + method + model +model2 + by + variable + scentype +scentrend +scendesc +version~ prob, 
     value.var= "qs",fun.aggregate=mean)
 
 #==================================================================================
@@ -287,10 +279,10 @@ summarydf_alpha<-summarydf[summarydf$parameter=="logalpha"&
 summarydf_alpha_sim<-summarydf[summarydf$parameter=="logalpha"&
                                 summarydf$variable=="sim", ]
 
-meancvdf_alpha<-meancvdf[meancvdf$parameter=="logalpha", ]
-
+#meancvdf_alpha<-meancvdf[meancvdf$parameter=="logalpha", ]
+head(summarydf_alpha)
 alphabase<-ggplot() + 
-geom_pointrange(data=summarydf_alpha,aes(x=by-54,y= median,ymin = lower, ymax = upper, col=method),alpha=.6)+
+geom_pointrange(data=summarydf_alpha,aes(x=by-54,y= median,ymin = lower, ymax = upper, col=version),alpha=.6)+
 geom_line(data=summarydf_alpha_sim,aes(x=by-54,y= median),color="black", alpha=.6,linewidth=1.2)+
 scale_color_viridis_d(begin=.1, end=.8) +
 scale_fill_viridis_d(begin=.1, end=.8) +
@@ -300,7 +292,7 @@ ylab(expression(log(alpha))) +
 xlab("year") +
 facet_grid(scentype+scendesc~model2, scales="free_y")
 alphabase
-ggsave("figures/hmm0compare/comparehmm_all_single.png",
+ggsave("figures/hmm_compare/comparehmm_all_single.png",
     plot=alphabase, width = 15,height = 18 )
 #ggsave("../Best-Practices-time-varying-salmon-SR-models/figures/MCMC_MLE_comp/base/compareMCMC_MLE_alpha_base.png",
 #    plot=alphabase, width = 15,height = 18 )
@@ -320,7 +312,7 @@ summarydf_smax_sim<-summarydf[summarydf$parameter=="smax"&
 
 smaxbase<-ggplot() + 
 geom_pointrange(data=summarydf_smax,aes(x=by-54,y=median/1000,ymin =lower/1000,
-   ymax = upper/1000, col=method),alpha=.6)+
+   ymax = upper/1000, col=version),alpha=.6)+
 geom_line(data=summarydf_smax_sim,aes(x=by-54,y= median/1000),color="black", 
     alpha=.6,linewidth=1.2)+
 scale_color_viridis_d(begin=.1, end=.8) +
@@ -331,7 +323,7 @@ xlab("year") +
 coord_cartesian(ylim = c(60000,400000)/1000)+ 
 facet_grid(scentype+scendesc~model2, scales="free_y")
 smaxbase
-ggsave("figures/MCMC_MLE_comp/base/compareMCMC_MLE_smax_base.png",
+ggsave("figures/hmm_compare/comparehmm_smax.png",
     plot=smaxbase, width = 15,height = 18)
 #ggsave("../Best-Practices-time-varying-salmon-SR-models/figures/MCMC_MLE_comp/base/compareMCMC_MLE_smax_base.png",
 #    plot=smaxbase, width = 15,height = 18)
