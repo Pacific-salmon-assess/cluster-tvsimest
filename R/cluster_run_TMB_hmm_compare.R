@@ -60,11 +60,11 @@ saveRDS(res, file = "resbase.rds")
 #compare Smax scripts with smax
 library(rslurm)
 library(samEst)
-source("R/tmb_func_comp_hmm_smax.R")
+source("R/tmb_func_comp_smax.R")
 
 simPars <- read.csv("data/generic/SimPars.csv")
 
-tst1<-tmb_func_comp_hmm_smax(path=".",
+tst1<-tmb_func_comp_smax(path=".",
   a=7,
   u=696)
 
