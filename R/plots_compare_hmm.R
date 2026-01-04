@@ -42,52 +42,17 @@ scenNames <- unique(simPar$scenario)
 restmb<-readRDS(file = "outs/simeval_results/res_hmm_compare.rds")
 
 
-unique(res$parameter)
-#res<-resstan
+unique(restmb$parameter)
+res<-restmb
 res$parameter[res$parameter=="Smax"]<-"smax"
-res$parameter[res$parameter=="alpha"]<-"logalpha"
 resparam<-res[res$parameter%in%c("logalpha","smax","smsy","sgen","umsy"),]
 
 #exclude outliers
 
 resparam$convergence[resparam$parameter=="alpha"&resparam$mode>40]<-1
 resparam$convergence[resparam$parameter=="smax"&resparam$mode>1e8]<-1
+sum(resparam$convergence)/length(resparam$convergence)
 
-
-
-convstat<-aggregate(resparam$convergence,
-    list(scenario=resparam$scenario,
-        model=resparam$model,
-        method=resparam$method,
-        iteration=resparam$iteration),
-    function(x){sum(x)})
-convstatMLE<-convstat[convstat$x==0&convstat$method=="MLE",]
-convstatMCMC<-convstat[convstat$x==0&convstat$method=="MCMC",]
-
-
-allconv<-inner_join(convstatMLE[,-3], convstatMCMC[,-3])
-
-convsum<-aggregate(allconv$iteration,
-    list(model=allconv$model,scenario=allconv$scenario),
-    function(x){length(unique(x))})
-
-conv_iter<-aggregate(allconv$iteration,
-    list(model=allconv$model,scenario=allconv$scenario),
-    function(x){(unique(x))})
-
-convsnc<-as.numeric(rownames(convsum))
-
-resl<-list()
-for(i in seq_along(convsnc)){
-
-    sel<-conv_iter[convsnc[i],]
-    resl[[i]]<-resparam %>% filter(model==sel$model&
-                            scenario==sel$scenario&
-                            iteration%in%sel$x[[1]])
-    
-}
-
-resparam<-as.data.frame(data.table::rbindlist(resl))
 
 
 #========================================================================================================
@@ -96,6 +61,19 @@ resparam<-as.data.frame(data.table::rbindlist(resl))
 
 df<-reshape2::melt(resparam, id.vars=c("parameter","iteration","scenario","method","model","by", 
                                       "convergence","conv_warning","pbias","bias"))
+unique(df$scenario)
+df<-df[df$scenario%in%c("stationary",
+                          "autocorr",
+                          "sigmaShift",
+                          "decLinearProd",
+                          "sineProd", 
+                          "regimeProd", 
+                          "shiftProd",                       
+                          "decLinearCap",
+                          "regimeCap",
+                          "shiftCap",                      
+                          "regimeProdCap",         
+                          "decLinearProdshiftCap"  ),]
 
 
 df$scenario<-factor(df$scenario,levels=c("stationary",
@@ -111,25 +89,7 @@ df$scenario<-factor(df$scenario,levels=c("stationary",
                                         "regimeProdCap",         
                                         "decLinearProdshiftCap"  ))
 
-#df$scencode<-dplyr::case_match(df$scenario, 
-#      "stationary"~"Base1",
-#      "autocorr"~"Base2",
-#      "sigmaShift"~"Base3", 
-#      "decLinearProd"~"Base4",
-#      "sineProd"~"Base5",
-#      "regimeProd"~"Base6",
-#      "shiftProd"~"Base7",
-#      "decLinearCap"~"Base8",
-#      "regimeCap"~"Base9",
-#      "shiftCap"~"Base10", 
-#      "regimeProdCap"~"Base11",
-#      "decLinearProdshiftCap"~"Base12"
-#      )   
 
-#df$scencode <-factor(df$scencode, levels=c("Base1","Base2","Base3",
-#             "Base4","Base5","Base6",
-#              "Base7","Base8","Base9",
-#               "Base10","Base11","Base12"))
 
 df$scentype<-dplyr::case_match(df$scenario, 
       "stationary"~"stationary",
@@ -182,6 +142,8 @@ df$scentrend<-dplyr::case_match(df$scenario,
       "regimeProdCap"~"shift",
       "decLinearProdshiftCap"~"trend & shift"
       )   
+
+unique(df$model)
 
 
 df$model<-factor(df$model,levels=c("simple",
@@ -338,7 +300,7 @@ ylab(expression(log(alpha))) +
 xlab("year") +
 facet_grid(scentype+scendesc~model2, scales="free_y")
 alphabase
-ggsave("figures/MCMC_MLE_comp/base/compareMCMC_MLE_alpha_base.png",
+ggsave("figures/hmm0compare/comparehmm_all_single.png",
     plot=alphabase, width = 15,height = 18 )
 #ggsave("../Best-Practices-time-varying-salmon-SR-models/figures/MCMC_MLE_comp/base/compareMCMC_MLE_alpha_base.png",
 #    plot=alphabase, width = 15,height = 18 )
