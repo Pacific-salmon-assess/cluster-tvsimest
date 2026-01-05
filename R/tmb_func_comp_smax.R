@@ -86,6 +86,9 @@ tmb_func_comp_smax <- function(path=".",a, u) {
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
+ aaa<- ricker_rw_TMB_logb(data=df, tv.par='both',sigb_p_sd=.4,
+                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)
+
   ptvab3 <- tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    Smax_mean=Smax_mean, Smax_sd=Smax_sd, deltaEDF=0.0001, silent=TRUE)},
                                   error=function(cond){
@@ -312,10 +315,10 @@ tmb_func_comp_smax <- function(path=".",a, u) {
                  ifelse(is.null(pac2$fail_conv),pac2$sig,NA),
                  ifelse(is.null(pac3$fail_conv),pac3$sigma,NA),
                  ifelse(is.null(ptva$fail_conv),ptva$sigma,NA),
-                 ifelse(is.null(ptva3$fail_conv),ptva$sigma,NA),
+                 ifelse(is.null(ptva3$fail_conv),ptva3$sigma,NA),
                  ifelse(is.null(ptvb$fail_conv),ptvb$sigma,NA),
-                 ifelse(is.null(ptvb3$fail_conv),ptvb$sigma,NA),
-                 ifelse(is.null(ptvab$fail_conv),ptvab$sigma,NA),
+                 ifelse(is.null(ptvb3$fail_conv),ptvb3$sigma,NA),
+                 ifelse(is.null(ptvab$fail_conv),ptvab3$sigma,NA),
 
                  ifelse(is.null(ptvab3$fail_conv),ptvab$sigma,NA),
 
@@ -367,8 +370,7 @@ tmb_func_comp_smax <- function(path=".",a, u) {
     dfsig$bias <- (dfsig$mode-dfsig$sim)
 
               
-   
-
+  
     dff<-rbind(dfa,dfsmax,dfsig)
 
   return(dff)
