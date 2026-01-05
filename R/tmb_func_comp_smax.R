@@ -159,7 +159,7 @@ tmb_func_comp_smax <- function(path=".",a, u) {
                     if(!is.null(ptva$fail_conv)){rep(NA, nrow(df))}else{ptva$logalpha},
                     if(!is.null(ptva3$fail_conv)){rep(NA, nrow(df))}else{ptva3$logalpha},
                     if(!is.null(ptvb$fail_conv)){rep(NA, nrow(df))}else{ptvb$logalpha},
-                    rep(if(!is.null(ptvb3$fail_conv)){rep(NA, nrow(df))}else{ptvb3$logalpha}, nrow(df)),
+                    rep(if(!is.null(ptvb3$fail_conv)){NA}else{ptvb3$logalpha}, nrow(df)),
                     if(!is.null(ptvab$fail_conv)){rep(NA, nrow(df))}else{ptvab$logalpha},
                     if(!is.null(ptvab3$fail_conv)){rep(NA, nrow(df))}else{ptvab3$logalpha},
                    if(!is.null(phmma2$fail_conv)){rep(NA, nrow(df))}else{phmma2$logalpha[phmma2$regime]},

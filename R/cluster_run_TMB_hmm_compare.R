@@ -66,8 +66,8 @@ source("R/tmb_func_comp_smax.R")
 simPars <- read.csv("data/generic/SimPars.csv")
 
 tst1<-tmb_func_comp_smax(path=".",
-  a=1,
-  u=515)
+  a=11,
+  u=235)
 
 
 pars<-data.frame(path="..",
