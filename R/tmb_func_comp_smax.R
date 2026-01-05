@@ -315,9 +315,9 @@ tmb_func_comp_smax <- function(path=".",a, u) {
                  ifelse(is.null(ptva3$fail_conv),ptva3$sigma,NA),
                  ifelse(is.null(ptvb$fail_conv),ptvb$sigma,NA),
                  ifelse(is.null(ptvb3$fail_conv),ptvb3$sigma,NA),
-                 ifelse(is.null(ptvab$fail_conv),ptvab3$sigma,NA),
+                 ifelse(is.null(ptvab$fail_conv),ptvab$sigma,NA),
 
-                 ifelse(is.null(ptvab3$fail_conv),ptvab$sigma,NA),
+                 ifelse(is.null(ptvab3$fail_conv),ptvab3$sigma,NA),
 
         
                  ifelse(is.null(phmma2$fail_conv),phmma2$sigma,NA),
