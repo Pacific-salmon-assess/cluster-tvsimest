@@ -86,9 +86,6 @@ tmb_func_comp_smax <- function(path=".",a, u) {
                                     return(list(fail_conv=1,
                                       conv_problem=1))})
 
- aaa<- ricker_rw_TMB_logb(data=df, tv.par='both',sigb_p_sd=.4,
-                   logb_p_mean=logbeta_pr,logb_p_sd=logbeta_pr_sig, deltaEDF=0.0001, silent=TRUE)
-
   ptvab3 <- tryCatch({ricker_rw_TMB(data=df, tv.par='both',sigb_p_sd=.4,
                    Smax_mean=Smax_mean, Smax_sd=Smax_sd, deltaEDF=0.0001, silent=TRUE)},
                                   error=function(cond){
